@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DepedencyContainer", "DepedencyContainer\DepedencyContainer.csproj", "{AECF582D-E881-4F1B-9C73-09FC17BFB256}"
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Solution.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AECF582D-E881-4F1B-9C73-09FC17BFB256}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AECF582D-E881-4F1B-9C73-09FC17BFB256}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AECF582D-E881-4F1B-9C73-09FC17BFB256}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AECF582D-E881-4F1B-9C73-09FC17BFB256}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
