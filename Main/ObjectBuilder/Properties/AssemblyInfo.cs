@@ -25,6 +25,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Microsoft ObjectBuilder Application Block")]
 [assembly: AssemblyTitle("Microsoft.Practices.ObjectBuilder")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyVersion("1.0.51205.0")]
+[assembly: AssemblyVersion("1.0.51206.0")]
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(true)]
