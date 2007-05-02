@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DepedencyContainer", "DepedencyContainer\DepedencyContainer.csproj", "{AECF582D-E881-4F1B-9C73-09FC17BFB256}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyContainer", "DependencyContainer\DependencyContainer.csproj", "{AECF582D-E881-4F1B-9C73-09FC17BFB256}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
