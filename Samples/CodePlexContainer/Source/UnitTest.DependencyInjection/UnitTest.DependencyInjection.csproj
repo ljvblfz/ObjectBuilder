@@ -1,0 +1,104 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BDBD6BA1-7B8C-4A8C-BB8F-9BF23CE2884C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CodePlex.DependencyInjection</RootNamespace>
+    <AssemblyName>UnitTest.DependencyInjection</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.2.6.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\3rdParty\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DependencyContainerTest.cs" />
+    <Compile Include="ObjectBuilder\BuilderBaseFixture.cs" />
+    <Compile Include="ObjectBuilder\BuilderCodeTests.cs" />
+    <Compile Include="ObjectBuilder\BuilderConfigTests.cs" />
+    <Compile Include="ObjectBuilder\BuilderContextFixture.cs" />
+    <Compile Include="ObjectBuilder\BuilderFixture.cs" />
+    <Compile Include="ObjectBuilder\Configuration\ObjectBuilderXmlConfig.cs">
+      <DependentUpon>ObjectBuilderXmlConfig.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ObjectBuilder\Configuration\ObjectBuilderXmlConfig.Generated.cs" />
+    <Compile Include="ObjectBuilder\Lifetime\LifetimeContainerFixture.cs" />
+    <Compile Include="ObjectBuilder\Location\LocatorFixture.cs" />
+    <Compile Include="ObjectBuilder\Location\ReadOnlyLocatorFixture.cs" />
+    <Compile Include="ObjectBuilder\MockBuilderContext.cs" />
+    <Compile Include="ObjectBuilder\Strategies\BuilderAware\BuilderAwareStrategyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Creation\ConstructorPolicyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Creation\ConstructorReflectionStrategyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Creation\CreationStrategyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Creation\DefaultCreationPolicyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Method\MethodExecutionStrategyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Method\MethodReflectionStrategyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Parameters\CloneableParameterFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Parameters\CreationParameterFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Parameters\LookupParameterFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Parameters\ValueParameterFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Property\PropertyReflectionStrategyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Property\PropertySetterStrategyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Singleton\SingletonStrategyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\TypeMapping\SimpleTypeMappingPolicyFixture.cs" />
+    <Compile Include="ObjectBuilder\Strategies\TypeMapping\TypeMappingStrategyFixture.cs" />
+    <Compile Include="ObjectBuilder\Utility\DependencyResolverFixture.cs" />
+    <Compile Include="ObjectBuilder\Utility\PolicyListFixture.cs" />
+    <Compile Include="ObjectBuilder\Utility\WeakRefDictionaryFixture.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DependencyInjection\DependencyInjection.csproj">
+      <Project>{4A3B5699-E4E2-4A3A-A772-7697A2437B07}</Project>
+      <Name>DependencyInjection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UnitTestUtility\UnitTestUtility.csproj">
+      <Project>{4C4BC0F4-A198-43DA-B743-A76D22C75BD5}</Project>
+      <Name>UnitTestUtility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ObjectBuilder\Configuration\ObjectBuilderXmlConfig.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="ObjectBuilder\Configuration\ObjectBuilderXmlConfig.xsx">
+      <DependentUpon>ObjectBuilderXmlConfig.xsd</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
