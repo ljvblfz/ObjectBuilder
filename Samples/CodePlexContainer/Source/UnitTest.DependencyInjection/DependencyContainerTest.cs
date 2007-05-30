@@ -68,6 +68,30 @@ namespace CodePlex.DependencyInjection
             Assert.Equal("foo", existingObject.Name);
         }
 
+        [Test]
+        public void NestedContainerCanReturnObjectsFromInnerContainer()
+        {
+            DependencyContainer innerContainer = new DependencyContainer();
+            DependencyContainer outerContainer = new DependencyContainer(innerContainer);
+            innerContainer.RegisterSingletonInstance("Hello world");
+
+            string result = outerContainer.Get<string>();
+
+            Assert.Equal("Hello world", result);
+        }
+
+        [Test]
+        public void SettingTypeMappingOnInnerContainerAffectsOuterContainer()
+        {
+            DependencyContainer innerContainer = new DependencyContainer();
+            DependencyContainer outerContainer = new DependencyContainer(innerContainer);
+            innerContainer.RegisterTypeMapping<ISingletonObject, SingletonObject>();
+
+            ISingletonObject result = outerContainer.Get<ISingletonObject>();
+
+            Assert.IsType<SingletonObject>(result);
+        }
+
         interface ISingletonObject {}
 
         class SingletonObject : ISingletonObject {}

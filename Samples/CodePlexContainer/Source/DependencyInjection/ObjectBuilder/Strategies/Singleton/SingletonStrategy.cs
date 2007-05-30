@@ -13,7 +13,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             DependencyResolutionLocatorKey key = new DependencyResolutionLocatorKey(typeToBuild, idToBuild);
 
-            if (context.Locator != null && context.Locator.Contains(key, SearchMode.Local))
+            if (context.Locator != null && context.Locator.Contains(key, SearchMode.Up))
                 return context.Locator.Get(key);
 
             return base.BuildUp(context, typeToBuild, existing, idToBuild);
