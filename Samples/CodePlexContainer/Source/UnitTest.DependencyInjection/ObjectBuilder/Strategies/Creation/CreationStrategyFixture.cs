@@ -20,13 +20,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void CreationStrategyUsesSingletonPolicyToLocateCreatedItems()
         {
             MockBuilderContext ctx = CreateContext();
-            ILifetimeContainer container = ctx.Locator.Get<ILifetimeContainer>();
             ctx.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             ctx.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
 
             object obj = ctx.HeadOfChain.BuildUp(ctx, typeof(object), null, null);
 
-            Assert.AreEqual(1, container.Count);
+            Assert.AreEqual(1, ctx.Lifetime.Count);
             Assert.AreSame(obj, ctx.Locator.Get(new DependencyResolutionLocatorKey(typeof(object), null)));
         }
 
@@ -34,14 +33,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void CreationStrategyOnlyLocatesItemIfSingletonPolicySetForThatType()
         {
             MockBuilderContext ctx = CreateContext();
-            ILifetimeContainer container = ctx.Locator.Get<ILifetimeContainer>();
             ctx.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             ctx.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
             ctx.Policies.Set<ISingletonPolicy>(new SingletonPolicy(false), typeof(object), null);
 
-            object obj = ctx.HeadOfChain.BuildUp(ctx, typeof(object), null, null);
+            ctx.HeadOfChain.BuildUp(ctx, typeof(object), null, null);
 
-            Assert.AreEqual(0, container.Count);
+            Assert.AreEqual(0, ctx.Lifetime.Count);
             Assert.IsNull(ctx.Locator.Get(new DependencyResolutionLocatorKey(typeof(object), null)));
         }
 
@@ -49,13 +47,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void AllCreatedDependenciesArePlacedIntoLocatorAndLifetimeContainer()
         {
             MockBuilderContext ctx = CreateContext();
-            ILifetimeContainer container = ctx.Locator.Get<ILifetimeContainer>();
             ctx.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             ctx.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
 
             MockDependingObject obj = (MockDependingObject)ctx.HeadOfChain.BuildUp(ctx, typeof(MockDependingObject), null, null);
 
-            Assert.AreEqual(2, container.Count);
+            Assert.AreEqual(2, ctx.Lifetime.Count);
             Assert.AreSame(obj, ctx.Locator.Get(new DependencyResolutionLocatorKey(typeof(MockDependingObject), null)));
             Assert.AreSame(obj.DependentObject, ctx.Locator.Get(new DependencyResolutionLocatorKey(typeof(MockDependentObject), null)));
         }
@@ -64,7 +61,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void InjectedDependencyIsReusedWhenDependingObjectIsCreatedTwice()
         {
             MockBuilderContext ctx = CreateContext();
-            ILifetimeContainer container = ctx.Locator.Get<ILifetimeContainer>();
             ctx.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             ctx.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
 
@@ -78,14 +74,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void NamedObjectsOfSameTypeAreUnique()
         {
             MockBuilderContext ctx = CreateContext();
-            ILifetimeContainer container = ctx.Locator.Get<ILifetimeContainer>();
             ctx.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             ctx.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
 
             object obj1 = ctx.HeadOfChain.BuildUp(ctx, typeof(object), null, "Foo");
             object obj2 = ctx.HeadOfChain.BuildUp(ctx, typeof(object), null, "Bar");
 
-            Assert.AreEqual(2, container.Count);
+            Assert.AreEqual(2, ctx.Lifetime.Count);
             Assert.IsFalse(ReferenceEquals(obj1, obj2));
         }
 
@@ -93,7 +88,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void CircularDependenciesCanBeResolved()
         {
             MockBuilderContext ctx = CreateContext();
-            ILifetimeContainer container = ctx.Locator.Get<ILifetimeContainer>();
             ctx.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             ctx.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
 
@@ -103,7 +97,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             Assert.IsNotNull(d1.Depends2);
             Assert.IsNotNull(d1.Depends2.Depends1);
             Assert.AreSame(d1, d1.Depends2.Depends1);
-            Assert.AreEqual(2, container.Count);
+            Assert.AreEqual(2, ctx.Lifetime.Count);
         }
 
         [Test]
@@ -111,7 +105,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void CreatingAbstractTypeThrows()
         {
             MockBuilderContext ctx = CreateContext();
-            ILifetimeContainer container = ctx.Locator.Get<ILifetimeContainer>();
             ctx.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             ctx.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
 
@@ -152,14 +145,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void CreationStrategyWillLocateExistingObjects()
         {
             MockBuilderContext ctx = CreateContext();
-            ILifetimeContainer container = ctx.Locator.Get<ILifetimeContainer>();
             ctx.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             ctx.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
             object obj = new object();
 
             ctx.HeadOfChain.BuildUp(ctx, typeof(object), obj, null);
 
-            Assert.AreEqual(1, container.Count);
+            Assert.AreEqual(1, ctx.Lifetime.Count);
             Assert.AreSame(obj, ctx.Locator.Get(new DependencyResolutionLocatorKey(typeof(object), null)));
         }
 
@@ -168,47 +160,20 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void IncompatibleTypesThrows()
         {
             MockBuilderContext ctx = CreateContext();
-            ILifetimeContainer container = ctx.Locator.Get<ILifetimeContainer>();
             ConstructorInfo ci = typeof(MockObject).GetConstructor(new Type[] { typeof(int) });
             ICreationPolicy policy = new ConstructorPolicy(ci, new ValueParameter<string>(String.Empty));
-            ctx.Policies.Set<ICreationPolicy>(policy, typeof(MockObject), null);
+            ctx.Policies.Set(policy, typeof(MockObject), null);
 
-            object obj = ctx.HeadOfChain.BuildUp(ctx, typeof(MockObject), null, null);
-        }
-
-        [Test]
-        public void CreationPolicyWillRecordSingletonsUsingLocalLifetimeContainerOnly()
-        {
-            BuilderStrategyChain chain = new BuilderStrategyChain();
-            chain.Add(new CreationStrategy());
-
-            Locator parentLocator = new Locator();
-            LifetimeContainer container = new LifetimeContainer();
-            parentLocator.Add(typeof(ILifetimeContainer), container);
-
-            Locator childLocator = new Locator(parentLocator);
-
-            PolicyList policies = new PolicyList();
-            policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
-            policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
-
-            BuilderContext ctx = new BuilderContext(chain, childLocator, policies);
-
-            object obj = ctx.HeadOfChain.BuildUp(ctx, typeof(object), null, null);
-
-            Assert.IsNotNull(obj);
-            Assert.IsNull(childLocator.Get(new DependencyResolutionLocatorKey(typeof(object), null)));
+            ctx.HeadOfChain.BuildUp(ctx, typeof(MockObject), null, null);
         }
 
         #region Helpers
 
         class MockObject
         {
-            int foo;
-
             public MockObject(int foo)
             {
-                this.foo = foo;
+                foo = foo + 1;
             }
         }
 
@@ -230,18 +195,15 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
         }
 
-        MockBuilderContext CreateContext()
+        static MockBuilderContext CreateContext()
         {
             MockBuilderContext result = new MockBuilderContext();
-            result.InnerChain.Add(new SingletonStrategy());
-            result.InnerChain.Add(new CreationStrategy());
+            result.Strategies.Add(new SingletonStrategy());
+            result.Strategies.Add(new CreationStrategy());
             return result;
         }
 
-        abstract class AbstractClass
-        {
-            public AbstractClass() {}
-        }
+        abstract class AbstractClass {}
 
         class MockDependingObject
         {

@@ -149,10 +149,9 @@ namespace CodePlex.DependencyInjection
                                            string idToBuild)
             {
                 object obj = base.BuildUp(context, typeToBuild, existing, idToBuild);
-                ILifetimeContainer lifetime = context.Locator.Get<ILifetimeContainer>();
 
-                if (lifetime != null)
-                    lifetime.Add(obj);
+                if (context.Lifetime != null)
+                    context.Lifetime.Add(obj);
 
                 return obj;
             }

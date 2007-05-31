@@ -102,7 +102,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             // Mode 2, with an existing object
             MockBuilderContext context = CreateContext();
             object dependent = new object();
-            context.InnerLocator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
+            context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
 
             object depending = context.HeadOfChain.BuildUp(context, typeof(MockDependingObject), null, null);
 
@@ -160,7 +160,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             // Mode 3, with an existing object
             MockBuilderContext context = CreateContext();
             object dependent = new object();
-            context.InnerLocator.Add(new DependencyResolutionLocatorKey(typeof(object), "Foo"), dependent);
+            context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), "Foo"), dependent);
 
             object depending = context.HeadOfChain.BuildUp(context, typeof(MockDependingNamedObject), null, null);
 
@@ -215,7 +215,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             MockBuilderContext context = CreateContext();
             object dependent = new object();
-            context.InnerLocator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
+            context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
 
             MockDependingNamedObject depending = (MockDependingNamedObject)context.HeadOfChain.BuildUp(context, typeof(MockDependingNamedObject), null, null);
 
@@ -242,7 +242,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             // Mode 4, with an existing object
             MockBuilderContext context = CreateContext();
             object dependent = new object();
-            context.InnerLocator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
+            context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
 
             object depending = context.HeadOfChain.BuildUp(context, typeof(MockOptionalDependingObject), null, null);
 
@@ -271,7 +271,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             // Mode 5, with an existing object
             MockBuilderContext context = CreateContext();
             object dependent = new object();
-            context.InnerLocator.Add(new DependencyResolutionLocatorKey(typeof(object), "Foo"), dependent);
+            context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), "Foo"), dependent);
 
             object depending = context.HeadOfChain.BuildUp(context, typeof(MockOptionalDependingObjectWithName), null, null);
 
@@ -349,10 +349,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         MockBuilderContext CreateContext(IReadWriteLocator locator)
         {
             MockBuilderContext result = new MockBuilderContext(locator);
-            result.InnerChain.Add(new SingletonStrategy());
-            result.InnerChain.Add(new MethodReflectionStrategy());
-            result.InnerChain.Add(new CreationStrategy());
-            result.InnerChain.Add(new MethodExecutionStrategy());
+            result.Strategies.Add(new SingletonStrategy());
+            result.Strategies.Add(new MethodReflectionStrategy());
+            result.Strategies.Add(new CreationStrategy());
+            result.Strategies.Add(new MethodExecutionStrategy());
             result.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             result.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
             return result;

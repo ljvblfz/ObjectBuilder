@@ -5,6 +5,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         // Fields
 
         IBuilderStrategyChain chain;
+        ILifetimeContainer lifetime;
         IReadWriteLocator locator;
         PolicyList policies;
 
@@ -14,10 +15,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         public BuilderContext(IBuilderStrategyChain chain,
                               IReadWriteLocator locator,
+                              ILifetimeContainer lifetime,
                               PolicyList policies)
         {
             this.chain = chain;
             this.locator = locator;
+            this.lifetime = lifetime;
             this.policies = new PolicyList(policies);
         }
 
@@ -26,6 +29,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public IBuilderStrategy HeadOfChain
         {
             get { return chain.Head; }
+        }
+
+        public ILifetimeContainer Lifetime
+        {
+            get { return lifetime; }
         }
 
         public IReadWriteLocator Locator

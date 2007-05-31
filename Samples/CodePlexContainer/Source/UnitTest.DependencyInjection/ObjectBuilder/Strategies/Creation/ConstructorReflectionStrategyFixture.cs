@@ -1,14 +1,14 @@
-using System;
 using NUnit.Framework;
+using Assert=CodePlex.NUnitExtensions.Assert;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     // These "modes" describe the classed of behavior provided by DI.
-    // 1. I need a new X. Don'typeToBuild reuse any existing ones.
-    // 2. I need the unnamed X. Create it if it doesn'typeToBuild exist, else return the existing one.
-    // 3. I need the X named Y. Create it if it doesn'typeToBuild exist, else return the existing one.
-    // 4. I want the unnamed X. Return null if it doesn'typeToBuild exist.
-    // 5. I want the X named Y. Return null if it doesn'typeToBuild exist.
+    // 1. I need a new X. Don't reuse any existing ones.
+    // 2. I need the unnamed X. Create it if it doesn't exist, else return the existing one.
+    // 3. I need the X named Y. Create it if it doesn't exist, else return the existing one.
+    // 4. I want the unnamed X. Return null if it doesn't exist.
+    // 5. I want the X named Y. Return null if it doesn't exist.
 
     [TestFixture]
     public class ConstructorReflectionStrategyFixture
@@ -20,7 +20,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             MockBuilderContext context = CreateContext();
 
-            Assert.AreEqual(0, context.HeadOfChain.BuildUp(context, typeof(int), null, null));
+            Assert.Equal(0, (int)context.HeadOfChain.BuildUp(context, typeof(int), null, null));
         }
 
         // Invalid attribute combination
@@ -53,7 +53,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockUndecoratedObject obj1 = (MockUndecoratedObject)context.HeadOfChain.BuildUp(context, typeof(MockUndecoratedObject), null, null);
             MockUndecoratedObject obj2 = (MockUndecoratedObject)context.HeadOfChain.BuildUp(context, typeof(MockUndecoratedObject), null, null);
 
-            Assert.AreSame(obj1.Foo, obj2.Foo);
+            Assert.Same(obj1.Foo, obj2.Foo);
         }
 
         [Test]
@@ -64,8 +64,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockUndecoratedConstructorObject obj1 = (MockUndecoratedConstructorObject)context.HeadOfChain.BuildUp(context, typeof(MockUndecoratedConstructorObject), null, null);
             MockUndecoratedConstructorObject obj2 = (MockUndecoratedConstructorObject)context.HeadOfChain.BuildUp(context, typeof(MockUndecoratedConstructorObject), null, null);
 
-            Assert.IsNotNull(obj1.Foo);
-            Assert.AreSame(obj1.Foo, obj2.Foo);
+            Assert.NotNull(obj1.Foo);
+            Assert.Same(obj1.Foo, obj2.Foo);
         }
 
         // Mode 1
@@ -78,11 +78,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockRequiresNewObject depending1 = (MockRequiresNewObject)context.HeadOfChain.BuildUp(context, typeof(MockRequiresNewObject), null, "Foo");
             MockRequiresNewObject depending2 = (MockRequiresNewObject)context.HeadOfChain.BuildUp(context, typeof(MockRequiresNewObject), null, "Bar");
 
-            Assert.IsNotNull(depending1);
-            Assert.IsNotNull(depending2);
-            Assert.IsNotNull(depending1.Foo);
-            Assert.IsNotNull(depending2.Foo);
-            Assert.IsFalse(ReferenceEquals(depending1.Foo, depending2.Foo));
+            Assert.NotNull(depending1);
+            Assert.NotNull(depending2);
+            Assert.NotNull(depending1.Foo);
+            Assert.NotNull(depending2.Foo);
+            Assert.False(ReferenceEquals(depending1.Foo, depending2.Foo));
         }
 
         [Test]
@@ -97,10 +97,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockRequiresNewObject depending1 = (MockRequiresNewObject)context.HeadOfChain.BuildUp(context, typeof(MockRequiresNewObject), null, null);
             MockRequiresNewObject depending2 = (MockRequiresNewObject)context.HeadOfChain.BuildUp(context, typeof(MockRequiresNewObject), null, null);
 
-            Assert.IsFalse(depending1.Foo == unnamed);
-            Assert.IsFalse(depending2.Foo == unnamed);
-            Assert.IsFalse(depending1.Foo == named);
-            Assert.IsFalse(depending2.Foo == named);
+            Assert.False(depending1.Foo == unnamed);
+            Assert.False(depending2.Foo == unnamed);
+            Assert.False(depending1.Foo == named);
+            Assert.False(depending2.Foo == named);
         }
 
         // Mode 2
@@ -111,13 +111,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             // Mode 2, with an existing object
             MockBuilderContext context = CreateContext();
             object dependent = new object();
-            context.InnerLocator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
+            context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
 
             object depending = context.HeadOfChain.BuildUp(context, typeof(MockDependingObject), null, null);
 
-            Assert.IsNotNull(depending);
-            Assert.IsTrue(depending is MockDependingObject);
-            Assert.AreSame(dependent, ((MockDependingObject)depending).InjectedObject);
+            Assert.NotNull(depending);
+            Assert.True(depending is MockDependingObject);
+            Assert.Same(dependent, ((MockDependingObject)depending).InjectedObject);
         }
 
         [Test]
@@ -129,7 +129,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockDependingObject depending1 = (MockDependingObject)context.HeadOfChain.BuildUp(context, typeof(MockDependingObject), null, null);
             MockDependingObject depending2 = (MockDependingObject)context.HeadOfChain.BuildUp(context, typeof(MockDependingObject), null, null);
 
-            Assert.AreSame(depending1.InjectedObject, depending2.InjectedObject);
+            Assert.Same(depending1.InjectedObject, depending2.InjectedObject);
         }
 
         [Test]
@@ -140,9 +140,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             object depending = context.HeadOfChain.BuildUp(context, typeof(MockDependingObject), null, null);
 
-            Assert.IsNotNull(depending);
-            Assert.IsTrue(depending is MockDependingObject);
-            Assert.IsNotNull(((MockDependingObject)depending).InjectedObject);
+            Assert.NotNull(depending);
+            Assert.True(depending is MockDependingObject);
+            Assert.NotNull(((MockDependingObject)depending).InjectedObject);
         }
 
         [Test]
@@ -154,8 +154,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockDependsOnIFoo depending = (MockDependsOnIFoo)context.HeadOfChain.BuildUp(
                                                                  context, typeof(MockDependsOnIFoo), null, null);
 
-            Assert.IsNotNull(depending);
-            Assert.IsNotNull(depending.Foo);
+            Assert.NotNull(depending);
+            Assert.NotNull(depending.Foo);
         }
 
         // Mode 3
@@ -166,13 +166,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             // Mode 3, with an existing object
             MockBuilderContext context = CreateContext();
             object dependent = new object();
-            context.InnerLocator.Add(new DependencyResolutionLocatorKey(typeof(object), "Foo"), dependent);
+            context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), "Foo"), dependent);
 
             object depending = context.HeadOfChain.BuildUp(context, typeof(MockDependingNamedObject), null, null);
 
-            Assert.IsNotNull(depending);
-            Assert.IsTrue(depending is MockDependingNamedObject);
-            Assert.AreSame(dependent, ((MockDependingNamedObject)depending).InjectedObject);
+            Assert.NotNull(depending);
+            Assert.True(depending is MockDependingNamedObject);
+            Assert.Same(dependent, ((MockDependingNamedObject)depending).InjectedObject);
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockDependingNamedObject depending1 = (MockDependingNamedObject)context.HeadOfChain.BuildUp(context, typeof(MockDependingNamedObject), null, null);
             MockDependingNamedObject depending2 = (MockDependingNamedObject)context.HeadOfChain.BuildUp(context, typeof(MockDependingNamedObject), null, null);
 
-            Assert.AreSame(depending1.InjectedObject, depending2.InjectedObject);
+            Assert.Same(depending1.InjectedObject, depending2.InjectedObject);
         }
 
         [Test]
@@ -195,8 +195,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             MockDependingNamedObject depending = (MockDependingNamedObject)context.HeadOfChain.BuildUp(context, typeof(MockDependingNamedObject), null, null);
 
-            Assert.IsNotNull(depending);
-            Assert.IsNotNull(depending.InjectedObject);
+            Assert.NotNull(depending);
+            Assert.NotNull(depending.InjectedObject);
         }
 
         [Test]
@@ -207,8 +207,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             MockDependsOnNamedIFoo depending = (MockDependsOnNamedIFoo)context.HeadOfChain.BuildUp(context, typeof(MockDependsOnNamedIFoo), null, null);
 
-            Assert.IsNotNull(depending);
-            Assert.IsNotNull(depending.Foo);
+            Assert.NotNull(depending);
+            Assert.NotNull(depending.Foo);
         }
 
         // Mode 2 & 3 together
@@ -218,11 +218,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             MockBuilderContext context = CreateContext();
             object dependent = new object();
-            context.InnerLocator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
+            context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
 
             MockDependingNamedObject depending = (MockDependingNamedObject)context.HeadOfChain.BuildUp(context, typeof(MockDependingNamedObject), null, null);
 
-            Assert.IsFalse(ReferenceEquals(dependent, depending.InjectedObject));
+            Assert.False(ReferenceEquals(dependent, depending.InjectedObject));
         }
 
         // Mode 4
@@ -235,8 +235,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             MockOptionalDependingObject depending = (MockOptionalDependingObject)context.HeadOfChain.BuildUp(context, typeof(MockOptionalDependingObject), null, null);
 
-            Assert.IsNotNull(depending);
-            Assert.IsNull(depending.InjectedObject);
+            Assert.NotNull(depending);
+            Assert.Null(depending.InjectedObject);
         }
 
         [Test]
@@ -245,13 +245,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             // Mode 4, with an existing object
             MockBuilderContext context = CreateContext();
             object dependent = new object();
-            context.InnerLocator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
+            context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), null), dependent);
 
             object depending = context.HeadOfChain.BuildUp(context, typeof(MockOptionalDependingObject), null, null);
 
-            Assert.IsNotNull(depending);
-            Assert.IsTrue(depending is MockOptionalDependingObject);
-            Assert.AreSame(dependent, ((MockOptionalDependingObject)depending).InjectedObject);
+            Assert.NotNull(depending);
+            Assert.True(depending is MockOptionalDependingObject);
+            Assert.Same(dependent, ((MockOptionalDependingObject)depending).InjectedObject);
         }
 
         // Mode 5
@@ -264,8 +264,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             MockOptionalDependingObjectWithName depending = (MockOptionalDependingObjectWithName)context.HeadOfChain.BuildUp(context, typeof(MockOptionalDependingObjectWithName), null, null);
 
-            Assert.IsNotNull(depending);
-            Assert.IsNull(depending.InjectedObject);
+            Assert.NotNull(depending);
+            Assert.Null(depending.InjectedObject);
         }
 
         [Test]
@@ -274,13 +274,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             // Mode 5, with an existing object
             MockBuilderContext context = CreateContext();
             object dependent = new object();
-            context.InnerLocator.Add(new DependencyResolutionLocatorKey(typeof(object), "Foo"), dependent);
+            context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), "Foo"), dependent);
 
             object depending = context.HeadOfChain.BuildUp(context, typeof(MockOptionalDependingObjectWithName), null, null);
 
-            Assert.IsNotNull(depending);
-            Assert.IsTrue(depending is MockOptionalDependingObjectWithName);
-            Assert.AreSame(dependent, ((MockOptionalDependingObjectWithName)depending).InjectedObject);
+            Assert.NotNull(depending);
+            Assert.True(depending is MockOptionalDependingObjectWithName);
+            Assert.Same(dependent, ((MockOptionalDependingObjectWithName)depending).InjectedObject);
         }
 
         // NotPresentBehavior.Throw Tests
@@ -339,7 +339,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             SearchLocalMockObject obj = (SearchLocalMockObject)context.HeadOfChain.BuildUp(context, typeof(SearchLocalMockObject), null, null);
 
-            Assert.AreEqual(15, obj.Value);
+            Assert.Equal(15, obj.Value);
         }
 
         // Helpers
@@ -352,9 +352,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         MockBuilderContext CreateContext(Locator locator)
         {
             MockBuilderContext result = new MockBuilderContext(locator);
-            result.InnerChain.Add(new SingletonStrategy());
-            result.InnerChain.Add(new ConstructorReflectionStrategy());
-            result.InnerChain.Add(new CreationStrategy());
+            result.Strategies.Add(new SingletonStrategy());
+            result.Strategies.Add(new ConstructorReflectionStrategy());
+            result.Strategies.Add(new CreationStrategy());
             result.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             result.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
             return result;

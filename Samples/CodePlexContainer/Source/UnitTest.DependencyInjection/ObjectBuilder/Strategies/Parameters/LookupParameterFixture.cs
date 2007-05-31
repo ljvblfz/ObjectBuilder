@@ -9,7 +9,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void ConstructorPolicyCanUseLookupToFindAnObject()
         {
             MockBuilderContext ctx = new MockBuilderContext();
-            ctx.InnerLocator.Add("foo", 11);
+            ctx.Locator.Add("foo", 11);
 
             LookupParameter param = new LookupParameter("foo");
 

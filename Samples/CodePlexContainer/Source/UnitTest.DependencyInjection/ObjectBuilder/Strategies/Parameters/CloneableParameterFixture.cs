@@ -13,7 +13,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void CloneParametersReturnsNewObjectOfCorrectType()
         {
             MockBuilderContext ctx = new MockBuilderContext();
-            ctx.InnerLocator.Add("foo", new CloneableObject());
+            ctx.Locator.Add("foo", new CloneableObject());
 
             CloneParameter cloneParam = new CloneParameter(new LookupParameter("foo"));
 

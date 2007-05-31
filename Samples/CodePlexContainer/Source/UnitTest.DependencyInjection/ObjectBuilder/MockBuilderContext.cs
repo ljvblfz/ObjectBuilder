@@ -1,24 +1,58 @@
+using System;
+
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    class MockBuilderContext : BuilderContext
+    class MockBuilderContext : IBuilderContext
     {
-        public IReadWriteLocator InnerLocator;
-        public BuilderStrategyChain InnerChain = new BuilderStrategyChain();
-        public PolicyList InnerPolicies = new PolicyList();
-        public LifetimeContainer lifetimeContainer = new LifetimeContainer();
+        // Fields
+
+        BuilderStrategyChain strategies = new BuilderStrategyChain();
+        ILifetimeContainer lifetime = new LifetimeContainer();
+        IReadWriteLocator locator;
+        PolicyList policies = new PolicyList();
+
+        // Lifetime
 
         public MockBuilderContext()
             : this(new Locator()) {}
 
         public MockBuilderContext(IReadWriteLocator locator)
         {
-            InnerLocator = locator;
-            SetLocator(InnerLocator);
-            StrategyChain = InnerChain;
-            SetPolicies(InnerPolicies);
+            this.locator = locator;
+        }
 
-            if (!Locator.Contains(typeof(ILifetimeContainer)))
-                Locator.Add(typeof(ILifetimeContainer), lifetimeContainer);
+        // Properties
+
+        public IBuilderStrategy HeadOfChain
+        {
+            get { return strategies.Head; }
+        }
+
+        public ILifetimeContainer Lifetime
+        {
+            get { return lifetime; }
+        }
+
+        public IReadWriteLocator Locator
+        {
+            get { return locator; }
+        }
+
+        public PolicyList Policies
+        {
+            get { return policies; }
+        }
+
+        public BuilderStrategyChain Strategies
+        {
+            get { return strategies; }
+        }
+
+        // Methods
+
+        public IBuilderStrategy GetNextInChain(IBuilderStrategy currentStrategy)
+        {
+            return strategies.GetNext(currentStrategy);
         }
     }
 }

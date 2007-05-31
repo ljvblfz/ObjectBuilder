@@ -12,7 +12,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = new MockBuilderContext();
             IgnorantObject obj = new IgnorantObject();
 
-            context.InnerChain.Add(strategy);
+            context.Strategies.Add(strategy);
 
             context.HeadOfChain.BuildUp(context, typeof(IgnorantObject), obj, null);
 
@@ -27,7 +27,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = new MockBuilderContext();
             IgnorantObject obj = new IgnorantObject();
 
-            context.InnerChain.Add(strategy);
+            context.Strategies.Add(strategy);
 
             context.HeadOfChain.TearDown(context, obj);
 
@@ -42,7 +42,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = new MockBuilderContext();
             AwareObject obj = new AwareObject();
 
-            context.InnerChain.Add(strategy);
+            context.Strategies.Add(strategy);
 
             context.HeadOfChain.BuildUp(context, typeof(AwareObject), obj, "foo");
 
@@ -58,7 +58,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = new MockBuilderContext();
             AwareObject obj = new AwareObject();
 
-            context.InnerChain.Add(strategy);
+            context.Strategies.Add(strategy);
 
             context.HeadOfChain.TearDown(context, obj);
 
@@ -73,7 +73,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = new MockBuilderContext();
             AwareObject obj = new AwareObject();
 
-            context.InnerChain.Add(strategy);
+            context.Strategies.Add(strategy);
 
             context.HeadOfChain.BuildUp(context, typeof(IgnorantObject), obj, null);
 

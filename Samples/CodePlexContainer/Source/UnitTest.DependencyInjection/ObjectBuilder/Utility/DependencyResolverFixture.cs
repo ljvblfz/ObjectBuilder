@@ -162,8 +162,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         MockBuilderContext CreateContext()
         {
             MockBuilderContext result = new MockBuilderContext();
-            result.InnerChain.Add(new SingletonStrategy());
-            result.InnerChain.Add(new CreationStrategy());
+            result.Strategies.Add(new SingletonStrategy());
+            result.Strategies.Add(new CreationStrategy());
             result.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             result.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
             return result;

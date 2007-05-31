@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Assert=CodePlex.NUnitExtensions.Assert;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
@@ -9,99 +10,176 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void CanAddPolicyToBagAndRetrieveIt()
         {
             PolicyList list = new PolicyList();
+            FakePolicy policy = new FakePolicy();
+            list.Set<IBuilderPolicy>(policy, typeof(object), null);
 
-            list.Set<IBuilderPolicy>(new MockPolicy(), typeof(object), null);
+            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(object), null);
 
-            Assert.IsNotNull(list.Get<IBuilderPolicy>(typeof(object), null));
+            Assert.Same(policy, result);
         }
 
         [Test]
         public void CanAddMultiplePoliciesToBagAndRetrieveThem()
         {
             PolicyList list = new PolicyList();
-            MockPolicy policy1 = new MockPolicy();
-            MockPolicy policy2 = new MockPolicy();
+            FakePolicy policy1 = new FakePolicy();
+            FakePolicy policy2 = new FakePolicy();
 
             list.Set<IBuilderPolicy>(policy1, typeof(object), "1");
             list.Set<IBuilderPolicy>(policy2, typeof(string), "2");
 
-            Assert.AreSame(policy1, list.Get<IBuilderPolicy>(typeof(object), "1"));
-            Assert.AreSame(policy2, list.Get<IBuilderPolicy>(typeof(string), "2"));
+            Assert.Same(policy1, list.Get<IBuilderPolicy>(typeof(object), "1"));
+            Assert.Same(policy2, list.Get<IBuilderPolicy>(typeof(string), "2"));
         }
 
         [Test]
         public void SetOverwritesExistingPolicy()
         {
             PolicyList list = new PolicyList();
-            MockPolicy policy1 = new MockPolicy();
-            MockPolicy policy2 = new MockPolicy();
-
+            FakePolicy policy1 = new FakePolicy();
+            FakePolicy policy2 = new FakePolicy();
             list.Set<IBuilderPolicy>(policy1, typeof(string), "1");
             list.Set<IBuilderPolicy>(policy2, typeof(string), "1");
 
-            Assert.AreSame(policy2, list.Get<IBuilderPolicy>(typeof(string), "1"));
+            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(string), "1");
+
+            Assert.Same(policy2, result);
         }
 
         [Test]
         public void CanClearPolicy()
         {
             PolicyList list = new PolicyList();
-            MockPolicy policy = new MockPolicy();
+            FakePolicy policy = new FakePolicy();
 
             list.Set<IBuilderPolicy>(policy, typeof(string), "1");
             list.Clear<IBuilderPolicy>(typeof(string), "1");
 
-            Assert.IsNull(list.Get<IBuilderPolicy>(typeof(string), "1"));
+            Assert.Null(list.Get<IBuilderPolicy>(typeof(string), "1"));
         }
 
         [Test]
         public void CanClearAllPolicies()
         {
             PolicyList list = new PolicyList();
-            list.Set<IBuilderPolicy>(new MockPolicy(), typeof(object), null);
-            list.Set<IBuilderPolicy>(new MockPolicy(), typeof(object), "1");
+            list.Set<IBuilderPolicy>(new FakePolicy(), typeof(object), null);
+            list.Set<IBuilderPolicy>(new FakePolicy(), typeof(object), "1");
 
             list.ClearAll();
 
-            Assert.AreEqual(0, list.Count);
+            Assert.Equal(0, list.Count);
         }
 
         [Test]
         public void DefaultPolicyUsedWhenSpecificPolicyIsntAvailable()
         {
             PolicyList list = new PolicyList();
-            MockPolicy defaultPolicy = new MockPolicy();
-
+            FakePolicy defaultPolicy = new FakePolicy();
             list.SetDefault<IBuilderPolicy>(defaultPolicy);
 
-            Assert.AreSame(defaultPolicy, list.Get<IBuilderPolicy>(typeof(object), null));
+            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(object), null);
+
+            Assert.Same(defaultPolicy, result);
         }
 
         [Test]
         public void SpecificPolicyOverridesDefaultPolicy()
         {
             PolicyList list = new PolicyList();
-            MockPolicy defaultPolicy = new MockPolicy();
-            MockPolicy specificPolicy = new MockPolicy();
-
+            FakePolicy defaultPolicy = new FakePolicy();
+            FakePolicy specificPolicy = new FakePolicy();
             list.Set<IBuilderPolicy>(specificPolicy, typeof(object), null);
             list.SetDefault<IBuilderPolicy>(defaultPolicy);
 
-            Assert.AreSame(specificPolicy, list.Get<IBuilderPolicy>(typeof(object), null));
+            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(object), null);
+
+            Assert.Same(specificPolicy, result);
         }
 
         [Test]
         public void CanClearDefaultPolicy()
         {
             PolicyList list = new PolicyList();
-            MockPolicy defaultPolicy = new MockPolicy();
+            FakePolicy defaultPolicy = new FakePolicy();
             list.SetDefault<IBuilderPolicy>(defaultPolicy);
-
             list.ClearDefault<IBuilderPolicy>();
 
-            Assert.IsNull(list.Get<IBuilderPolicy>(typeof(object), null));
+            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(object), null);
+
+            Assert.Null(result);
         }
 
-        class MockPolicy : IBuilderPolicy {}
+        [Test]
+        public void WillAskInnerPolicyListWhenOuterHasNoAnswer()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy policy = new FakePolicy();
+            innerList.Set(policy, typeof(object), null);
+
+            FakePolicy result = outerList.Get<FakePolicy>(typeof(object), null);
+
+            Assert.Same(policy, result);
+        }
+
+        [Test]
+        public void WillUseInnerDefaultPolicyWhenOuterHasNoAnswer()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy policy = new FakePolicy();
+            innerList.SetDefault(policy);
+
+            FakePolicy result = outerList.Get<FakePolicy>(typeof(object), null);
+
+            Assert.Same(policy, result);
+        }
+
+        [Test]
+        public void OuterPolicyOverridesInnerPolicy()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy innerPolicy = new FakePolicy();
+            FakePolicy outerPolicy = new FakePolicy();
+            innerList.Set(innerPolicy, typeof(object), null);
+            outerList.Set(outerPolicy, typeof(object), null);
+
+            FakePolicy result = outerList.Get<FakePolicy>(typeof(object), null);
+
+            Assert.Same(outerPolicy, result);
+        }
+
+        [Test]
+        public void SpecificInnerPolicyOverridesDefaultOuterPolicy()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy innerPolicy = new FakePolicy();
+            FakePolicy outerPolicy = new FakePolicy();
+            innerList.Set(innerPolicy, typeof(object), null);
+            outerList.SetDefault(outerPolicy);
+
+            FakePolicy result = outerList.Get<FakePolicy>(typeof(object), null);
+
+            Assert.Same(innerPolicy, result);
+        }
+
+        [Test]
+        public void OuterPolicyDefaultOverridesInnerPolicyDefault()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy innerPolicy = new FakePolicy();
+            FakePolicy outerPolicy = new FakePolicy();
+            innerList.SetDefault(innerPolicy);
+            outerList.SetDefault(outerPolicy);
+
+            FakePolicy result = outerList.Get<FakePolicy>(typeof(object), null);
+
+            Assert.Same(outerPolicy, result);
+        }
+
+        class FakePolicy : IBuilderPolicy {}
     }
 }

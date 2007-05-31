@@ -11,7 +11,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             MockBuilderContext ctx = new MockBuilderContext();
             NullStrategy strategy = new NullStrategy();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             CreationParameter param = new CreationParameter(typeof(object));
             param.GetValue(ctx);
@@ -25,7 +25,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             MockBuilderContext ctx = new MockBuilderContext();
             NullStrategy strategy = new NullStrategy();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             CreationParameter param = new CreationParameter(typeof(object), "foo");
             param.GetValue(ctx);

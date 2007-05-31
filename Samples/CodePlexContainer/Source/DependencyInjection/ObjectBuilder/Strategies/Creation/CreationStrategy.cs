@@ -82,7 +82,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             object[] parms = policy.GetParameters(context, type, id, constructor);
 
-            MethodBase method = (MethodBase)constructor;
+            MethodBase method = constructor;
             Guard.ValidateMethodParameters(method, parms, existing.GetType());
 
             method.Invoke(existing, parms);
@@ -96,9 +96,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             if (context.Locator == null)
                 return;
 
-            ILifetimeContainer lifetime = context.Locator.Get<ILifetimeContainer>(typeof(ILifetimeContainer), SearchMode.Local);
-
-            if (lifetime == null)
+            if (context.Lifetime == null)
                 return;
 
             ISingletonPolicy singletonPolicy = context.Policies.Get<ISingletonPolicy>(typeToBuild, idToBuild);
@@ -108,8 +106,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 lock (context.Locator)
                     context.Locator.Add(new DependencyResolutionLocatorKey(typeToBuild, idToBuild), existing);
 
-                lock (lifetime)
-                    lifetime.Add(existing);
+                lock (context.Lifetime)
+                    context.Lifetime.Add(existing);
             }
         }
     }

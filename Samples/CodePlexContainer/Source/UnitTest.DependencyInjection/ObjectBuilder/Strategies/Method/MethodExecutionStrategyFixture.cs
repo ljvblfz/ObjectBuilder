@@ -15,7 +15,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
             MockObject obj = new MockObject();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             MethodPolicy policy = new MethodPolicy();
             policy.Methods.Add("ParameterlessMethod", new MethodCallInfo("ParameterlessMethod"));
@@ -32,7 +32,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
             MockObject obj = new MockObject();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             MethodPolicy policy = new MethodPolicy();
             policy.Methods.Add("ParameterlessMethod", new MethodCallInfo("ParameterlessMethod"));
@@ -49,7 +49,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
             MockObject obj = new MockObject();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             MethodPolicy policy = new MethodPolicy();
             policy.Methods.Add("IntMethod", new MethodCallInfo("IntMethod", 32));
@@ -66,7 +66,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
             MockObject obj = new MockObject();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             MethodPolicy policy = new MethodPolicy();
             policy.Methods.Add("IntMethod", new MethodCallInfo("IntMethod", new ValueParameter<int>(32)));
@@ -83,7 +83,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
             MockObject obj = new MockObject();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             MethodPolicy policy = new MethodPolicy();
             policy.Methods.Add("MultiParamMethod", new MethodCallInfo("MultiParamMethod", 1.0, "foo"));
@@ -101,7 +101,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
             MockObject obj = new MockObject();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             MethodPolicy policy = new MethodPolicy();
             policy.Methods.Add("ParameterlessMethod", new MethodCallInfo("ParameterlessMethod"));
@@ -123,7 +123,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             ctx.HeadOfChain.BuildUp(ctx, typeof(object), null, null);
         }
@@ -134,7 +134,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
             MockObject obj = new MockObject();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             ctx.HeadOfChain.BuildUp(ctx, typeof(MockObject), obj, null);
 
@@ -147,7 +147,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
             MockObject obj = new MockObject();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             MethodPolicy policy = new MethodPolicy();
             policy.Methods.Add("NonExistantMethod", new MethodCallInfo("NonExistantMethod"));
@@ -162,7 +162,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
             MockObject obj = new MockObject();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             MethodPolicy policy = new MethodPolicy();
             policy.Methods.Add("ParameterlessMethod", new MethodCallInfo("ParameterlessMethod", 123));
@@ -178,7 +178,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MethodExecutionStrategy strategy = new MethodExecutionStrategy();
             MockBuilderContext ctx = new MockBuilderContext();
             MockObject obj = new MockObject();
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             MethodPolicy policy = new MethodPolicy();
             MethodInfo mi = typeof(MockObject).GetMethod("IntMethod");

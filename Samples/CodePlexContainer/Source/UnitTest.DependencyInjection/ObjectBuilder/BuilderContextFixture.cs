@@ -12,7 +12,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockCreationPolicy policy = new MockCreationPolicy();
 
             policies.Set<IBuilderPolicy>(policy, typeof(object), null);
-            BuilderContext context = new BuilderContext(null, null, policies);
+            BuilderContext context = new BuilderContext(null, null, null, policies);
 
             IBuilderPolicy outPolicy = context.Policies.Get<IBuilderPolicy>(typeof(object), null);
 
@@ -24,7 +24,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void TestNoPoliciesReturnsNull()
         {
             PolicyList policies = new PolicyList();
-            BuilderContext context = new BuilderContext(null, null, policies);
+            BuilderContext context = new BuilderContext(null, null, null, policies);
 
             Assert.IsNull(context.Policies.Get<IBuilderPolicy>(typeof(object), null));
         }
@@ -32,7 +32,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         [Test]
         public void PassingNullPoliciesObjectDoesntThrowWhenAskingForPolicy()
         {
-            BuilderContext context = new BuilderContext(null, null, null);
+            BuilderContext context = new BuilderContext(null, null, null, null);
 
             Assert.IsNull(context.Policies.Get<IBuilderPolicy>(typeof(object), null));
         }
@@ -40,7 +40,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         [Test]
         public void CanSetPoliciesUsingTheContext()
         {
-            BuilderContext context = new BuilderContext(null, null, null);
+            BuilderContext context = new BuilderContext(null, null, null, null);
             MockCreationPolicy policy = new MockCreationPolicy();
 
             context.Policies.Set<IBuilderPolicy>(policy, typeof(object), "foo");
@@ -55,7 +55,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockCreationPolicy policy1 = new MockCreationPolicy();
 
             policies.Set<IBuilderPolicy>(policy1, typeof(object), null);
-            BuilderContext context = new BuilderContext(null, null, policies);
+            BuilderContext context = new BuilderContext(null, null, null, policies);
 
             MockCreationPolicy policy2 = new MockCreationPolicy();
             context.Policies.Set<IBuilderPolicy>(policy2, typeof(string), null);

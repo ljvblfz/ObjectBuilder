@@ -21,11 +21,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         // Properties
 
+        //[Obsolete]
         public PolicyList Policies
         {
             get { return policies; }
         }
 
+        //[Obsolete]
         public StrategyList<TStageEnum> Strategies
         {
             get { return strategies; }
@@ -33,6 +35,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         // Methods
 
+        //[Obsolete]
         public TTypeToBuild BuildUp<TTypeToBuild>(IReadWriteLocator locator,
                                                   string idToBuild,
                                                   object existing,
@@ -41,6 +44,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return (TTypeToBuild)BuildUp(locator, typeof(TTypeToBuild), idToBuild, existing, transientPolicies);
         }
 
+        //[Obsolete]
         public virtual object BuildUp(IReadWriteLocator locator,
                                       Type typeToBuild,
                                       string idToBuild,
@@ -87,9 +91,15 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             foreach (PolicyList policyList in transientPolicies)
                 policies.AddPolicies(policyList);
 
-            return new BuilderContext(chain, locator, policies);
+            ILifetimeContainer lifetime = null;
+
+            if (locator != null)
+                lifetime = locator.Get<ILifetimeContainer>();
+
+            return new BuilderContext(chain, locator, lifetime, policies);
         }
 
+        //[Obsolete]
         public TItem TearDown<TItem>(IReadWriteLocator locator,
                                      TItem item)
         {
@@ -97,6 +107,38 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 throw new ArgumentNullException("item");
 
             return DoTearDown(locator, item);
+        }
+
+        // New Methods
+
+        public object BuildUp(IReadWriteLocator locator,
+                              ILifetimeContainer lifetime,
+                              PolicyList policies,
+                              StrategyList<TStageEnum> strategies,
+                              Type typeToBuild,
+                              string idToBuild,
+                              object existing)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TTypeToBuild BuildUp<TTypeToBuild>(IReadWriteLocator locator,
+                                                  ILifetimeContainer lifetime,
+                                                  PolicyList policies,
+                                                  StrategyList<TStageEnum> strategies,
+                                                  string idToBuild,
+                                                  object existing)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TItem TearDown<TItem>(IReadWriteLocator locator,
+                                     ILifetimeContainer lifetime,
+                                     PolicyList policies,
+                                     StrategyList<TStageEnum> strategies,
+                                     TItem item)
+        {
+            throw new NotImplementedException();
         }
 
         static void ThrowIfNoStrategiesInChain(IBuilderStrategyChain chain)

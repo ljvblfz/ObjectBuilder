@@ -13,10 +13,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             TypeMappingStrategy strategy = new TypeMappingStrategy();
             ctx.Policies.Set<ITypeMappingPolicy>(new TypeMappingPolicy(typeof(SalesFoo), null), typeof(IFoo), "sales");
             ctx.Policies.Set<ITypeMappingPolicy>(new TypeMappingPolicy(typeof(Foo), null), typeof(IFoo), "marketing");
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             MockStrategy mock = new MockStrategy();
-            ctx.InnerChain.Add(mock);
+            ctx.Strategies.Add(mock);
 
             strategy.BuildUp<IFoo>(ctx, null, "sales");
 
@@ -39,7 +39,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext ctx = new MockBuilderContext();
             TypeMappingStrategy strategy = new TypeMappingStrategy();
             ctx.Policies.Set<ITypeMappingPolicy>(new TypeMappingPolicy(typeof(object), null), typeof(IFoo), "sales");
-            ctx.InnerChain.Add(strategy);
+            ctx.Strategies.Add(strategy);
 
             strategy.BuildUp<IFoo>(ctx, null, "sales");
         }

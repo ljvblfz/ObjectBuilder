@@ -10,6 +10,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         static readonly Array stageValues = Enum.GetValues(typeof(TStageEnum));
         Dictionary<TStageEnum, List<IBuilderStrategy>> stages;
         object lockObject = new object();
+        StrategyList<TStageEnum> innerStrategyList;
 
         // Lifetime
 
@@ -19,6 +20,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             foreach (TStageEnum stage in stageValues)
                 stages[stage] = new List<IBuilderStrategy>();
+        }
+
+        public StrategyList(StrategyList<TStageEnum> innerStrategyList)
+            : this()
+        {
+            this.innerStrategyList = innerStrategyList;
         }
 
         // Methods
@@ -50,7 +57,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             {
                 List<IBuilderStrategy> tempList = new List<IBuilderStrategy>();
                 foreach (TStageEnum stage in stageValues)
+                {
+                    if (innerStrategyList != null)
+                        tempList.AddRange(innerStrategyList.stages[stage]);
+
                     tempList.AddRange(stages[stage]);
+                }
 
                 tempList.Reverse();
 
@@ -67,7 +79,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 BuilderStrategyChain result = new BuilderStrategyChain();
 
                 foreach (TStageEnum stage in stageValues)
+                {
+                    if (innerStrategyList != null)
+                        result.AddRange(innerStrategyList.stages[stage]);
+
                     result.AddRange(stages[stage]);
+                }
 
                 return result;
             }

@@ -69,6 +69,7 @@
     <Compile Include="ObjectBuilder\Strategies\TypeMapping\TypeMappingStrategyFixture.cs" />
     <Compile Include="ObjectBuilder\Utility\DependencyResolverFixture.cs" />
     <Compile Include="ObjectBuilder\Utility\PolicyListFixture.cs" />
+    <Compile Include="ObjectBuilder\Utility\StrategyListFixture.cs" />
     <Compile Include="ObjectBuilder\Utility\WeakRefDictionaryFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

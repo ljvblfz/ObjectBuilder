@@ -55,7 +55,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             MockBuilderContext ctx = CreateContext();
             MockStrategy mockStrategy = new MockStrategy();
-            ctx.InnerChain.Add(mockStrategy);
+            ctx.Strategies.Add(mockStrategy);
 
             object existing = new object();
             object result = ctx.HeadOfChain.BuildUp(ctx, typeof(object), existing, null);
@@ -97,7 +97,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         MockBuilderContext CreateContext()
         {
             MockBuilderContext result = new MockBuilderContext();
-            result.InnerChain.Add(new CreationStrategy());
+            result.Strategies.Add(new CreationStrategy());
             result.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             return result;
         }

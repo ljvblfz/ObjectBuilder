@@ -64,8 +64,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             MockBuilderContext ctx = new MockBuilderContext();
 
-            ctx.InnerChain.Add(new SingletonStrategy());
-            ctx.InnerChain.Add(new CreationStrategy());
+            ctx.Strategies.Add(new SingletonStrategy());
+            ctx.Strategies.Add(new CreationStrategy());
 
             ctx.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
 
@@ -76,8 +76,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             MockBuilderContext ctx = new MockBuilderContext(locator);
 
-            ctx.InnerChain.Add(new SingletonStrategy());
-            ctx.InnerChain.Add(new CreationStrategy());
+            ctx.Strategies.Add(new SingletonStrategy());
+            ctx.Strategies.Add(new CreationStrategy());
 
             ctx.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
 
