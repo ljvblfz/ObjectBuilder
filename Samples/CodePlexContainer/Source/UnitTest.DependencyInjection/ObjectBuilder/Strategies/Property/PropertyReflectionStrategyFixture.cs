@@ -298,45 +298,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             context.HeadOfChain.BuildUp(context, typeof(NamedThrowingMockObject), null, null);
         }
 
-        // SearchMode Tests
-
-        [Test]
-        public void CanSearchDependencyUp()
-        {
-            Locator parent = new Locator();
-            parent.Add(new DependencyResolutionLocatorKey(typeof(int), null), 25);
-            Locator child = new Locator(parent);
-            MockBuilderContext context = CreateContext(child);
-
-            context.HeadOfChain.BuildUp(context, typeof(SearchUpMockObject), null, null);
-        }
-
-        [Test]
-        [ExpectedException(typeof(DependencyMissingException))]
-        public void LocalSearchFailsIfDependencyIsOnlyUpstream()
-        {
-            Locator parent = new Locator();
-            parent.Add(new DependencyResolutionLocatorKey(typeof(int), null), 25);
-            Locator child = new Locator(parent);
-            MockBuilderContext context = CreateContext(child);
-
-            context.HeadOfChain.BuildUp(context, typeof(SearchLocalMockObject), null, null);
-        }
-
-        [Test]
-        public void LocalSearchGetsLocalIfDependencyIsAlsoUpstream()
-        {
-            Locator parent = new Locator();
-            parent.Add(new DependencyResolutionLocatorKey(typeof(int), null), 25);
-            Locator child = new Locator(parent);
-            child.Add(new DependencyResolutionLocatorKey(typeof(int), null), 15);
-            MockBuilderContext context = CreateContext(child);
-
-            SearchLocalMockObject obj = (SearchLocalMockObject)context.HeadOfChain.BuildUp(context, typeof(SearchLocalMockObject), null, null);
-
-            Assert.AreEqual(15, obj.Value);
-        }
-
         // Helpers
 
         MockBuilderContext CreateContext()
@@ -354,32 +315,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             result.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
             result.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             return result;
-        }
-
-        #region Mock Classes
-
-        public class SearchUpMockObject
-        {
-            int value;
-
-            [Dependency(SearchMode = SearchMode.Up, NotPresentBehavior = NotPresentBehavior.Throw)]
-            public int Value
-            {
-                get { return value; }
-                set { this.value = value; }
-            }
-        }
-
-        public class SearchLocalMockObject
-        {
-            int value;
-
-            [Dependency(SearchMode = SearchMode.Local, NotPresentBehavior = NotPresentBehavior.Throw)]
-            public int Value
-            {
-                get { return value; }
-                set { this.value = value; }
-            }
         }
 
         public class ThrowingMockObject
@@ -532,7 +467,5 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public interface IFoo {}
 
         public class Foo : IFoo {}
-
-        #endregion
     }
 }

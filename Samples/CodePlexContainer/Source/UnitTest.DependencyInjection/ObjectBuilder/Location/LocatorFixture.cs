@@ -7,8 +7,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     [TestFixture]
     public class LocatorFixture
     {
-        #region Invalid parameter tests
-
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void NullKeyOnAddThrows()
@@ -62,38 +60,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             locator.FindBy(null);
         }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentException))]
-        public void BadSearchModeOnContainsThrows()
-        {
-            IReadWriteLocator locator = new Locator();
-
-            locator.Contains(1, (SearchMode)254);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentException))]
-        public void BadSearchModeOnGetThrows()
-        {
-            IReadWriteLocator locator = new Locator();
-
-            locator.Get(1, (SearchMode)254);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentException))]
-        public void BadSearchModeOnFindByThrows()
-        {
-            IReadWriteLocator locator = new Locator();
-
-            locator.FindBy((SearchMode)254, delegate
-                                            {
-                                                return true;
-                                            });
-        }
-
-        #endregion
 
         [Test]
         public void LocatorIsNotReadOnly()
@@ -294,7 +260,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             IReadWriteLocator childLocator = new Locator(rootLocator);
 
             rootLocator.Add("Foo", o);
-            object result = childLocator.Get("Foo", SearchMode.Up);
+            object result = childLocator.Get("Foo");
 
             Assert.IsNotNull(result);
             Assert.AreSame(o, result);
@@ -310,7 +276,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             rootLocator.Add("bar", o);
 
-            object result = grandchildLocator.Get("bar", SearchMode.Up);
+            object result = grandchildLocator.Get("bar");
 
             Assert.IsNotNull(result);
             Assert.AreSame(o, result);
@@ -328,7 +294,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             rootLocator.Add("foo", o1);
             childLocator.Add("foo", o2);
 
-            object result = grandchildLocator.Get("foo", SearchMode.Up);
+            object result = grandchildLocator.Get("foo");
 
             Assert.IsNotNull(result);
             Assert.AreSame(o2, result);
@@ -355,8 +321,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             rootLocator.Add("froz", o);
 
-            Assert.IsFalse(childLocator.Contains("froz", SearchMode.Local));
-            Assert.IsTrue(childLocator.Contains("froz", SearchMode.Up));
+            Assert.IsTrue(childLocator.Contains("froz"));
         }
 
         [Test]
@@ -415,12 +380,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             IReadableLocator results;
 
-            results = childLocator.FindBy(
-                SearchMode.Up,
-                delegate(KeyValuePair<object, object> kvp)
-                {
-                    return true;
-                });
+            results = childLocator.FindBy(delegate
+                                          {
+                                              return true;
+                                          });
 
             Assert.AreEqual(1, results.Count);
             Assert.AreSame(o, results.Get("bar"));
@@ -439,12 +402,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             IReadableLocator results;
 
-            results = childLocator.FindBy(
-                SearchMode.Up,
-                delegate(KeyValuePair<object, object> kvp)
-                {
-                    return true;
-                });
+            results = childLocator.FindBy(delegate
+                                          {
+                                              return true;
+                                          });
 
             Assert.AreEqual(2, results.Count);
             Assert.AreSame(o, results.Get("foo"));
@@ -464,12 +425,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             IReadableLocator results;
 
-            results = childLocator.FindBy(
-                SearchMode.Up,
-                delegate(KeyValuePair<object, object> kvp)
-                {
-                    return true;
-                });
+            results = childLocator.FindBy(delegate
+                                          {
+                                              return true;
+                                          });
 
             Assert.AreEqual(1, results.Count);
             Assert.AreSame(o2, results.Get("foo"));

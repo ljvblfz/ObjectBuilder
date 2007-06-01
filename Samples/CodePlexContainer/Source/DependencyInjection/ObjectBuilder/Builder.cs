@@ -1,28 +1,55 @@
+using System;
+using CodePlex.DependencyInjection.Properties;
+
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class Builder : BuilderBase<BuilderStage>
+    public class Builder : IBuilder
     {
-        // Lifetime
+        // Methods
 
-        public Builder()
-            : this(null) {}
-
-        public Builder(IBuilderConfigurator<BuilderStage> configurator)
+        public object BuildUp(IReadWriteLocator locator,
+                              ILifetimeContainer lifetime,
+                              PolicyList policies,
+                              IStrategyChain strategies,
+                              Type typeToBuild,
+                              string idToBuild,
+                              object existing)
         {
-            Strategies.AddNew<TypeMappingStrategy>(BuilderStage.PreCreation);
-            Strategies.AddNew<SingletonStrategy>(BuilderStage.PreCreation);
-            Strategies.AddNew<ConstructorReflectionStrategy>(BuilderStage.PreCreation);
-            Strategies.AddNew<PropertyReflectionStrategy>(BuilderStage.PreCreation);
-            Strategies.AddNew<MethodReflectionStrategy>(BuilderStage.PreCreation);
-            Strategies.AddNew<CreationStrategy>(BuilderStage.Creation);
-            Strategies.AddNew<PropertySetterStrategy>(BuilderStage.Initialization);
-            Strategies.AddNew<MethodExecutionStrategy>(BuilderStage.Initialization);
-            Strategies.AddNew<BuilderAwareStrategy>(BuilderStage.PostInitialization);
+            Guard.ArgumentNotNull(strategies, "strategies");
+            GuardStrategiesNotEmpty(strategies);
 
-            Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
+            BuilderContext context = new BuilderContext(strategies, locator, lifetime, policies);
+            return context.HeadOfChain.BuildUp(context, typeToBuild, existing, idToBuild);
+        }
 
-            if (configurator != null)
-                configurator.ApplyConfiguration(this);
+        public TTypeToBuild BuildUp<TTypeToBuild>(IReadWriteLocator locator,
+                                                  ILifetimeContainer lifetime,
+                                                  PolicyList policies,
+                                                  IStrategyChain strategies,
+                                                  string idToBuild,
+                                                  object existing)
+        {
+            return (TTypeToBuild)BuildUp(locator, lifetime, policies, strategies, typeof(TTypeToBuild), idToBuild, existing);
+        }
+
+        static void GuardStrategiesNotEmpty(IStrategyChain strategies)
+        {
+            if (strategies.Head == null)
+                throw new ArgumentException(Resources.BuilderHasNoStrategies, "strategies");
+        }
+
+        public TItem TearDown<TItem>(IReadWriteLocator locator,
+                                     ILifetimeContainer lifetime,
+                                     PolicyList policies,
+                                     IStrategyChain strategies,
+                                     TItem item)
+        {
+            Guard.ArgumentNotNull(item, "item");
+            Guard.ArgumentNotNull(strategies, "strategies");
+            GuardStrategiesNotEmpty(strategies);
+
+            BuilderContext context = new BuilderContext(strategies.Reverse(), locator, lifetime, policies);
+            return (TItem)context.HeadOfChain.TearDown(context, item);
         }
     }
 }

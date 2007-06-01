@@ -14,7 +14,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), null), obj);
             DependencyResolver resolver = new DependencyResolver(context);
 
-            Assert.AreSame(obj, resolver.Resolve(typeof(object), null, null, NotPresentBehavior.ReturnNull, SearchMode.Local));
+            Assert.AreSame(obj, resolver.Resolve(typeof(object), null, null, NotPresentBehavior.ReturnNull));
         }
 
         [Test]
@@ -25,7 +25,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), "Foo"), obj);
             DependencyResolver resolver = new DependencyResolver(context);
 
-            Assert.AreSame(obj, resolver.Resolve(typeof(object), null, "Foo", NotPresentBehavior.ReturnNull, SearchMode.Local));
+            Assert.AreSame(obj, resolver.Resolve(typeof(object), null, "Foo", NotPresentBehavior.ReturnNull));
         }
 
         [Test]
@@ -43,9 +43,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             object obj3 = new object();
             context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), "Bar"), obj3);
 
-            Assert.AreSame(obj1, resolver.Resolve(typeof(object), null, null, NotPresentBehavior.ReturnNull, SearchMode.Local));
-            Assert.AreSame(obj2, resolver.Resolve(typeof(object), null, "Foo", NotPresentBehavior.ReturnNull, SearchMode.Local));
-            Assert.AreSame(obj3, resolver.Resolve(typeof(object), null, "Bar", NotPresentBehavior.ReturnNull, SearchMode.Local));
+            Assert.AreSame(obj1, resolver.Resolve(typeof(object), null, null, NotPresentBehavior.ReturnNull));
+            Assert.AreSame(obj2, resolver.Resolve(typeof(object), null, "Foo", NotPresentBehavior.ReturnNull));
+            Assert.AreSame(obj3, resolver.Resolve(typeof(object), null, "Bar", NotPresentBehavior.ReturnNull));
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = CreateContext();
             DependencyResolver resolver = new DependencyResolver(context);
 
-            object obj = resolver.Resolve(typeof(object), null, null, NotPresentBehavior.CreateNew, SearchMode.Local);
+            object obj = resolver.Resolve(typeof(object), null, null, NotPresentBehavior.CreateNew);
 
             Assert.IsNotNull(obj);
             Assert.IsTrue(obj is object);
@@ -68,7 +68,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             object obj = new object();
             context.Locator.Add(new DependencyResolutionLocatorKey(typeof(object), null), obj);
 
-            Assert.AreSame(obj, resolver.Resolve(typeof(object), null, null, NotPresentBehavior.CreateNew, SearchMode.Local));
+            Assert.AreSame(obj, resolver.Resolve(typeof(object), null, null, NotPresentBehavior.CreateNew));
         }
 
         [Test]
@@ -77,8 +77,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = CreateContext();
             DependencyResolver resolver = new DependencyResolver(context);
 
-            object obj1 = resolver.Resolve(typeof(object), null, null, NotPresentBehavior.CreateNew, SearchMode.Local);
-            object obj2 = resolver.Resolve(typeof(object), null, null, NotPresentBehavior.CreateNew, SearchMode.Local);
+            object obj1 = resolver.Resolve(typeof(object), null, null, NotPresentBehavior.CreateNew);
+            object obj2 = resolver.Resolve(typeof(object), null, null, NotPresentBehavior.CreateNew);
 
             Assert.IsNotNull(obj1);
             Assert.AreSame(obj1, obj2);
@@ -90,8 +90,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = CreateContext();
             DependencyResolver resolver = new DependencyResolver(context);
 
-            object obj1 = resolver.Resolve(typeof(object), null, "Foo", NotPresentBehavior.CreateNew, SearchMode.Local);
-            object obj2 = resolver.Resolve(typeof(object), null, "Foo", NotPresentBehavior.CreateNew, SearchMode.Local);
+            object obj1 = resolver.Resolve(typeof(object), null, "Foo", NotPresentBehavior.CreateNew);
+            object obj2 = resolver.Resolve(typeof(object), null, "Foo", NotPresentBehavior.CreateNew);
 
             Assert.IsNotNull(obj1);
             Assert.AreSame(obj1, obj2);
@@ -103,7 +103,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = CreateContext();
             DependencyResolver resolver = new DependencyResolver(context);
 
-            Assert.IsNull(resolver.Resolve(typeof(object), null, null, NotPresentBehavior.ReturnNull, SearchMode.Local));
+            Assert.IsNull(resolver.Resolve(typeof(object), null, null, NotPresentBehavior.ReturnNull));
         }
 
         [Test]
@@ -112,8 +112,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = CreateContext();
             DependencyResolver resolver = new DependencyResolver(context);
 
-            object obj = resolver.Resolve(typeof(IMockObject), typeof(MockObject), null, NotPresentBehavior.CreateNew, SearchMode.Local);
-            object retrieved = resolver.Resolve(typeof(MockObject), null, null, NotPresentBehavior.ReturnNull, SearchMode.Local);
+            object obj = resolver.Resolve(typeof(IMockObject), typeof(MockObject), null, NotPresentBehavior.CreateNew);
+            object retrieved = resolver.Resolve(typeof(MockObject), null, null, NotPresentBehavior.ReturnNull);
 
             Assert.IsNotNull(obj);
             Assert.IsTrue(obj is MockObject);
@@ -127,7 +127,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = CreateContext();
             DependencyResolver resolver = new DependencyResolver(context);
 
-            resolver.Resolve(null, typeof(object), null, NotPresentBehavior.ReturnNull, SearchMode.Local);
+            resolver.Resolve(null, typeof(object), null, NotPresentBehavior.ReturnNull);
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = CreateContext();
             DependencyResolver resolver = new DependencyResolver(context);
 
-            object obj = resolver.Resolve(typeof(MockObject), null, null, NotPresentBehavior.CreateNew, SearchMode.Local);
+            object obj = resolver.Resolve(typeof(MockObject), null, null, NotPresentBehavior.CreateNew);
 
             Assert.IsNotNull(obj);
             Assert.IsTrue(obj is MockObject);
@@ -149,7 +149,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             MockBuilderContext context = CreateContext();
             DependencyResolver resolver = new DependencyResolver(context);
 
-            resolver.Resolve(typeof(object), typeof(object), null, (NotPresentBehavior)254, SearchMode.Local);
+            resolver.Resolve(typeof(object), typeof(object), null, (NotPresentBehavior)254);
         }
 
         [Test]

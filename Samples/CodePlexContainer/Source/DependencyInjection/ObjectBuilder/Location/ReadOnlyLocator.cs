@@ -38,16 +38,14 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         // Methods
 
-        public override bool Contains(object key,
-                                      SearchMode options)
+        public override bool Contains(object key)
         {
-            return innerLocator.Contains(key, options);
+            return innerLocator.Contains(key);
         }
 
-        public override object Get(object key,
-                                   SearchMode options)
+        public override object Get(object key)
         {
-            return innerLocator.Get(key, options);
+            return innerLocator.Get(key);
         }
 
         public override IEnumerator<KeyValuePair<object, object>> GetEnumerator()

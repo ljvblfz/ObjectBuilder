@@ -57,9 +57,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return result;
         }
 
-        /// <summary>
-        /// See <see cref="ReflectionStrategy{T}.MemberRequiresProcessing"/> for more information.
-        /// </summary>
         protected override bool MemberRequiresProcessing(IReflectionMemberInfo<ConstructorInfo> member)
         {
             return true;

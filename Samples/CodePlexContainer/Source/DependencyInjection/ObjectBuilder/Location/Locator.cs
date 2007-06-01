@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using CodePlex.DependencyInjection.Properties;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
@@ -16,9 +15,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             : this(null) {}
 
         public Locator(IReadableLocator parentLocator)
-        {
-            SetParentLocator(parentLocator);
-        }
+            : base(parentLocator) {}
 
         // Properties
 
@@ -40,36 +37,30 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             references.Add(key, value);
         }
 
-        public override bool Contains(object key,
-                                      SearchMode options)
+        public override bool Contains(object key)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
-            if (!Enum.IsDefined(typeof(SearchMode), options))
-                throw new ArgumentException(Resources.InvalidEnumerationValue, "options");
 
             if (references.ContainsKey(key))
                 return true;
 
-            if (options == SearchMode.Up && ParentLocator != null)
-                return ParentLocator.Contains(key, options);
+            if (ParentLocator != null)
+                return ParentLocator.Contains(key);
 
             return false;
         }
 
-        public override object Get(object key,
-                                   SearchMode options)
+        public override object Get(object key)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
-            if (!Enum.IsDefined(typeof(SearchMode), options))
-                throw new ArgumentException(Resources.InvalidEnumerationValue, "options");
 
             if (references.ContainsKey(key))
                 return references[key];
 
-            if (options == SearchMode.Up && ParentLocator != null)
-                return ParentLocator.Get(key, options);
+            if (ParentLocator != null)
+                return ParentLocator.Get(key);
 
             return null;
         }

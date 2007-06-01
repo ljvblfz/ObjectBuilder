@@ -3,7 +3,7 @@ using NUnit.Framework;
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     [TestFixture]
-    public class BuilderContextFixture
+    public class BuilderContextTest
     {
         [Test]
         public void TestSettingAndRetrievePolicy()

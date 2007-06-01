@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class StrategyList<TStageEnum>
+    public class StagedStrategyChain<TStageEnum>
     {
         // Fields
 
         static readonly Array stageValues = Enum.GetValues(typeof(TStageEnum));
         Dictionary<TStageEnum, List<IBuilderStrategy>> stages;
         object lockObject = new object();
-        StrategyList<TStageEnum> innerStrategyList;
+        StagedStrategyChain<TStageEnum> innerChain;
 
         // Lifetime
 
-        public StrategyList()
+        public StagedStrategyChain()
         {
             stages = new Dictionary<TStageEnum, List<IBuilderStrategy>>();
 
@@ -22,10 +22,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 stages[stage] = new List<IBuilderStrategy>();
         }
 
-        public StrategyList(StrategyList<TStageEnum> innerStrategyList)
+        public StagedStrategyChain(StagedStrategyChain<TStageEnum> innerChain)
             : this()
         {
-            this.innerStrategyList = innerStrategyList;
+            this.innerChain = innerChain;
         }
 
         // Methods
@@ -51,37 +51,16 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     stages[stage].Clear();
         }
 
-        public IBuilderStrategyChain MakeReverseStrategyChain()
+        public StrategyChain MakeStrategyChain()
         {
             lock (lockObject)
             {
-                List<IBuilderStrategy> tempList = new List<IBuilderStrategy>();
-                foreach (TStageEnum stage in stageValues)
-                {
-                    if (innerStrategyList != null)
-                        tempList.AddRange(innerStrategyList.stages[stage]);
-
-                    tempList.AddRange(stages[stage]);
-                }
-
-                tempList.Reverse();
-
-                BuilderStrategyChain result = new BuilderStrategyChain();
-                result.AddRange(tempList);
-                return result;
-            }
-        }
-
-        public IBuilderStrategyChain MakeStrategyChain()
-        {
-            lock (lockObject)
-            {
-                BuilderStrategyChain result = new BuilderStrategyChain();
+                StrategyChain result = new StrategyChain();
 
                 foreach (TStageEnum stage in stageValues)
                 {
-                    if (innerStrategyList != null)
-                        result.AddRange(innerStrategyList.stages[stage]);
+                    if (innerChain != null)
+                        result.AddRange(innerChain.stages[stage]);
 
                     result.AddRange(stages[stage]);
                 }

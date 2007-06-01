@@ -1,12 +1,10 @@
-using System;
-
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     class MockBuilderContext : IBuilderContext
     {
         // Fields
 
-        BuilderStrategyChain strategies = new BuilderStrategyChain();
+        StrategyChain strategies = new StrategyChain();
         ILifetimeContainer lifetime = new LifetimeContainer();
         IReadWriteLocator locator;
         PolicyList policies = new PolicyList();
@@ -43,7 +41,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             get { return policies; }
         }
 
-        public BuilderStrategyChain Strategies
+        public StrategyChain Strategies
         {
             get { return strategies; }
         }

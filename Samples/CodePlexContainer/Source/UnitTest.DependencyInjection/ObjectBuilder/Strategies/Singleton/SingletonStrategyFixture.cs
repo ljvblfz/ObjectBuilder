@@ -84,6 +84,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return ctx;
         }
 
-        class Something { }
+        class Something {}
     }
 }

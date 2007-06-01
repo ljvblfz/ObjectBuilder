@@ -3,26 +3,18 @@ using System.Collections.Generic;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    interface IPolicyList
-    {
-        IBuilderPolicy GetDefault(BuilderPolicyKey key);
-        IBuilderPolicy GetWithoutDefault(BuilderPolicyKey key);
-    }
-
     public class PolicyList : IPolicyList
     {
         // Fields
 
-        Dictionary<BuilderPolicyKey, IBuilderPolicy> policies = new Dictionary<BuilderPolicyKey, IBuilderPolicy>();
-        object lockObject = new object();
         IPolicyList innerPolicyList;
+        object lockObject = new object();
+        Dictionary<BuilderPolicyKey, IBuilderPolicy> policies = new Dictionary<BuilderPolicyKey, IBuilderPolicy>();
 
         // Lifetime
 
         public PolicyList()
-        {
-            innerPolicyList = new NullPolicyList();
-        }
+            : this(null) {}
 
         public PolicyList(PolicyList innerPolicyList)
         {
@@ -91,15 +83,18 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                   Type typePolicyAppliesTo,
                                   string idPolicyAppliesTo)
         {
-            BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo);
-            BuilderPolicyKey defaultKey = new BuilderPolicyKey(policyInterface, null, null);
+            BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo ?? "");
+            BuilderPolicyKey keyForDefaultType = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, null);
+            BuilderPolicyKey keyForDefaultAllTypes = new BuilderPolicyKey(policyInterface, null, null);
+            IPolicyList thisPolicyList = this;
 
             return
-                ((IPolicyList)this).GetWithoutDefault(key) ??
-                ((IPolicyList)this).GetDefault(defaultKey);
+                thisPolicyList.GetForKey(key) ??
+                thisPolicyList.GetForKey(keyForDefaultType) ??
+                thisPolicyList.GetForKey(keyForDefaultAllTypes);
         }
 
-        IBuilderPolicy IPolicyList.GetDefault(BuilderPolicyKey key)
+        IBuilderPolicy IPolicyList.GetForKey(BuilderPolicyKey key)
         {
             lock (lockObject)
             {
@@ -108,20 +103,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     return policy;
             }
 
-            return innerPolicyList.GetDefault(key);
-        }
-
-        IBuilderPolicy IPolicyList.GetWithoutDefault(BuilderPolicyKey key)
-        {
-            lock (lockObject)
-            {
-                IBuilderPolicy policy;
-
-                if (policies.TryGetValue(key, out policy))
-                    return policy;
-            }
-
-            return innerPolicyList.GetWithoutDefault(key);
+            return innerPolicyList.GetForKey(key);
         }
 
         public void Set<TPolicyInterface>(TPolicyInterface policy,
@@ -137,7 +119,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                         Type typePolicyAppliesTo,
                         string idPolicyAppliesTo)
         {
-            BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo);
+            BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo ?? "");
 
             lock (lockObject)
                 policies[key] = policy;
@@ -152,19 +134,34 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void SetDefault(Type policyInterface,
                                IBuilderPolicy policy)
         {
-            Set(policyInterface, policy, null, null);
+            BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, null, null);
+
+            lock (lockObject)
+                policies[key] = policy;
+        }
+
+        public void SetDefaultForType<TPolicyInterface>(TPolicyInterface policy,
+                                                        Type typePolicyAppliesTo)
+            where TPolicyInterface : IBuilderPolicy
+        {
+            SetDefaultForType(typeof(TPolicyInterface), policy, typePolicyAppliesTo);
+        }
+
+        public void SetDefaultForType(Type policyInterface,
+                                      IBuilderPolicy policy,
+                                      Type typePolicyAppliesTo)
+        {
+            BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, null);
+
+            lock (lockObject)
+                policies[key] = policy;
         }
 
         // Inner types
 
         class NullPolicyList : IPolicyList
         {
-            public IBuilderPolicy GetDefault(BuilderPolicyKey key)
-            {
-                return null;
-            }
-
-            public IBuilderPolicy GetWithoutDefault(BuilderPolicyKey key)
+            public IBuilderPolicy GetForKey(BuilderPolicyKey key)
             {
                 return null;
             }

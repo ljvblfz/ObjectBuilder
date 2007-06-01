@@ -9,21 +9,18 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         string name;
         Type createType;
         NotPresentBehavior notPresentBehavior;
-        SearchMode searchMode;
 
         // Lifetime
 
         public DependencyParameter(Type parameterType,
                                    string name,
                                    Type createType,
-                                   NotPresentBehavior notPresentBehavior,
-                                   SearchMode searchMode)
+                                   NotPresentBehavior notPresentBehavior)
             : base(parameterType)
         {
             this.name = name;
             this.createType = createType;
             this.notPresentBehavior = notPresentBehavior;
-            this.searchMode = searchMode;
         }
 
         // Methods
@@ -31,7 +28,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public override object GetValue(IBuilderContext context)
         {
             return new DependencyResolver(context).Resolve(
-                base.type, createType, name, notPresentBehavior, searchMode);
+                base.type, createType, name, notPresentBehavior);
         }
     }
 }

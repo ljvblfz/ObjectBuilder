@@ -25,8 +25,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public object Resolve(Type typeToResolve,
                               Type typeToCreate,
                               string id,
-                              NotPresentBehavior notPresent,
-                              SearchMode searchMode)
+                              NotPresentBehavior notPresent)
         {
             if (typeToResolve == null)
                 throw new ArgumentNullException("typeToResolve");
@@ -38,8 +37,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             DependencyResolutionLocatorKey key = new DependencyResolutionLocatorKey(typeToResolve, id);
 
-            if (context.Locator.Contains(key, searchMode))
-                return context.Locator.Get(key, searchMode);
+            if (context.Locator.Contains(key))
+                return context.Locator.Get(key);
 
             switch (notPresent)
             {

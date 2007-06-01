@@ -3,17 +3,19 @@ using System.Collections.Generic;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class BuilderStrategyChain : IBuilderStrategyChain
+    public class StrategyChain : IStrategyChain
     {
         // Fields
 
-        List<IBuilderStrategy> strategies;
+        List<IBuilderStrategy> strategies = new List<IBuilderStrategy>();
 
         // Lifetime
 
-        public BuilderStrategyChain()
+        public StrategyChain() {}
+
+        public StrategyChain(IEnumerable<IBuilderStrategy> strategies)
         {
-            strategies = new List<IBuilderStrategy>();
+            AddRange(strategies);
         }
 
         // Properties
@@ -24,8 +26,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             {
                 if (strategies.Count > 0)
                     return strategies[0];
-                else
-                    return null;
+                return null;
             }
         }
 
@@ -49,6 +50,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     return strategies[idx + 1];
 
             return null;
+        }
+
+        public IStrategyChain Reverse()
+        {
+            List<IBuilderStrategy> reverseList = new List<IBuilderStrategy>(strategies);
+            reverseList.Reverse();
+            return new StrategyChain(reverseList);
         }
     }
 }

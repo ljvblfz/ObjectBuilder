@@ -180,6 +180,52 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             Assert.Same(outerPolicy, result);
         }
 
+        [Test]
+        public void NullNameIsSameAsEmptyStringName()
+        {
+            PolicyList list = new PolicyList();
+            FakePolicy policy = new FakePolicy();
+            list.Set(policy, typeof(object), null);
+
+            FakePolicy result1 = list.Get<FakePolicy>(typeof(object), null);
+            FakePolicy result2 = list.Get<FakePolicy>(typeof(object), "");
+
+            Assert.Same(result1, result2);
+        }
+
+        [Test]
+        public void EmptyStringNameIsSameAsNullName()
+        {
+            PolicyList list = new PolicyList();
+            FakePolicy policy = new FakePolicy();
+            list.Set(policy, typeof(object), "");
+
+            FakePolicy result1 = list.Get<FakePolicy>(typeof(object), null);
+            FakePolicy result2 = list.Get<FakePolicy>(typeof(object), "");
+
+            Assert.Same(result1, result2);
+        }
+
+        [Test]
+        public void CanSetDefaultPolicyForTypes()
+        {
+            PolicyList list = new PolicyList();
+            FakePolicy policyAllTypesDefault = new FakePolicy();
+            FakePolicy policyTypeDefault = new FakePolicy();
+            FakePolicy policyNamedType = new FakePolicy();
+            list.SetDefault(policyAllTypesDefault);
+            list.SetDefaultForType(policyTypeDefault, typeof(object));
+            list.Set(policyNamedType, typeof(object), "foo");
+
+            FakePolicy resultAll = list.Get<FakePolicy>(typeof(int), null);
+            FakePolicy resultTyped = list.Get<FakePolicy>(typeof(object), "bar");
+            FakePolicy resultNamed = list.Get<FakePolicy>(typeof(object), "foo");
+
+            Assert.Same(policyAllTypesDefault, resultAll);
+            Assert.Same(policyTypeDefault, resultTyped);
+            Assert.Same(policyNamedType, resultNamed);
+        }
+
         class FakePolicy : IBuilderPolicy {}
     }
 }

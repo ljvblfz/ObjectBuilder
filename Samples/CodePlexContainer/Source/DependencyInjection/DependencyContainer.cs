@@ -7,61 +7,42 @@ namespace CodePlex.DependencyInjection
     {
         // Fields
 
-        IBuilder<BuilderStage> builder;
+        Builder builder;
         ILifetimeContainer lifetime;
         IReadWriteLocator locator;
-        PolicyList policies = new PolicyList();
+        PolicyList policies;
+        StagedStrategyChain<BuilderStage> strategies = new StagedStrategyChain<BuilderStage>();
         bool disposed;
-        DependencyContainer innerContainer;
 
         // Lifetime
 
         public DependencyContainer()
-        {
-            disposed = false;
-            locator = new Locator();
-            lifetime = new LifetimeContainer();
-            locator.Add(typeof(ILifetimeContainer), lifetime);
-            builder = new BuilderBase<BuilderStage>();
-
-            locator.Add(new DependencyResolutionLocatorKey(typeof(IObjectFactory), null), this);
-
-            builder.Strategies.AddNew<LifetimeStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<TypeMappingStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<SingletonStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<ConstructorReflectionStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<MethodReflectionStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<PropertyReflectionStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<CreationStrategy>(BuilderStage.Creation);
-            builder.Strategies.AddNew<PropertySetterStrategy>(BuilderStage.Initialization);
-            builder.Strategies.AddNew<MethodExecutionStrategy>(BuilderStage.Initialization);
-            builder.Strategies.AddNew<BuilderAwareStrategy>(BuilderStage.PostInitialization);
-
-            policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
-        }
+            : this(null, null) {}
 
         public DependencyContainer(DependencyContainer innerContainer)
-        {
-            this.innerContainer = innerContainer;
+            : this(innerContainer.locator, innerContainer.policies) {}
 
+        DependencyContainer(IReadWriteLocator innerLocator,
+                            PolicyList innerPolicyList)
+        {
             disposed = false;
-            locator = new Locator(innerContainer.locator);
+            locator = new Locator(innerLocator);
             lifetime = new LifetimeContainer();
-            locator.Add(typeof(ILifetimeContainer), lifetime);
-            builder = new BuilderBase<BuilderStage>();
+            builder = new Builder();
+            policies = new PolicyList(innerPolicyList);
 
             locator.Add(new DependencyResolutionLocatorKey(typeof(IObjectFactory), null), this);
 
-            builder.Strategies.AddNew<LifetimeStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<TypeMappingStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<SingletonStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<ConstructorReflectionStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<MethodReflectionStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<PropertyReflectionStrategy>(BuilderStage.PreCreation);
-            builder.Strategies.AddNew<CreationStrategy>(BuilderStage.Creation);
-            builder.Strategies.AddNew<PropertySetterStrategy>(BuilderStage.Initialization);
-            builder.Strategies.AddNew<MethodExecutionStrategy>(BuilderStage.Initialization);
-            builder.Strategies.AddNew<BuilderAwareStrategy>(BuilderStage.PostInitialization);
+            strategies.AddNew<LifetimeStrategy>(BuilderStage.PreCreation);
+            strategies.AddNew<TypeMappingStrategy>(BuilderStage.PreCreation);
+            strategies.AddNew<SingletonStrategy>(BuilderStage.PreCreation);
+            strategies.AddNew<ConstructorReflectionStrategy>(BuilderStage.PreCreation);
+            strategies.AddNew<MethodReflectionStrategy>(BuilderStage.PreCreation);
+            strategies.AddNew<PropertyReflectionStrategy>(BuilderStage.PreCreation);
+            strategies.AddNew<CreationStrategy>(BuilderStage.Creation);
+            strategies.AddNew<PropertySetterStrategy>(BuilderStage.Initialization);
+            strategies.AddNew<MethodExecutionStrategy>(BuilderStage.Initialization);
+            strategies.AddNew<BuilderAwareStrategy>(BuilderStage.PostInitialization);
 
             policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
         }
@@ -89,23 +70,7 @@ namespace CodePlex.DependencyInjection
 
         public object Get(Type typeToBuild)
         {
-            return builder.BuildUp(locator, typeToBuild, null, null, GetPoliciesForBuild());
-        }
-
-        PolicyList GetPoliciesForBuild()
-        {
-            PolicyList buildPolicies = new PolicyList();
-
-            if (innerContainer != null)
-                buildPolicies.AddPolicies(innerContainer.GetPoliciesForBuild());
-
-            buildPolicies.AddPolicies(policies);
-            return buildPolicies;
-        }
-
-        public void Inject(object existingObject)
-        {
-            builder.BuildUp(locator, existingObject.GetType(), null, existingObject);
+            return builder.BuildUp(locator, lifetime, policies, strategies.MakeStrategyChain(), typeToBuild, null, null);
         }
 
         public void RegisterSingletonInstance(Type typeToRegisterAs,
@@ -136,7 +101,7 @@ namespace CodePlex.DependencyInjection
 
         public void TearDown(object existingObject)
         {
-            builder.TearDown(locator, existingObject);
+            builder.TearDown(locator, lifetime, policies, strategies.MakeStrategyChain(), existingObject);
         }
 
         // Inner types

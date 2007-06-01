@@ -98,17 +98,5 @@ namespace CodePlex.DependencyInjection.ObjectBuilder.Location
 
             locator.Get<string>(1);
         }
-
-        [Test]
-        [ExpectedException(typeof(InvalidCastException))]
-        public void GenericGetWithSearchModeEnforcesDataType()
-        {
-            Locator innerLocator = new Locator();
-            ReadOnlyLocator locator = new ReadOnlyLocator(innerLocator);
-
-            innerLocator.Add(1, 2);
-
-            locator.Get<string>(1, SearchMode.Local);
-        }
     }
 }

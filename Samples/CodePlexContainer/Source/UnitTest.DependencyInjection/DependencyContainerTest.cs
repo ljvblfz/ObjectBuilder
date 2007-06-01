@@ -57,18 +57,6 @@ namespace CodePlex.DependencyInjection
         }
 
         [Test]
-        public void CanBuildExistingObject()
-        {
-            DependencyContainer container = new DependencyContainer();
-            container.RegisterSingletonInstance("foo");
-            ExistingObject existingObject = new ExistingObject();
-
-            container.Inject(existingObject);
-
-            Assert.Equal("foo", existingObject.Name);
-        }
-
-        [Test]
         public void NestedContainerCanReturnObjectsFromInnerContainer()
         {
             DependencyContainer innerContainer = new DependencyContainer();

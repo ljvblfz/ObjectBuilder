@@ -38,15 +38,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DependencyContainerTest.cs" />
-    <Compile Include="ObjectBuilder\BuilderBaseFixture.cs" />
-    <Compile Include="ObjectBuilder\BuilderCodeTests.cs" />
-    <Compile Include="ObjectBuilder\BuilderConfigTests.cs" />
-    <Compile Include="ObjectBuilder\BuilderContextFixture.cs" />
-    <Compile Include="ObjectBuilder\BuilderFixture.cs" />
-    <Compile Include="ObjectBuilder\Configuration\ObjectBuilderXmlConfig.cs">
-      <DependentUpon>ObjectBuilderXmlConfig.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="ObjectBuilder\Configuration\ObjectBuilderXmlConfig.Generated.cs" />
+    <Compile Include="ObjectBuilder\BuilderContextTest.cs" />
+    <Compile Include="ObjectBuilder\BuilderTest.cs" />
     <Compile Include="ObjectBuilder\Lifetime\LifetimeContainerFixture.cs" />
     <Compile Include="ObjectBuilder\Location\LocatorFixture.cs" />
     <Compile Include="ObjectBuilder\Location\ReadOnlyLocatorFixture.cs" />
@@ -69,7 +62,7 @@
     <Compile Include="ObjectBuilder\Strategies\TypeMapping\TypeMappingStrategyFixture.cs" />
     <Compile Include="ObjectBuilder\Utility\DependencyResolverFixture.cs" />
     <Compile Include="ObjectBuilder\Utility\PolicyListFixture.cs" />
-    <Compile Include="ObjectBuilder\Utility\StrategyListFixture.cs" />
+    <Compile Include="ObjectBuilder\Utility\StagedStrategyChainTest.cs" />
     <Compile Include="ObjectBuilder\Utility\WeakRefDictionaryFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -82,14 +75,6 @@
       <Project>{4C4BC0F4-A198-43DA-B743-A76D22C75BD5}</Project>
       <Name>UnitTestUtility</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="ObjectBuilder\Configuration\ObjectBuilderXmlConfig.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <None Include="ObjectBuilder\Configuration\ObjectBuilderXmlConfig.xsx">
-      <DependentUpon>ObjectBuilderXmlConfig.xsd</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />

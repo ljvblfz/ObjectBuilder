@@ -10,7 +10,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         string name;
         Type createType;
         NotPresentBehavior notPresentBehavior = NotPresentBehavior.CreateNew;
-        SearchMode searchMode;
 
         // Properties
 
@@ -34,15 +33,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         // Methods
 
-        public SearchMode SearchMode
-        {
-            get { return searchMode; }
-            set { searchMode = value; }
-        }
-
         public override IParameter CreateParameter(Type annotatedMemberType)
         {
-            return new DependencyParameter(annotatedMemberType, name, createType, notPresentBehavior, searchMode);
+            return new DependencyParameter(annotatedMemberType, name, createType, notPresentBehavior);
         }
     }
 }

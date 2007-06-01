@@ -1,8 +1,6 @@
-using System.Collections;
-
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public interface IBuilderStrategyChain
+    public interface IStrategyChain
     {
         // Properties
 
@@ -10,8 +8,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         // Methods
 
-        void Add(IBuilderStrategy strategy);
-        void AddRange(IEnumerable strategyEnumerable);
         IBuilderStrategy GetNext(IBuilderStrategy currentStrategy);
+        IStrategyChain Reverse();
     }
 }

@@ -303,53 +303,14 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             context.HeadOfChain.BuildUp(context, typeof(NamedThrowingMockObject), null, null);
         }
 
-        // SearchMode Tests
-
-        [Test]
-        public void CanSearchDependencyUp()
-        {
-            Locator parent = new Locator();
-            parent.Add(new DependencyResolutionLocatorKey(typeof(int), null), 25);
-            Locator child = new Locator(parent);
-            MockBuilderContext context = CreateContext(child);
-
-            context.HeadOfChain.BuildUp(context, typeof(SearchUpMockObject), null, null);
-        }
-
-        [Test]
-        [ExpectedException(typeof(DependencyMissingException))]
-        public void LocalSearchFailsIfDependencyIsOnlyUpstream()
-        {
-            Locator parent = new Locator();
-            parent.Add(new DependencyResolutionLocatorKey(typeof(int), null), 25);
-            Locator child = new Locator(parent);
-            MockBuilderContext context = CreateContext(child);
-
-            context.HeadOfChain.BuildUp(context, typeof(SearchLocalMockObject), null, null);
-        }
-
-        [Test]
-        public void LocalSearchGetsLocalIfDependencyIsAlsoUpstream()
-        {
-            Locator parent = new Locator();
-            parent.Add(new DependencyResolutionLocatorKey(typeof(int), null), 25);
-            Locator child = new Locator(parent);
-            child.Add(new DependencyResolutionLocatorKey(typeof(int), null), 15);
-            MockBuilderContext context = CreateContext(child);
-
-            SearchLocalMockObject obj = (SearchLocalMockObject)context.HeadOfChain.BuildUp(context, typeof(SearchLocalMockObject), null, null);
-
-            Assert.Equal(15, obj.Value);
-        }
-
         // Helpers
 
-        MockBuilderContext CreateContext()
+        static MockBuilderContext CreateContext()
         {
             return CreateContext(new Locator());
         }
 
-        MockBuilderContext CreateContext(Locator locator)
+        static MockBuilderContext CreateContext(Locator locator)
         {
             MockBuilderContext result = new MockBuilderContext(locator);
             result.Strategies.Add(new SingletonStrategy());
@@ -358,29 +319,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             result.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             result.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
             return result;
-        }
-
-        public class SearchUpMockObject
-        {
-            public int Value;
-
-            public SearchUpMockObject(
-                [Dependency(SearchMode = SearchMode.Up, NotPresentBehavior = NotPresentBehavior.Throw)] int value)
-            {
-                Value = value;
-            }
-        }
-
-        public class SearchLocalMockObject
-        {
-            public int Value;
-
-            public SearchLocalMockObject(
-                [Dependency(SearchMode = SearchMode.Local, NotPresentBehavior = NotPresentBehavior.Throw)] int value
-                )
-            {
-                Value = value;
-            }
         }
 
         public class ThrowingMockObject
