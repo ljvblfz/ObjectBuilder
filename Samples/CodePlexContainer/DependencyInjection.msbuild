@@ -33,7 +33,7 @@
   </Target>
 
   <Target Name="CreateZip">
-    <Exec Command="$(CodePlex3rdParty)\zip.exe -r -9 $(ZipStoragePath)\dependency-injection-build-$(Revision).zip *.*" WorkingDirectory="Source\DependencyInjection\bin\Release"/>
+    <Exec Command="$(CodePlex3rdParty)\zip.exe -r -9 $(ZipStoragePath)\dependency-injection-build-$(ccnetlabel).zip *.*" WorkingDirectory="Source\DependencyInjection\bin\Release"/>
   </Target>
 
 </Project>
