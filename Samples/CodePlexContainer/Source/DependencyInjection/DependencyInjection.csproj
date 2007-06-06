@@ -38,7 +38,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DependencyContainer.cs" />
+    <Compile Include="Interception\HandlerPipeline.cs" />
+    <Compile Include="Interception\ICallHandler.cs" />
+    <Compile Include="Interception\IInterceptionPolicy.cs" />
+    <Compile Include="Interception\IMethodInvocation.cs" />
+    <Compile Include="Interception\IMethodReturn.cs" />
+    <Compile Include="Interception\InputParameterCollection.cs" />
+    <Compile Include="Interception\InterceptionPolicy.cs" />
+    <Compile Include="Interception\InterceptionType.cs" />
+    <Compile Include="Interception\IParameterCollection.cs" />
+    <Compile Include="Interception\MethodReturn.cs" />
+    <Compile Include="Interception\OutputParameterCollection.cs" />
+    <Compile Include="Interception\ParameterCollection.cs" />
+    <Compile Include="Interception\MethodInvocation.cs" />
+    <Compile Include="Interception\Remoting\RemotingInterceptionStrategy.cs" />
+    <Compile Include="Interception\Remoting\RemotingInterceptor.cs" />
+    <Compile Include="Interception\Remoting\RemotingProxy.cs" />
     <Compile Include="IObjectFactory.cs" />
+    <Compile Include="Lifetime\LifetimeStrategy.cs" />
     <Compile Include="ObjectBuilder\Builder.cs" />
     <Compile Include="ObjectBuilder\BuilderContext.cs" />
     <Compile Include="ObjectBuilder\BuilderPolicyKey.cs" />

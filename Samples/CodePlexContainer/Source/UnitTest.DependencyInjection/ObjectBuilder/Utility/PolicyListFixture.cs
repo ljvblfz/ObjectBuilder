@@ -226,6 +226,19 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             Assert.Same(policyNamedType, resultNamed);
         }
 
+        [Test]
+        public void CanGetLocalPolicy()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy innerPolicy = new FakePolicy();
+            innerList.Set(innerPolicy, typeof(object), null);
+
+            FakePolicy result = outerList.GetLocal<FakePolicy>(typeof(object), null);
+
+            Assert.Null(result);
+        }
+
         class FakePolicy : IBuilderPolicy {}
     }
 }

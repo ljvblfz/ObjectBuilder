@@ -83,18 +83,27 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                   Type typePolicyAppliesTo,
                                   string idPolicyAppliesTo)
         {
+            return Get(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo, false);
+        }
+
+        IBuilderPolicy Get(Type policyInterface,
+                           Type typePolicyAppliesTo,
+                           string idPolicyAppliesTo,
+                           bool localOnly)
+        {
             BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo ?? "");
             BuilderPolicyKey keyForDefaultType = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, null);
             BuilderPolicyKey keyForDefaultAllTypes = new BuilderPolicyKey(policyInterface, null, null);
             IPolicyList thisPolicyList = this;
 
             return
-                thisPolicyList.GetForKey(key) ??
-                thisPolicyList.GetForKey(keyForDefaultType) ??
-                thisPolicyList.GetForKey(keyForDefaultAllTypes);
+                thisPolicyList.GetForKey(key, localOnly) ??
+                thisPolicyList.GetForKey(keyForDefaultType, localOnly) ??
+                thisPolicyList.GetForKey(keyForDefaultAllTypes, localOnly);
         }
 
-        IBuilderPolicy IPolicyList.GetForKey(BuilderPolicyKey key)
+        IBuilderPolicy IPolicyList.GetForKey(BuilderPolicyKey key,
+                                             bool localOnly)
         {
             lock (lockObject)
             {
@@ -103,7 +112,24 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     return policy;
             }
 
-            return innerPolicyList.GetForKey(key);
+            if (localOnly)
+                return null;
+            else
+                return innerPolicyList.GetForKey(key, localOnly);
+        }
+
+        public TPolicy GetLocal<TPolicy>(Type typePolicyAppliesTo,
+                                         string idPolicyAppliesTo)
+            where TPolicy : IBuilderPolicy
+        {
+            return (TPolicy)GetLocal(typeof(TPolicy), typePolicyAppliesTo, idPolicyAppliesTo);
+        }
+
+        public IBuilderPolicy GetLocal(Type policyInterface,
+                                       Type typePolicyAppliesTo,
+                                       string idPolicyAppliesTo)
+        {
+            return Get(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo, true);
         }
 
         public void Set<TPolicyInterface>(TPolicyInterface policy,
@@ -161,7 +187,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         class NullPolicyList : IPolicyList
         {
-            public IBuilderPolicy GetForKey(BuilderPolicyKey key)
+            public IBuilderPolicy GetForKey(BuilderPolicyKey key, bool localOnly)
             {
                 return null;
             }

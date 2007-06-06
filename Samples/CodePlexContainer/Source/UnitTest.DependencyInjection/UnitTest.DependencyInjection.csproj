@@ -37,7 +37,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assert\Assert.cs" />
+    <Compile Include="Assert\AssertActualExpectedException.cs" />
+    <Compile Include="Assert\AssertException.cs" />
+    <Compile Include="Assert\ContainsException.cs" />
+    <Compile Include="Assert\DoesNotContainException.cs" />
+    <Compile Include="Assert\EmptyException.cs" />
+    <Compile Include="Assert\EqualException.cs" />
+    <Compile Include="Assert\FalseException.cs" />
+    <Compile Include="Assert\InRangeException.cs" />
+    <Compile Include="Assert\IsTypeException.cs" />
+    <Compile Include="Assert\NotEmptyException.cs" />
+    <Compile Include="Assert\NotEqualException.cs" />
+    <Compile Include="Assert\NotNullException.cs" />
+    <Compile Include="Assert\NotSameException.cs" />
+    <Compile Include="Assert\NullException.cs" />
+    <Compile Include="Assert\SameException.cs" />
+    <Compile Include="Assert\ThrowsException.cs" />
+    <Compile Include="Assert\TrueException.cs" />
     <Compile Include="DependencyContainerTest.cs" />
+    <Compile Include="Interception\HandlerPipelineTest.cs" />
+    <Compile Include="Interception\Remoting\RemotingInterceptorTest.cs" />
+    <Compile Include="MethodInvocationTest.cs" />
+    <Compile Include="Stubs\StubMethodReturn.cs" />
+    <Compile Include="Stubs\StubMethodInvocation.cs" />
     <Compile Include="ObjectBuilder\BuilderContextTest.cs" />
     <Compile Include="ObjectBuilder\BuilderTest.cs" />
     <Compile Include="ObjectBuilder\Lifetime\LifetimeContainerFixture.cs" />
@@ -70,10 +93,6 @@
     <ProjectReference Include="..\DependencyInjection\DependencyInjection.csproj">
       <Project>{4A3B5699-E4E2-4A3A-A772-7697A2437B07}</Project>
       <Name>DependencyInjection</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UnitTestUtility\UnitTestUtility.csproj">
-      <Project>{4C4BC0F4-A198-43DA-B743-A76D22C75BD5}</Project>
-      <Name>UnitTestUtility</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
