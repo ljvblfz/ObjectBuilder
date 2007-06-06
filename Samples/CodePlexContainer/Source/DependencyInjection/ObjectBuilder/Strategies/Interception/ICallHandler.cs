@@ -1,4 +1,4 @@
-namespace CodePlex.DependencyInjection
+namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public delegate IMethodReturn InvokeHandlerDelegate(IMethodInvocation call,
                                                         GetNextHandlerDelegate getNext);

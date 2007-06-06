@@ -1,7 +1,6 @@
 using System;
-using CodePlex.DependencyInjection.ObjectBuilder;
 
-namespace CodePlex.DependencyInjection
+namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class RemotingInterceptionStrategy : BuilderStrategy
     {

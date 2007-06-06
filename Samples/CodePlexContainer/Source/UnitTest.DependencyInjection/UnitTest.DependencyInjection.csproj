@@ -56,9 +56,9 @@
     <Compile Include="Assert\ThrowsException.cs" />
     <Compile Include="Assert\TrueException.cs" />
     <Compile Include="DependencyContainerTest.cs" />
-    <Compile Include="Interception\HandlerPipelineTest.cs" />
-    <Compile Include="Interception\Remoting\RemotingInterceptorTest.cs" />
-    <Compile Include="MethodInvocationTest.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\HandlerPipelineTest.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\Remoting\RemotingInterceptorTest.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\MethodInvocationTest.cs" />
     <Compile Include="Stubs\StubMethodReturn.cs" />
     <Compile Include="Stubs\StubMethodInvocation.cs" />
     <Compile Include="ObjectBuilder\BuilderContextTest.cs" />

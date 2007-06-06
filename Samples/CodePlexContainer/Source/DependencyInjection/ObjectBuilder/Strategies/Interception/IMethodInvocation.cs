@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace CodePlex.DependencyInjection
+namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IMethodInvocation
     {

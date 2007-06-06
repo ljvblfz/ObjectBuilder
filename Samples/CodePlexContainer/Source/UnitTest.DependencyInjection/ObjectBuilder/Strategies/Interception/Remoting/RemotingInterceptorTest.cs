@@ -4,7 +4,7 @@ using System.Reflection;
 using NUnit.Framework;
 using Assert=CodePlex.NUnitExtensions.Assert;
 
-namespace CodePlex.DependencyInjection
+namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     [TestFixture]
     public class RemotingInterceptorTest

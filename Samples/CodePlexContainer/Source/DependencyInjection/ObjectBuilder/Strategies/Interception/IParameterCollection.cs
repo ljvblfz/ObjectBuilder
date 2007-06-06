@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace CodePlex.DependencyInjection
+namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IParameterCollection : IEnumerable
     {

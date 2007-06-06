@@ -187,7 +187,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         class NullPolicyList : IPolicyList
         {
-            public IBuilderPolicy GetForKey(BuilderPolicyKey key, bool localOnly)
+            public IBuilderPolicy GetForKey(BuilderPolicyKey key,
+                                            bool localOnly)
             {
                 return null;
             }

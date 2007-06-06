@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using CodePlex.DependencyInjection.ObjectBuilder;
 using NUnit.Framework;
 using Assert=CodePlex.NUnitExtensions.Assert;

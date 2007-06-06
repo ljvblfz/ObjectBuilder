@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace CodePlex.DependencyInjection.ObjectBuilder.Location
+namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     [TestFixture]
     public class ReadOnlyLocatorFixture

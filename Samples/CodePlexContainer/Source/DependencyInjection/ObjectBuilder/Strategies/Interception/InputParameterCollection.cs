@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace CodePlex.DependencyInjection
+namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     class InputParameterCollection : ParameterCollection
     {

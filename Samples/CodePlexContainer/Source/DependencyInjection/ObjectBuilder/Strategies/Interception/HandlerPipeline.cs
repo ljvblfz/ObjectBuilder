@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CodePlex.DependencyInjection
+namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class HandlerPipeline
     {

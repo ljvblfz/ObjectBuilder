@@ -1,6 +1,6 @@
 using System;
 
-namespace CodePlex.DependencyInjection
+namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IMethodReturn
     {

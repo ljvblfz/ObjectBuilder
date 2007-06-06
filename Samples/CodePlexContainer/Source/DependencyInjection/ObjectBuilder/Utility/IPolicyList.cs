@@ -2,6 +2,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     interface IPolicyList
     {
-        IBuilderPolicy GetForKey(BuilderPolicyKey key, bool localOnly);
+        IBuilderPolicy GetForKey(BuilderPolicyKey key,
+                                 bool localOnly);
     }
 }

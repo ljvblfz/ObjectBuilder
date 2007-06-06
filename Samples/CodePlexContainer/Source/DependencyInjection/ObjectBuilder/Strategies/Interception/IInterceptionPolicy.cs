@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
-using CodePlex.DependencyInjection.ObjectBuilder;
 
-namespace CodePlex.DependencyInjection
+namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IInterceptionPolicy : IBuilderPolicy, IEnumerable<KeyValuePair<MethodBase, List<ICallHandler>>>
     {
