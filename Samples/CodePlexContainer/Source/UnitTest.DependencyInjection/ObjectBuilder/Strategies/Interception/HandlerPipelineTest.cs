@@ -13,12 +13,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             Assert.Throws<ArgumentNullException>(delegate
                                                  {
-                                                     new HandlerPipeline((IEnumerable<ICallHandler>)null);
+                                                     new HandlerPipeline((IEnumerable<IInterceptionHandler>)null);
                                                  });
 
             Assert.Throws<ArgumentNullException>(delegate
                                                  {
-                                                     new HandlerPipeline((ICallHandler[])null);
+                                                     new HandlerPipeline((IInterceptionHandler[])null);
                                                  });
         }
 
@@ -48,7 +48,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public void OneHandler()
         {
             Recorder.Records.Clear();
-            RecordingHandler handler = new RecordingHandler("handler");
+            RecordingHandler handler = new RecordingHandler();
             StubMethodInvocation invocation = new StubMethodInvocation();
             HandlerPipeline pipeline = new HandlerPipeline(handler);
 
@@ -58,17 +58,18 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                             return null;
                                         });
 
-            Assert.Equal(2, Recorder.Records.Count);
-            Assert.Equal("handler", Recorder.Records[0]);
+            Assert.Equal(3, Recorder.Records.Count);
+            Assert.Equal("Before Method", Recorder.Records[0]);
             Assert.Equal("method", Recorder.Records[1]);
+            Assert.Equal("After Method", Recorder.Records[2]);
         }
 
         [Test]
         public void TwoHandlers()
         {
             Recorder.Records.Clear();
-            RecordingHandler handler1 = new RecordingHandler("handler 1");
-            RecordingHandler handler2 = new RecordingHandler("handler 2");
+            RecordingHandler handler1 = new RecordingHandler("1");
+            RecordingHandler handler2 = new RecordingHandler("2");
             StubMethodInvocation invocation = new StubMethodInvocation();
             HandlerPipeline pipeline = new HandlerPipeline(handler1, handler2);
 
@@ -78,40 +79,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                             return null;
                                         });
 
-            Assert.Equal(3, Recorder.Records.Count);
-            Assert.Equal("handler 1", Recorder.Records[0]);
-            Assert.Equal("handler 2", Recorder.Records[1]);
+            Assert.Equal(5, Recorder.Records.Count);
+            Assert.Equal("Before Method (1)", Recorder.Records[0]);
+            Assert.Equal("Before Method (2)", Recorder.Records[1]);
             Assert.Equal("method", Recorder.Records[2]);
-        }
-
-        // Helpers
-
-        static class Recorder
-        {
-            public static List<string> Records = new List<string>();
-        }
-
-        class RecordingHandler : ICallHandler
-        {
-            // Fields
-
-            string message;
-
-            // Lifetime
-
-            public RecordingHandler(string message)
-            {
-                this.message = message;
-            }
-
-            // Method
-
-            public IMethodReturn Invoke(IMethodInvocation call,
-                                        GetNextHandlerDelegate getNext)
-            {
-                Recorder.Records.Add(message);
-                return getNext().Invoke(call, getNext);
-            }
+            Assert.Equal("After Method (2)", Recorder.Records[3]);
+            Assert.Equal("After Method (1)", Recorder.Records[4]);
         }
     }
 }

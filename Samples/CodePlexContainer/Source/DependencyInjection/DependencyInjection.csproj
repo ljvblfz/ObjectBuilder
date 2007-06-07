@@ -39,14 +39,17 @@
   <ItemGroup>
     <Compile Include="DependencyContainer.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\HandlerPipeline.cs" />
-    <Compile Include="ObjectBuilder\Strategies\Interception\ICallHandler.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\IInterceptionHandler.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\IInterceptionPolicy.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\IMethodInvocation.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\IMethodReturn.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\InputParameterCollection.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\InterceptAttribute.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\InterceptionPolicy.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\InterceptionReflectionStrategy.cs" />
     <Compile Include="InterceptionType.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\InterceptionReflector.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\InterceptTypeAttribute.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\IParameterCollection.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\MethodReturn.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\OutputParameterCollection.cs" />

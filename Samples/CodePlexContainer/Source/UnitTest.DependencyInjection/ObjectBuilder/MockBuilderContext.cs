@@ -1,3 +1,5 @@
+using System;
+
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     class MockBuilderContext : IBuilderContext
@@ -8,6 +10,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         ILifetimeContainer lifetime = new LifetimeContainer();
         IReadWriteLocator locator;
         PolicyList policies = new PolicyList();
+        string originalID;
+        Type originalType;
 
         // Lifetime
 
@@ -34,6 +38,18 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public IReadWriteLocator Locator
         {
             get { return locator; }
+        }
+
+        public string OriginalID
+        {
+            get { return originalID; }
+            set { originalID = value; }
+        }
+
+        public Type OriginalType
+        {
+            get { return originalType; }
+            set { originalType = value; }
         }
 
         public PolicyList Policies

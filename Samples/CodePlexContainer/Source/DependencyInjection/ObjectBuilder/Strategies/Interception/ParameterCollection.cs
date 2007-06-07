@@ -43,68 +43,25 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         public object this[string paramName]
         {
-            get { return arguments[IndexForInputParameterName(paramName)]; }
-            set { arguments[IndexForInputParameterName(paramName)] = value; }
+            get { return arguments[IndexForParameterName(paramName)]; }
+            set { arguments[IndexForParameterName(paramName)] = value; }
         }
 
         // Methods
 
-        [Obsolete]
-        public int Count
-        {
-            get { return argumentInfo.Count; }
-        }
-
-        [Obsolete]
-        public bool Contains(object value)
-        {
-            return argumentInfo.Exists(delegate(ArgumentInfo info)
-                                       {
-                                           return arguments[info.Index].Equals(value);
-                                       });
-        }
-
-        [Obsolete]
         public IEnumerator GetEnumerator()
         {
             for (int i = 0; i < argumentInfo.Count; ++i)
                 yield return arguments[argumentInfo[i].Index];
         }
 
-        [Obsolete]
-        public ParameterInfo GetParameterInfo(int index)
-        {
-            return argumentInfo[index].ParameterInfo;
-        }
-
-        [Obsolete]
-        public ParameterInfo GetParameterInfo(string paramName)
-        {
-            return argumentInfo[IndexForInputParameterName(paramName)].ParameterInfo;
-        }
-
-        int IndexForInputParameterName(string paramName)
+        int IndexForParameterName(string paramName)
         {
             for (int i = 0; i < argumentInfo.Count; ++i)
                 if (argumentInfo[i].Name == paramName)
-                    return i;
+                    return argumentInfo[i].Index;
 
             throw new ArgumentException("Invalid parameter Name", "paramName");
-        }
-
-        [Obsolete]
-        public int IndexOf(object value)
-        {
-            return argumentInfo.FindIndex(delegate(ArgumentInfo info)
-                                          {
-                                              return arguments[info.Index].Equals(value);
-                                          });
-        }
-
-        [Obsolete]
-        public string ParameterName(int index)
-        {
-            return argumentInfo[index].Name;
         }
 
         // Inner types

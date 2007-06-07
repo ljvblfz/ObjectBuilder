@@ -167,7 +167,7 @@ namespace CodePlex.DependencyInjection
             }
 
             [Test]
-            public void CanInterceptWithRemoting()
+            public void RemotingInterceptionViaCode()
             {
                 Recorder.Records.Clear();
                 DependencyContainer container = new DependencyContainer();
@@ -182,6 +182,38 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("Before Method", Recorder.Records[0]);
                 Assert.Equal("In Method", Recorder.Records[1]);
                 Assert.Equal("After Method", Recorder.Records[2]);
+            }
+
+            [Test]
+            public void RemotingInterceptionViaAttributes()
+            {
+                Recorder.Records.Clear();
+                DependencyContainer container = new DependencyContainer();
+
+                SpyMBROWithAttribute obj = container.Get<SpyMBROWithAttribute>();
+                obj.InterceptedMethod();
+
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In Method", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+            }
+
+            [Test]
+            public void RemotingInterceptionThroughInterfaceViaAttributes()
+            {
+                Recorder.Records.Clear();
+                DependencyContainer container = new DependencyContainer();
+                container.RegisterTypeMapping<ISpy, SpyInterfaceImplWithAttribute>();
+
+                ISpy obj = container.Get<ISpy>();
+                obj.InterceptedMethod();
+
+                Assert.Equal(4, Recorder.Records.Count);
+                Assert.Equal("OnBuiltUp", Recorder.Records[0]);
+                Assert.Equal("Before Method", Recorder.Records[1]);
+                Assert.Equal("In Method", Recorder.Records[2]);
+                Assert.Equal("After Method", Recorder.Records[3]);
             }
 
             [Test]
@@ -210,7 +242,7 @@ namespace CodePlex.DependencyInjection
                 public static List<string> Records = new List<string>();
             }
 
-            class RecordingHandler : ICallHandler
+            class RecordingHandler : IInterceptionHandler
             {
                 public IMethodReturn Invoke(IMethodInvocation call,
                                             GetNextHandlerDelegate getNext)
@@ -227,6 +259,41 @@ namespace CodePlex.DependencyInjection
                 public void InterceptedMethod()
                 {
                     Recorder.Records.Add("In Method");
+                }
+            }
+
+            [InterceptType(InterceptionType.Remoting)]
+            internal class SpyMBROWithAttribute : MarshalByRefObject
+            {
+                [Intercept(typeof(RecordingHandler))]
+                public void InterceptedMethod()
+                {
+                    Recorder.Records.Add("In Method");
+                }
+            }
+
+            internal interface ISpy
+            {
+                void InterceptedMethod();
+            }
+
+            [InterceptType(InterceptionType.Remoting)]
+            internal class SpyInterfaceImplWithAttribute : ISpy, IBuilderAware
+            {
+                [Intercept(typeof(RecordingHandler))]
+                public void InterceptedMethod()
+                {
+                    Recorder.Records.Add("In Method");
+                }
+
+                public void OnBuiltUp(string id)
+                {
+                    Recorder.Records.Add("OnBuiltUp");
+                }
+
+                public void OnTearingDown()
+                {
+                    Recorder.Records.Add("OnTearingDown");
                 }
             }
 

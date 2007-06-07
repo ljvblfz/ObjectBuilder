@@ -41,11 +41,12 @@ namespace CodePlex.DependencyInjection
                 strategies.AddNew<ConstructorReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<MethodReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<PropertyReflectionStrategy>(BuilderStage.PreCreation);
+                strategies.AddNew<InterceptionReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<CreationStrategy>(BuilderStage.Creation);
                 strategies.AddNew<PropertySetterStrategy>(BuilderStage.Initialization);
                 strategies.AddNew<MethodExecutionStrategy>(BuilderStage.Initialization);
-                strategies.AddNew<RemotingInterceptionStrategy>(BuilderStage.PostInitialization);
                 strategies.AddNew<BuilderAwareStrategy>(BuilderStage.PostInitialization);
+                strategies.AddNew<RemotingInterceptionStrategy>(BuilderStage.PostInitialization);
             }
 
             if (innerPolicies == null)
@@ -91,14 +92,14 @@ namespace CodePlex.DependencyInjection
         }
 
         public void Intercept<T>(MethodInfo method,
-                                 params ICallHandler[] handlers)
+                                 params IInterceptionHandler[] handlers)
         {
             Intercept(typeof(T), method, handlers);
         }
 
         public void Intercept(Type typeToIntercept,
                               MethodInfo method,
-                              params ICallHandler[] handlers)
+                              params IInterceptionHandler[] handlers)
         {
             InterceptionPolicy policy = (InterceptionPolicy)policies.GetLocal<IInterceptionPolicy>(typeToIntercept, null);
 

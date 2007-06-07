@@ -5,7 +5,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
     public delegate InvokeHandlerDelegate GetNextHandlerDelegate();
 
-    public interface ICallHandler
+    public interface IInterceptionHandler
     {
         IMethodReturn Invoke(IMethodInvocation call,
                              GetNextHandlerDelegate getNext);

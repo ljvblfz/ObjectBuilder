@@ -1,3 +1,5 @@
+using System;
+
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class BuilderContext : IBuilderContext
@@ -8,6 +10,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         ILifetimeContainer lifetime;
         IReadWriteLocator locator;
         PolicyList policies;
+        string originalID;
+        Type originalType;
 
         // Lifetime
 
@@ -16,12 +20,16 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public BuilderContext(IStrategyChain chain,
                               IReadWriteLocator locator,
                               ILifetimeContainer lifetime,
-                              PolicyList policies)
+                              PolicyList policies,
+                              Type originalType,
+                              string originalID)
         {
             this.chain = chain;
             this.locator = locator;
             this.lifetime = lifetime;
             this.policies = new PolicyList(policies);
+            this.originalType = originalType;
+            this.originalID = originalID;
         }
 
         // Properties
@@ -39,6 +47,16 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public IReadWriteLocator Locator
         {
             get { return locator; }
+        }
+
+        public string OriginalID
+        {
+            get { return originalID; }
+        }
+
+        public Type OriginalType
+        {
+            get { return originalType; }
         }
 
         public PolicyList Policies

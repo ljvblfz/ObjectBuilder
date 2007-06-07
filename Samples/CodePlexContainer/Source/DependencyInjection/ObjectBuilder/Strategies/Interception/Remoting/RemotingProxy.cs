@@ -13,22 +13,24 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         Dictionary<MethodBase, HandlerPipeline> handlers;
         object target;
-        string typeName;
+        Type typeToProxy;
+        Type typeOfTarget;
 
         // Lifetime
 
         public RemotingProxy(object target,
-                             Type classToProxy,
-                             IEnumerable<KeyValuePair<MethodBase, List<ICallHandler>>> handlers)
-            : base(classToProxy)
+                             Type typeToProxy,
+                             IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers)
+            : base(typeToProxy)
         {
             this.target = target;
+            this.typeToProxy = typeToProxy;
             this.handlers = new Dictionary<MethodBase, HandlerPipeline>();
 
-            foreach (KeyValuePair<MethodBase, List<ICallHandler>> kvp in handlers)
+            foreach (KeyValuePair<MethodBase, List<IInterceptionHandler>> kvp in handlers)
                 this.handlers.Add(kvp.Key, new HandlerPipeline(kvp.Value));
 
-            typeName = target.GetType().FullName;
+            typeOfTarget = target.GetType();
         }
 
         // Properties
@@ -40,8 +42,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         string IRemotingTypeInfo.TypeName
         {
-            get { return typeName; }
-            set { typeName = value; }
+            get { return typeOfTarget.FullName; }
+            set { throw new NotImplementedException(); }
         }
 
         // Methods
@@ -56,9 +58,27 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             IMethodCallMessage callMessage = (IMethodCallMessage)msg;
             HandlerPipeline pipeline;
+            MethodBase method = callMessage.MethodBase;
+
+            if (method.ReflectedType != typeOfTarget)
+            {
+                List<Type> paramTypes = new List<Type>();
+
+                foreach (ParameterInfo paramInfo in method.GetParameters())
+                    paramTypes.Add(paramInfo.ParameterType);
+
+                method = typeOfTarget.GetMethod(method.Name,
+                                                BindingFlags.Public | BindingFlags.Instance,
+                                                null,
+                                                method.CallingConvention,
+                                                paramTypes.ToArray(),
+                                                null);
+            }
 
             if (handlers.ContainsKey(callMessage.MethodBase))
                 pipeline = handlers[callMessage.MethodBase];
+            else if (handlers.ContainsKey(method))
+                pipeline = handlers[method];
             else
                 pipeline = new HandlerPipeline();
 

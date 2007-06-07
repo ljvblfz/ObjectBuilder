@@ -31,7 +31,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return base.BuildUp(context, typeToBuild, existing, idToBuild);
         }
 
-        IEnumerable<IParameter> GenerateIParametersFromParameterInfos(ParameterInfo[] parameterInfos)
+        static IEnumerable<IParameter> GenerateIParametersFromParameterInfos(ParameterInfo[] parameterInfos)
         {
             List<IParameter> result = new List<IParameter>();
 

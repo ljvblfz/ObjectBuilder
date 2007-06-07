@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -8,7 +9,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     {
         // Fields
 
-        Dictionary<MethodBase, List<ICallHandler>> handlers;
+        Dictionary<MethodBase, List<IInterceptionHandler>> handlers;
         InterceptionType interceptionType;
 
         // Lifetime
@@ -17,31 +18,46 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             this.interceptionType = interceptionType;
 
-            handlers = new Dictionary<MethodBase, List<ICallHandler>>();
+            handlers = new Dictionary<MethodBase, List<IInterceptionHandler>>();
         }
 
         // Properties
+
+        public IList<IInterceptionHandler> this[MethodBase method]
+        {
+            get { return handlers[method].AsReadOnly(); }
+        }
+
+        public int Count
+        {
+            get { return handlers.Count; }
+        }
 
         public InterceptionType InterceptionType
         {
             get { return interceptionType; }
         }
 
+        public IEnumerable<MethodBase> Methods
+        {
+            get { return handlers.Keys; }
+        }
+
         // Methods
 
         public void Add(MethodBase method,
-                        IEnumerable<ICallHandler> methodHandlers)
+                        IEnumerable<IInterceptionHandler> methodHandlers)
         {
-            handlers[method] = new List<ICallHandler>(methodHandlers);
+            handlers[method] = new List<IInterceptionHandler>(methodHandlers);
         }
 
         public void Add(MethodBase method,
-                        params ICallHandler[] methodHandlers)
+                        params IInterceptionHandler[] methodHandlers)
         {
-            handlers[method] = new List<ICallHandler>(methodHandlers);
+            handlers[method] = new List<IInterceptionHandler>(methodHandlers);
         }
 
-        public IEnumerator<KeyValuePair<MethodBase, List<ICallHandler>>> GetEnumerator()
+        public IEnumerator<KeyValuePair<MethodBase, List<IInterceptionHandler>>> GetEnumerator()
         {
             return handlers.GetEnumerator();
         }

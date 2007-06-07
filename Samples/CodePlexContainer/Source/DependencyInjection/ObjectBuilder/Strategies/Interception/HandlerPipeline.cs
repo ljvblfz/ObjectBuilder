@@ -6,18 +6,18 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     {
         // Fields
 
-        List<ICallHandler> handlers;
+        List<IInterceptionHandler> handlers;
 
         // Lifetime
 
-        public HandlerPipeline(IEnumerable<ICallHandler> handlers)
+        public HandlerPipeline(IEnumerable<IInterceptionHandler> handlers)
         {
-            this.handlers = new List<ICallHandler>(handlers);
+            this.handlers = new List<IInterceptionHandler>(handlers);
         }
 
-        public HandlerPipeline(params ICallHandler[] handlers)
+        public HandlerPipeline(params IInterceptionHandler[] handlers)
         {
-            this.handlers = new List<ICallHandler>(handlers);
+            this.handlers = new List<IInterceptionHandler>(handlers);
         }
 
         // Methods

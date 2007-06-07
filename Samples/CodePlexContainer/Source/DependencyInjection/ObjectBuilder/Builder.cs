@@ -18,7 +18,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             Guard.ArgumentNotNull(strategies, "strategies");
             GuardStrategiesNotEmpty(strategies);
 
-            BuilderContext context = new BuilderContext(strategies, locator, lifetime, policies);
+            BuilderContext context = new BuilderContext(strategies, locator, lifetime, policies, typeToBuild, idToBuild);
             return context.HeadOfChain.BuildUp(context, typeToBuild, existing, idToBuild);
         }
 
@@ -48,7 +48,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             Guard.ArgumentNotNull(strategies, "strategies");
             GuardStrategiesNotEmpty(strategies);
 
-            BuilderContext context = new BuilderContext(strategies.Reverse(), locator, lifetime, policies);
+            BuilderContext context = new BuilderContext(strategies.Reverse(), locator, lifetime, policies, null, null);
             return (TItem)context.HeadOfChain.TearDown(context, item);
         }
     }
