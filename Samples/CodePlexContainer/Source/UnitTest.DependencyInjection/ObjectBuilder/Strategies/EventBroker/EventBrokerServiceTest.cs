@@ -36,7 +36,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
 
             [Test]
-            public void NullEventName()
+            public void NullEventID()
             {
                 EventBrokerService service = new EventBrokerService();
                 SpyEventSink sink = new SpyEventSink();
@@ -91,7 +91,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
 
             [Test]
-            public void NullEventName()
+            public void NullEventID()
             {
                 EventBrokerService service = new EventBrokerService();
                 SpyEventSource source = new SpyEventSource();
@@ -119,7 +119,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
 
             [Test]
-            public void NullEventName()
+            public void NullEventID()
             {
                 EventBrokerService service = new EventBrokerService();
 
@@ -162,7 +162,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
 
             [Test]
-            public void NullEventName()
+            public void NullEventID()
             {
                 EventBrokerService service = new EventBrokerService();
 
@@ -183,6 +183,40 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 service.UnregisterSource(source, "MyEvent");
 
                 Assert.False(source.HasHandlers);
+            }
+        }
+
+        [TestFixture]
+        public class WeakReferences
+        {
+            [Test]
+            public void SinksAreStoredWithWeakReferences()
+            {
+                EventBrokerService service = new EventBrokerService();
+                MethodInfo sinkMethod = typeof(ExceptionThrowingSink).GetMethod("MySink");
+                service.RegisterSink(new ExceptionThrowingSink(), sinkMethod, "MyEvent");
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+                Assert.DoesNotThrow(delegate
+                                    {
+                                        service.Fire("MyEvent", this, new EventArgs<string>("Hello world"));
+                                    });
+            }
+
+            [Test]
+            public void SourcesAreStoredWithWeakReferences()
+            {
+                SpyEventSource.FinalizerCalled = false;
+                EventBrokerService service = new EventBrokerService();
+                EventInfo sourceEvent = typeof(SpyEventSource).GetEvent("MySource");
+                service.RegisterSource(new SpyEventSource(), sourceEvent, "MyEvent");
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+                Assert.True(SpyEventSource.FinalizerCalled);
             }
         }
 
@@ -247,14 +281,19 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         // Static methods
         // Static events?
         // Hierarchy?
-        // Can we detect when an object is disposed to auto-unwire
 
         // Helpers
 
         internal class SpyEventSource
         {
+            public static bool FinalizerCalled;
             public event EventHandler<EventArgs<string>> MySource;
             public string SourceText = "Hello, world!";
+
+            ~SpyEventSource()
+            {
+                FinalizerCalled = true;
+            }
 
             public bool HasHandlers
             {

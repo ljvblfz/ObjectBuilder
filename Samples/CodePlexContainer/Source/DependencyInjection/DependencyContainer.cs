@@ -41,16 +41,23 @@ namespace CodePlex.DependencyInjection
                 strategies.AddNew<ConstructorReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<MethodReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<PropertyReflectionStrategy>(BuilderStage.PreCreation);
+                strategies.AddNew<EventBrokerReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<InterceptionReflectionStrategy>(BuilderStage.PreCreation);
+
                 strategies.AddNew<CreationStrategy>(BuilderStage.Creation);
+
                 strategies.AddNew<PropertySetterStrategy>(BuilderStage.Initialization);
                 strategies.AddNew<MethodExecutionStrategy>(BuilderStage.Initialization);
+                strategies.AddNew<EventBrokerStrategy>(BuilderStage.Initialization);
+
                 strategies.AddNew<BuilderAwareStrategy>(BuilderStage.PostInitialization);
                 strategies.AddNew<RemotingInterceptionStrategy>(BuilderStage.PostInitialization);
             }
 
             if (innerPolicies == null)
                 policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
+
+            locator.Add(typeof(EventBrokerService), new EventBrokerService());
         }
 
         public void Dispose()
@@ -84,6 +91,19 @@ namespace CodePlex.DependencyInjection
             return builder.BuildUp(locator, lifetime, policies, strategies.MakeStrategyChain(), typeToBuild, null, null);
         }
 
+        EventBrokerPolicy GetEventBrokerPolicy(Type type)
+        {
+            EventBrokerPolicy policy = (EventBrokerPolicy)policies.Get<IEventBrokerPolicy>(type, null);
+
+            if (policy == null)
+            {
+                policy = new EventBrokerPolicy();
+                policies.Set<IEventBrokerPolicy>(policy, type, null);
+            }
+
+            return policy;
+        }
+
         public object Inject(object @object)
         {
             Guard.ArgumentNotNull(@object, "object");
@@ -107,6 +127,34 @@ namespace CodePlex.DependencyInjection
                 throw new InvalidOperationException("Must call SetInterceptionType before calling Intercept");
 
             policy.Add(method, handlers);
+        }
+
+        public void RegisterEventSink<T>(string methodName,
+                                         string eventID)
+        {
+            RegisterEventSink(typeof(T), methodName, eventID);
+        }
+
+        public void RegisterEventSink(Type type,
+                                      string methodName,
+                                      string eventID)
+        {
+            EventBrokerPolicy policy = GetEventBrokerPolicy(type);
+            policy.AddSink(type.GetMethod(methodName), eventID);
+        }
+
+        public void RegisterEventSource<T>(string eventName,
+                                           string eventID)
+        {
+            RegisterEventSource(typeof(T), eventName, eventID);
+        }
+
+        public void RegisterEventSource(Type type,
+                                        string eventName,
+                                        string eventID)
+        {
+            EventBrokerPolicy policy = GetEventBrokerPolicy(type);
+            policy.AddSource(type.GetEvent(eventName), eventID);
         }
 
         public void RegisterSingletonInstance<TTypeToRegisterAs>(TTypeToRegisterAs instance)

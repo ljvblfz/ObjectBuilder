@@ -306,6 +306,82 @@ namespace CodePlex.DependencyInjection
             }
         }
 
+        [TestFixture]
+        public class EventBroker
+        {
+            [Test]
+            public void RegisterByCode()
+            {
+                DependencyContainer container = new DependencyContainer();
+                container.RegisterEventSource<EventSourceCode>("TheEvent", "MyEventID");
+                container.RegisterEventSink<EventSinkCode>("TheHandler", "MyEventID");
+                EventSourceCode source = container.Get<EventSourceCode>();
+                EventSinkCode sink = container.Get<EventSinkCode>();
+
+                source.Invoke();
+
+                Assert.NotNull(sink.HandlerArgs);
+            }
+
+            [Test]
+            public void RegisterByAttributes()
+            {
+                DependencyContainer container = new DependencyContainer();
+                EventSourceAttr source = container.Get<EventSourceAttr>();
+                EventSinkAttr sink = container.Get<EventSinkAttr>();
+
+                source.Invoke();
+
+                Assert.NotNull(sink.HandlerArgs);
+            }
+
+            internal class EventSourceCode
+            {
+                public event EventHandler<EventArgs> TheEvent;
+
+                public void Invoke()
+                {
+                    if (TheEvent != null)
+                        TheEvent(this, EventArgs.Empty);
+                }
+            }
+
+            internal class EventSourceAttr
+            {
+                [EventSource("MyEvent")]
+                public event EventHandler<EventArgs> TheEvent;
+
+                public void Invoke()
+                {
+                    if (TheEvent != null)
+                        TheEvent(this, EventArgs.Empty);
+                }
+            }
+
+            internal class EventSinkCode
+            {
+                public EventArgs HandlerArgs;
+
+                public void TheHandler(object sender,
+                                       EventArgs e)
+                {
+                    HandlerArgs = e;
+                }
+            }
+
+            internal class EventSinkAttr
+            {
+                public EventArgs HandlerArgs;
+
+                [EventSink("MyEvent")]
+                public void TheHandler(object sender,
+                                       EventArgs e)
+                {
+                    HandlerArgs = e;
+                }
+            }
+        }
+
         // Helpers
 
         interface IMyObject {}

@@ -285,6 +285,11 @@ namespace CodePlex.NUnitExtensions
             return (T)exception;
         }
 
+        public static void DoesNotThrow(ExceptionDelegate testCode)
+        {
+            testCode();
+        }
+
         static IComparer<T> GetComparer<T>()
         {
             return new AssertComparer<T>();

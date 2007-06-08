@@ -39,7 +39,13 @@
   <ItemGroup>
     <Compile Include="DependencyContainer.cs" />
     <Compile Include="ObjectBuilder\Strategies\EventBroker\EventBrokerException.cs" />
+    <Compile Include="ObjectBuilder\Strategies\EventBroker\EventBrokerPolicy.cs" />
+    <Compile Include="ObjectBuilder\Strategies\EventBroker\EventBrokerReflectionStrategy.cs" />
     <Compile Include="ObjectBuilder\Strategies\EventBroker\EventBrokerService.cs" />
+    <Compile Include="ObjectBuilder\Strategies\EventBroker\EventBrokerStrategy.cs" />
+    <Compile Include="ObjectBuilder\Strategies\EventBroker\EventSinkAttribute.cs" />
+    <Compile Include="ObjectBuilder\Strategies\EventBroker\EventSourceAttribute.cs" />
+    <Compile Include="ObjectBuilder\Strategies\EventBroker\IEventBrokerPolicy.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\HandlerPipeline.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\IInterceptionHandler.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\IInterceptionPolicy.cs" />

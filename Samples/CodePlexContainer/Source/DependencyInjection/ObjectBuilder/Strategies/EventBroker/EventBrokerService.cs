@@ -22,13 +22,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         // Methods
 
-        public void Fire(string eventName,
+        public void Fire(string eventID,
                          object sender,
                          EventArgs e)
         {
             List<Exception> exceptions = new List<Exception>();
 
-            foreach (EventSink sink in sinks[eventName])
+            foreach (EventSink sink in sinks[eventID])
             {
                 Exception ex = sink.Invoke(sender, e);
 
@@ -42,37 +42,58 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         public void RegisterSink(object sink,
                                  MethodInfo methodInfo,
-                                 string eventName)
+                                 string eventID)
         {
             Guard.ArgumentNotNull(sink, "sink");
             Guard.ArgumentNotNull(methodInfo, "methodInfo");
-            Guard.ArgumentNotNullOrEmptyString(eventName, "eventName");
+            Guard.ArgumentNotNullOrEmptyString(eventID, "eventID");
 
-            sinks.Add(eventName, new EventSink(sink, methodInfo));
+            RemoveDeadSinksAndSources();
+
+            sinks.Add(eventID, new EventSink(sink, methodInfo));
         }
 
         public void RegisterSource(object source,
                                    EventInfo eventInfo,
-                                   string eventName)
+                                   string eventID)
         {
             Guard.ArgumentNotNull(source, "source");
             Guard.ArgumentNotNull(eventInfo, "eventInfo");
-            Guard.ArgumentNotNullOrEmptyString(eventName, "eventName");
+            Guard.ArgumentNotNullOrEmptyString(eventID, "eventID");
 
-            sources.Add(eventName, new EventSource(this, source, eventInfo, eventName));
+            RemoveDeadSinksAndSources();
+
+            sources.Add(eventID, new EventSource(this, source, eventInfo, eventID));
+        }
+
+        void RemoveDeadSinksAndSources()
+        {
+            foreach (string eventID in sinks.Keys)
+                sinks[eventID].RemoveAll(delegate(EventSink sink)
+                                         {
+                                             return sink.Sink == null;
+                                         });
+
+            foreach (string eventID in sources.Keys)
+                sources[eventID].RemoveAll(delegate(EventSource source)
+                                           {
+                                               return source.Source == null;
+                                           });
         }
 
         public void UnregisterSink(object sink,
-                                   string eventName)
+                                   string eventID)
         {
             Guard.ArgumentNotNull(sink, "sink");
-            Guard.ArgumentNotNullOrEmptyString(eventName, "eventName");
+            Guard.ArgumentNotNullOrEmptyString(eventID, "eventID");
+
+            RemoveDeadSinksAndSources();
 
             List<EventSink> matchingSinks = new List<EventSink>();
 
             matchingSinks.AddRange(sinks.FindByKeyAndValue(delegate(string name)
                                                            {
-                                                               return name == eventName;
+                                                               return name == eventID;
                                                            },
                                                            delegate(EventSink snk)
                                                            {
@@ -80,20 +101,22 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                                            }));
 
             foreach (EventSink eventSink in matchingSinks)
-                sinks.Remove(eventName, eventSink);
+                sinks.Remove(eventID, eventSink);
         }
 
         public void UnregisterSource(object source,
-                                     string eventName)
+                                     string eventID)
         {
             Guard.ArgumentNotNull(source, "source");
-            Guard.ArgumentNotNullOrEmptyString(eventName, "eventName");
+            Guard.ArgumentNotNullOrEmptyString(eventID, "eventID");
+
+            RemoveDeadSinksAndSources();
 
             List<EventSource> matchingSources = new List<EventSource>();
 
             matchingSources.AddRange(sources.FindByKeyAndValue(delegate(string name)
                                                                {
-                                                                   return name == eventName;
+                                                                   return name == eventID;
                                                                },
                                                                delegate(EventSource src)
                                                                {
@@ -103,13 +126,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             foreach (EventSource eventSource in matchingSources)
             {
                 eventSource.Dispose();
-                sources.Remove(eventName, eventSource);
+                sources.Remove(eventID, eventSource);
             }
         }
 
         // Inner types
 
-        class EventSink
+        internal class EventSink
         {
             // Fields
 
@@ -164,43 +187,49 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
         }
 
-        class EventSource : IDisposable
+        internal class EventSource : IDisposable
         {
             // Fields
 
             EventBrokerService service;
-            object source;
+            WeakReference source;
             EventInfo eventInfo;
-            string eventName;
-            Delegate @delegate;
+            string eventID;
+            MethodInfo handlerMethod;
 
             // Lifetime
 
             public EventSource(EventBrokerService service,
                                object source,
                                EventInfo eventInfo,
-                               string eventName)
+                               string eventID)
             {
                 this.service = service;
-                this.source = source;
+                this.source = new WeakReference(source);
                 this.eventInfo = eventInfo;
-                this.eventName = eventName;
+                this.eventID = eventID;
 
-                MethodInfo handler = GetType().GetMethod("SourceHandler");
-                @delegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, this, handler);
+                handlerMethod = GetType().GetMethod("SourceHandler");
+                Delegate @delegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, this, handlerMethod);
                 eventInfo.AddEventHandler(source, @delegate);
             }
 
             public void Dispose()
             {
-                eventInfo.RemoveEventHandler(source, @delegate);
+                object sourceObj = source.Target;
+
+                if (sourceObj != null)
+                {
+                    Delegate @delegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, this, handlerMethod);
+                    eventInfo.RemoveEventHandler(sourceObj, @delegate);
+                }
             }
 
             // Properties
 
             public object Source
             {
-                get { return source; }
+                get { return source.Target; }
             }
 
             // Methods
@@ -208,7 +237,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void SourceHandler(object sender,
                                       EventArgs e)
             {
-                service.Fire(eventName, sender, e);
+                service.Fire(eventID, sender, e);
             }
         }
     }
