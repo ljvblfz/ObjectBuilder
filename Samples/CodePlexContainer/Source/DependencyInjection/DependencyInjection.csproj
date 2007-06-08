@@ -38,6 +38,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DependencyContainer.cs" />
+    <Compile Include="ObjectBuilder\Strategies\EventBroker\EventBrokerException.cs" />
+    <Compile Include="ObjectBuilder\Strategies\EventBroker\EventBrokerService.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\HandlerPipeline.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\IInterceptionHandler.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\IInterceptionPolicy.cs" />
@@ -125,8 +127,10 @@
     <Compile Include="ObjectBuilder\Strategies\TypeMapping\TypeMappingStrategy.cs" />
     <Compile Include="ObjectBuilder\Utility\DependencyResolutionLocatorKey.cs" />
     <Compile Include="ObjectBuilder\Utility\DependencyResolver.cs" />
+    <Compile Include="ObjectBuilder\Utility\EventArgs.cs" />
     <Compile Include="ObjectBuilder\Utility\Guard.cs" />
     <Compile Include="ObjectBuilder\Utility\IPolicyList.cs" />
+    <Compile Include="ObjectBuilder\Utility\ListDictionary.cs" />
     <Compile Include="ObjectBuilder\Utility\NotPresentBehavior.cs" />
     <Compile Include="ObjectBuilder\Utility\PolicyList.cs" />
     <Compile Include="ObjectBuilder\Utility\StagedStrategyChain.cs" />
