@@ -32,17 +32,7 @@ namespace CodePlex.NUnitExtensions
 
         public override string StackTrace
         {
-            get
-            {
-                string[] originalTrace = base.StackTrace.Split(new string[] { "\r\n" }, StringSplitOptions.None);
-                List<string> results = new List<string>();
-
-                foreach (string line in originalTrace)
-                    if (!line.StartsWith("   at CodePlex.NUnitExtensions.Assert."))
-                        results.Add(line);
-
-                return string.Join("\r\n", results.ToArray());
-            }
+            get { return FilterStackTrace(base.StackTrace); }
         }
 
         public string UserMessage
@@ -52,6 +42,18 @@ namespace CodePlex.NUnitExtensions
         }
 
         // Methods
+
+        protected static string FilterStackTrace(string stackTrace)
+        {
+            string[] originalTrace = stackTrace.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            List<string> results = new List<string>();
+
+            foreach (string line in originalTrace)
+                if (!line.StartsWith("   at CodePlex.Xunit.Assert."))
+                    results.Add(line);
+
+            return string.Join("\r\n", results.ToArray());
+        }
 
         public new virtual void GetObjectData(SerializationInfo info,
                                               StreamingContext context)

@@ -230,6 +230,20 @@ namespace CodePlex.NUnitExtensions
             throw new ContainsException(expected);
         }
 
+        public static void Contains(string expectedSubString,
+                                    string actualString)
+        {
+            Contains(expectedSubString, actualString, StringComparison.CurrentCulture);
+        }
+
+        public static void Contains(string expectedSubString,
+                                    string actualString,
+                                    StringComparison comparisonType)
+        {
+            if (actualString.IndexOf(expectedSubString, comparisonType) < 0)
+                throw new ContainsException(expectedSubString);
+        }
+
         public static void DoesNotContain<T>(T expected,
                                              IEnumerable<T> collection)
         {
@@ -243,6 +257,20 @@ namespace CodePlex.NUnitExtensions
             foreach (T item in collection)
                 if (comparer.Compare(expected, item) == 0)
                     throw new DoesNotContainException(expected);
+        }
+
+        public static void DoesNotContain(string expectedSubString,
+                                          string actualString)
+        {
+            DoesNotContain(expectedSubString, actualString, StringComparison.CurrentCulture);
+        }
+
+        public static void DoesNotContain(string expectedSubString,
+                                          string actualString,
+                                          StringComparison comparisonType)
+        {
+            if (actualString.IndexOf(expectedSubString, comparisonType) >= 0)
+                throw new DoesNotContainException(expectedSubString);
         }
 
         public static void Empty(IEnumerable collection)
@@ -265,6 +293,12 @@ namespace CodePlex.NUnitExtensions
         public static T Throws<T>(ExceptionDelegate testCode)
             where T : Exception
         {
+            return (T)Throws(typeof(T), testCode);
+        }
+
+        public static Exception Throws(Type exceptionType,
+                                       ExceptionDelegate testCode)
+        {
             Exception exception = null;
 
             try
@@ -277,12 +311,12 @@ namespace CodePlex.NUnitExtensions
             }
 
             if (exception == null)
-                throw new ThrowsException(typeof(T));
+                throw new ThrowsException(exceptionType);
 
-            if (!typeof(T).Equals(exception.GetType()))
-                throw new ThrowsException(exception, typeof(T));
+            if (!exceptionType.Equals(exception.GetType()))
+                throw new ThrowsException(exception, exceptionType, exception.StackTrace);
 
-            return (T)exception;
+            return exception;
         }
 
         public static void DoesNotThrow(ExceptionDelegate testCode)
