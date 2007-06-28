@@ -4,11 +4,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class HandlerPipeline
     {
-        // Fields
-
-        List<IInterceptionHandler> handlers;
-
-        // Lifetime
+        readonly List<IInterceptionHandler> handlers;
 
         public HandlerPipeline(IEnumerable<IInterceptionHandler> handlers)
         {
@@ -19,8 +15,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             this.handlers = new List<IInterceptionHandler>(handlers);
         }
-
-        // Methods
 
         public IMethodReturn Invoke(IMethodInvocation input,
                                     InvokeHandlerDelegate target)

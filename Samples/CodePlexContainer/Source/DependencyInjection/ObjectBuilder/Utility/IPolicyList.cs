@@ -1,6 +1,6 @@
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    interface IPolicyList
+    public interface IPolicyList
     {
         IBuilderPolicy GetForKey(BuilderPolicyKey key,
                                  bool localOnly);

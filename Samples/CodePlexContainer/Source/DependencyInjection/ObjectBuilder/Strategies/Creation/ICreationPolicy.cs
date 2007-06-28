@@ -5,8 +5,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface ICreationPolicy : IBuilderPolicy
     {
-        // Methods
-
         object[] GetParameters(IBuilderContext context,
                                Type type,
                                string id,

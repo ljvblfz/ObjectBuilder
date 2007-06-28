@@ -4,8 +4,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IBuilder
     {
-        // Methods
-
         object BuildUp(IReadWriteLocator locator,
                        ILifetimeContainer lifetime,
                        PolicyList policies,

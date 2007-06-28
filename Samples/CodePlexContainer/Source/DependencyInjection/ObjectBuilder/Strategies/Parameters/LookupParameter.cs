@@ -4,18 +4,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class LookupParameter : IParameter
     {
-        // Fields
-
-        object key;
-
-        // Lifetime
+        readonly object key;
 
         public LookupParameter(object key)
         {
             this.key = key;
         }
-
-        // Methods
 
         public Type GetParameterType(IBuilderContext context)
         {

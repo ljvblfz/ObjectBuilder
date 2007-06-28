@@ -5,8 +5,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IPropertySetterInfo
     {
-        // Methods
-
         object GetValue(IBuilderContext context,
                         Type type,
                         string id,

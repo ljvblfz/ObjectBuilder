@@ -9,13 +9,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class RemotingProxy : RealProxy, IRemotingTypeInfo
     {
-        // Fields
-
         readonly Dictionary<MethodBase, HandlerPipeline> handlers;
         readonly object target;
         readonly Type typeOfTarget;
-
-        // Lifetime
 
         public RemotingProxy(object target,
                              Type typeToProxy,
@@ -43,8 +39,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             get { return typeOfTarget.FullName; }
             set { throw new NotImplementedException(); }
         }
-
-        // Methods
 
         bool IRemotingTypeInfo.CanCastTo(Type fromType,
                                          object obj)

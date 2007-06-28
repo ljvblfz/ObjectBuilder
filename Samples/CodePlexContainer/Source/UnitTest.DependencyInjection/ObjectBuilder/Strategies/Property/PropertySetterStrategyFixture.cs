@@ -87,15 +87,15 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             string foo = null;
 
+            public string Bar
+            {
+                get { return null; }
+            }
+
             public string Foo
             {
                 get { return foo; }
                 set { foo = value; }
-            }
-
-            public string Bar
-            {
-                get { return null; }
             }
         }
     }

@@ -6,16 +6,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     {
         // Fields
 
-        IParameterCollection inputs;
         IParameterCollection arguments;
-        object target;
+        IParameterCollection inputs;
         MethodBase methodBase;
-
-        public IParameterCollection Inputs
-        {
-            get { return inputs; }
-            set { inputs = value; }
-        }
+        object target;
 
         public IParameterCollection Arguments
         {
@@ -23,16 +17,22 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             set { arguments = value; }
         }
 
-        public object Target
+        public IParameterCollection Inputs
         {
-            get { return target; }
-            set { target = value; }
+            get { return inputs; }
+            set { inputs = value; }
         }
 
         public MethodBase MethodBase
         {
             get { return methodBase; }
             set { methodBase = value; }
+        }
+
+        public object Target
+        {
+            get { return target; }
+            set { target = value; }
         }
     }
 }

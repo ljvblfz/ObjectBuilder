@@ -7,12 +7,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class ParameterCollection : IParameterCollection
     {
-        // Fields
-
-        List<ArgumentInfo> argumentInfo;
-        object[] arguments;
-
-        // Lifetime
+        readonly List<ArgumentInfo> argumentInfo;
+        readonly object[] arguments;
 
         public ParameterCollection(object[] arguments,
                                    ParameterInfo[] argumentInfo)
@@ -33,8 +29,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     this.argumentInfo.Add(new ArgumentInfo(idx, argumentInfo[idx]));
         }
 
-        // Properties
-
         public object this[int index]
         {
             get { return arguments[argumentInfo[index].Index]; }
@@ -46,8 +40,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             get { return arguments[IndexForParameterName(paramName)]; }
             set { arguments[IndexForParameterName(paramName)] = value; }
         }
-
-        // Methods
 
         public IEnumerator GetEnumerator()
         {
@@ -64,24 +56,16 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             throw new ArgumentException("Invalid parameter Name", "paramName");
         }
 
-        // Inner types
-
         struct ArgumentInfo
         {
-            // Fields
-
-            public int Index;
-            public string Name;
-            public ParameterInfo ParameterInfo;
-
-            // Lifetime
+            public readonly int Index;
+            public readonly string Name;
 
             public ArgumentInfo(int index,
                                 ParameterInfo parameterInfo)
             {
                 Index = index;
                 Name = parameterInfo.Name;
-                ParameterInfo = parameterInfo;
             }
         }
     }

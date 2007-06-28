@@ -6,11 +6,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class EventBrokerException : Exception
     {
-        // Fields
-
-        List<Exception> exceptions;
-
-        // Lifetime
+        readonly List<Exception> exceptions;
 
         public EventBrokerException()
             : base("One or more exceptions were thrown by event broker sinks") {}
@@ -20,8 +16,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             this.exceptions = new List<Exception>(exceptions);
         }
-
-        // Properties
 
         public ReadOnlyCollection<Exception> Exceptions
         {

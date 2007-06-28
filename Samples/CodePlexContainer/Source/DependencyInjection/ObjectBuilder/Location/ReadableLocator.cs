@@ -6,11 +6,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public abstract class ReadableLocator : IReadableLocator
     {
-        // Fields
-
-        IReadableLocator parentLocator;
-
-        // Lifetime
+        readonly IReadableLocator parentLocator;
 
         protected ReadableLocator() {}
 
@@ -18,8 +14,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             this.parentLocator = parentLocator;
         }
-
-        // Properties
 
         public abstract int Count { get; }
 
@@ -29,8 +23,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         }
 
         public abstract bool ReadOnly { get; }
-
-        // Methods
 
         public abstract bool Contains(object key);
 
@@ -52,8 +44,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         }
 
         static void FindInLocator(Predicate<KeyValuePair<object, object>> predicate,
-                                  Locator results,
-                                  IReadableLocator currentLocator)
+                                  IReadWriteLocator results,
+                                  IEnumerable<KeyValuePair<object, object>> currentLocator)
         {
             foreach (KeyValuePair<object, object> kvp in currentLocator)
                 if (!results.Contains(kvp.Key) && predicate(kvp))

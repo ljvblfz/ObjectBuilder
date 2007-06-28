@@ -5,8 +5,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class MethodExecutionStrategy : BuilderStrategy
     {
-        // Methods
-
         static void ApplyPolicy(IBuilderContext context,
                                 object obj,
                                 string id)

@@ -6,12 +6,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class EventBrokerService : IDisposable
     {
-        // Fields
-
-        ListDictionary<string, EventSource> sources = new ListDictionary<string, EventSource>();
-        ListDictionary<string, EventSink> sinks = new ListDictionary<string, EventSink>();
-
-        // Lifetime
+        readonly ListDictionary<string, EventSink> sinks = new ListDictionary<string, EventSink>();
+        readonly ListDictionary<string, EventSource> sources = new ListDictionary<string, EventSource>();
 
         public void Dispose()
         {
@@ -19,8 +15,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 foreach (EventSource source in kvp.Value)
                     source.Dispose();
         }
-
-        // Methods
 
         public void Fire(string eventID,
                          object sender,
@@ -130,17 +124,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
         }
 
-        // Inner types
-
         internal class EventSink
         {
-            // Fields
-
-            WeakReference sink;
-            MethodInfo methodInfo;
-            Type handlerEventArgsType;
-
-            // Lifetime
+            readonly Type handlerEventArgsType;
+            readonly MethodInfo methodInfo;
+            readonly WeakReference sink;
 
             public EventSink(object sink,
                              MethodInfo methodInfo)
@@ -156,14 +144,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 handlerEventArgsType = typeof(EventHandler<>).MakeGenericType(parameters[1].ParameterType);
             }
 
-            // Properties
-
             public object Sink
             {
                 get { return sink.Target; }
             }
-
-            // Methods
 
             public Exception Invoke(object sender,
                                     EventArgs e)
@@ -189,15 +173,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         internal class EventSource : IDisposable
         {
-            // Fields
-
-            EventBrokerService service;
-            WeakReference source;
-            EventInfo eventInfo;
-            string eventID;
-            MethodInfo handlerMethod;
-
-            // Lifetime
+            readonly string eventID;
+            readonly EventInfo eventInfo;
+            readonly MethodInfo handlerMethod;
+            readonly EventBrokerService service;
+            readonly WeakReference source;
 
             public EventSource(EventBrokerService service,
                                object source,
@@ -214,6 +194,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 eventInfo.AddEventHandler(source, @delegate);
             }
 
+            public object Source
+            {
+                get { return source.Target; }
+            }
+
             public void Dispose()
             {
                 object sourceObj = source.Target;
@@ -224,15 +209,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     eventInfo.RemoveEventHandler(sourceObj, @delegate);
                 }
             }
-
-            // Properties
-
-            public object Source
-            {
-                get { return source.Target; }
-            }
-
-            // Methods
 
             public void SourceHandler(object sender,
                                       EventArgs e)

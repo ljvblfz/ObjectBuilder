@@ -4,18 +4,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class CloneParameter : IParameter
     {
-        // Fields
-
-        IParameter param;
-
-        // Lifetime
+        readonly IParameter param;
 
         public CloneParameter(IParameter param)
         {
             this.param = param;
         }
-
-        // Methods
 
         public Type GetParameterType(IBuilderContext context)
         {

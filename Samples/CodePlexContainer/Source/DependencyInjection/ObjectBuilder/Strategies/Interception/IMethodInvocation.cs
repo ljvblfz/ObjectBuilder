@@ -4,9 +4,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IMethodInvocation
     {
-        IParameterCollection Inputs { get; }
         IParameterCollection Arguments { get; }
-        object Target { get; }
+        IParameterCollection Inputs { get; }
         MethodBase MethodBase { get; }
+        object Target { get; }
     }
 }

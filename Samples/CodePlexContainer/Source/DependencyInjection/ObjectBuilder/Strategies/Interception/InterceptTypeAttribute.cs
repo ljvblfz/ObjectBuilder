@@ -5,18 +5,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
     public class InterceptTypeAttribute : Attribute
     {
-        // Fields
-
-        InterceptionType interceptionType;
-
-        // Lifetime
+        readonly InterceptionType interceptionType;
 
         public InterceptTypeAttribute(InterceptionType interceptionType)
         {
             this.interceptionType = interceptionType;
         }
-
-        // Properties
 
         public InterceptionType InterceptionType
         {

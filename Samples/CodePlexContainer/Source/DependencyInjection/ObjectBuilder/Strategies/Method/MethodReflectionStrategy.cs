@@ -6,8 +6,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class MethodReflectionStrategy : ReflectionStrategy<MethodInfo>
     {
-        // Methods
-
         protected override void AddParametersToPolicy(IBuilderContext context,
                                                       Type typeToBuild,
                                                       string idToBuild,

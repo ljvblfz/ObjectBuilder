@@ -6,13 +6,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class MethodCallInfo : IMethodCallInfo
     {
-        // Fields
-
-        MethodInfo method;
-        string methodName;
-        List<IParameter> parameters;
-
-        // Lifetime
+        readonly MethodInfo method;
+        readonly string methodName;
+        readonly List<IParameter> parameters;
 
         public MethodCallInfo(string methodName)
             : this(methodName, (MethodInfo)null, null) {}
@@ -52,8 +48,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 foreach (IParameter param in parameters)
                     this.parameters.Add(param);
         }
-
-        // Methods
 
         public object[] GetParameters(IBuilderContext context,
                                       Type type,

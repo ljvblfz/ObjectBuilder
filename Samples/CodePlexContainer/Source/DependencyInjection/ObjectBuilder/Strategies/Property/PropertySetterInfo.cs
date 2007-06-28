@@ -5,13 +5,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class PropertySetterInfo : IPropertySetterInfo
     {
-        // Fields
-
-        string name = null;
-        PropertyInfo prop = null;
-        IParameter value = null;
-
-        // Lifetime
+        readonly string name = null;
+        readonly PropertyInfo prop = null;
+        readonly IParameter value = null;
 
         public PropertySetterInfo(string name,
                                   IParameter value)
@@ -26,8 +22,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             prop = propInfo;
             this.value = value;
         }
-
-        // Methods
 
         public object GetValue(IBuilderContext context,
                                Type type,

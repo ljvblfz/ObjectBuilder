@@ -43,6 +43,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 if (policy.Count > 0)
                     return policy;
             }
+
             return null;
         }
     }

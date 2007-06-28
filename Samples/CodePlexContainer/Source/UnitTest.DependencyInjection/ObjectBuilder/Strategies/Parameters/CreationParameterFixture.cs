@@ -35,9 +35,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         class NullStrategy : BuilderStrategy
         {
-            public bool WasCalled = false;
-            public Type TypeRequested = null;
             public object IDRequested = null;
+            public Type TypeRequested = null;
+            public bool WasCalled = false;
 
             public override object BuildUp(IBuilderContext context,
                                            Type t,

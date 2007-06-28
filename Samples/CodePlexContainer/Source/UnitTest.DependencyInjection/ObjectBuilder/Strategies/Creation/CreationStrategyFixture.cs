@@ -181,19 +181,19 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         internal class FailingCreationPolicy : ICreationPolicy
         {
-            public ConstructorInfo SelectConstructor(IBuilderContext context,
-                                                     Type type,
-                                                     string id)
-            {
-                return null;
-            }
-
             public object[] GetParameters(IBuilderContext context,
                                           Type type,
                                           string id,
                                           ConstructorInfo ci)
             {
                 return new object[] { };
+            }
+
+            public ConstructorInfo SelectConstructor(IBuilderContext context,
+                                                     Type type,
+                                                     string id)
+            {
+                return null;
             }
         }
 

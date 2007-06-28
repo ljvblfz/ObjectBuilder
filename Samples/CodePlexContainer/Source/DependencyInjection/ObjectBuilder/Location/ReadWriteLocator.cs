@@ -2,21 +2,15 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public abstract class ReadWriteLocator : ReadableLocator, IReadWriteLocator
     {
-        // Lifetime
-
         protected ReadWriteLocator() {}
 
         protected ReadWriteLocator(IReadableLocator parentLocator)
             : base(parentLocator) {}
 
-        // Properties
-
         public override bool ReadOnly
         {
             get { return false; }
         }
-
-        // Methods
 
         public abstract void Add(object key,
                                  object value);

@@ -5,12 +5,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class EventBrokerPolicy : IEventBrokerPolicy
     {
-        // Fields
-
-        Dictionary<string, MethodInfo> sinks = new Dictionary<string, MethodInfo>();
-        Dictionary<string, EventInfo> sources = new Dictionary<string, EventInfo>();
-
-        // Properties
+        readonly Dictionary<string, MethodInfo> sinks = new Dictionary<string, MethodInfo>();
+        readonly Dictionary<string, EventInfo> sources = new Dictionary<string, EventInfo>();
 
         public bool IsEmpty
         {
@@ -26,8 +22,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             get { return sources; }
         }
-
-        // Methods
 
         public void AddSink(MethodInfo method,
                             string eventID)

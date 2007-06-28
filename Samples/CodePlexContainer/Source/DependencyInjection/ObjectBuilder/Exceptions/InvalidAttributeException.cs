@@ -8,8 +8,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     [Serializable]
     public class InvalidAttributeException : Exception
     {
-        // Lifetime
-
         public InvalidAttributeException() {}
 
         public InvalidAttributeException(string message)

@@ -6,8 +6,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class PropertyReflectionStrategy : ReflectionStrategy<PropertyInfo>
     {
-        // Methods
-
         protected override void AddParametersToPolicy(IBuilderContext context,
                                                       Type typeToBuild,
                                                       string idToBuild,
@@ -41,22 +39,35 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return (member.GetCustomAttributes(typeof(ParameterAttribute), true).Length > 0);
         }
 
-        // Inner types
+        class CustomPropertyParameterInfo : ParameterInfo
+        {
+            readonly PropertyInfo prop;
+
+            public CustomPropertyParameterInfo(PropertyInfo prop)
+            {
+                this.prop = prop;
+            }
+
+            public override Type ParameterType
+            {
+                get { return prop.PropertyType; }
+            }
+
+            public override object[] GetCustomAttributes(Type attributeType,
+                                                         bool inherit)
+            {
+                return prop.GetCustomAttributes(attributeType, inherit);
+            }
+        }
 
         class PropertyReflectionMemberInfo : IReflectionMemberInfo<PropertyInfo>
         {
-            // Fields
-
-            PropertyInfo prop;
-
-            // Lifetime
+            readonly PropertyInfo prop;
 
             public PropertyReflectionMemberInfo(PropertyInfo prop)
             {
                 this.prop = prop;
             }
-
-            // Properties
 
             public PropertyInfo MemberInfo
             {
@@ -68,8 +79,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 get { return prop.Name; }
             }
 
-            // Methods
-
             public object[] GetCustomAttributes(Type attributeType,
                                                 bool inherit)
             {
@@ -79,35 +88,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public ParameterInfo[] GetParameters()
             {
                 return new ParameterInfo[] { new CustomPropertyParameterInfo(prop) };
-            }
-        }
-
-        class CustomPropertyParameterInfo : ParameterInfo
-        {
-            // Fields
-
-            PropertyInfo prop;
-
-            // Lifetime
-
-            public CustomPropertyParameterInfo(PropertyInfo prop)
-            {
-                this.prop = prop;
-            }
-
-            // Properties
-
-            public override Type ParameterType
-            {
-                get { return prop.PropertyType; }
-            }
-
-            // Methods
-
-            public override object[] GetCustomAttributes(Type attributeType,
-                                                         bool inherit)
-            {
-                return prop.GetCustomAttributes(attributeType, inherit);
             }
         }
     }

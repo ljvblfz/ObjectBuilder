@@ -4,11 +4,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class EventArgs<TData> : EventArgs
     {
-        // Fields
-
-        TData data;
-
-        // Lifetime
+        readonly TData data;
 
         public EventArgs(TData data)
         {
@@ -17,14 +13,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             this.data = data;
         }
 
-        // Properties
-
         public TData Data
         {
             get { return data; }
         }
-
-        // Methods
 
         public override string ToString()
         {

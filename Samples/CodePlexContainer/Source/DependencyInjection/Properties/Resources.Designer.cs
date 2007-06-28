@@ -30,40 +30,11 @@ namespace CodePlex.DependencyInjection.Properties
     [CompilerGenerated()]
     class Resources
     {
-        static ResourceManager resourceMan;
-
         static CultureInfo resourceCulture;
+        static ResourceManager resourceMan;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {}
-
-        /// <summary>
-        ///   Returns the cached ResourceManager instance used by this class.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        internal static ResourceManager ResourceManager
-        {
-            get
-            {
-                if (ReferenceEquals(resourceMan, null))
-                {
-                    ResourceManager temp = new ResourceManager("CodePlex.DependencyInjection.Properties.Resources", typeof(Resources).Assembly);
-                    resourceMan = temp;
-                }
-                return resourceMan;
-            }
-        }
-
-        /// <summary>
-        ///   Overrides the current thread's CurrentUICulture property for all
-        ///   resource lookups using this strongly typed resource class.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        internal static CultureInfo Culture
-        {
-            get { return resourceCulture; }
-            set { resourceCulture = value; }
-        }
 
         /// <summary>
         ///   Looks up a localized string similar to Object builder has no strategies..
@@ -162,6 +133,17 @@ namespace CodePlex.DependencyInjection.Properties
         }
 
         /// <summary>
+        ///   Overrides the current thread's CurrentUICulture property for all
+        ///   resource lookups using this strongly typed resource class.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        internal static CultureInfo Culture
+        {
+            get { return resourceCulture; }
+            set { resourceCulture = value; }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Could not locate dependency &quot;{0}&quot;..
         /// </summary>
         internal static string DependencyMissing
@@ -239,6 +221,23 @@ namespace CodePlex.DependencyInjection.Properties
         internal static string NoAppropriateConstructor
         {
             get { return ResourceManager.GetString("NoAppropriateConstructor", resourceCulture); }
+        }
+
+        /// <summary>
+        ///   Returns the cached ResourceManager instance used by this class.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        internal static ResourceManager ResourceManager
+        {
+            get
+            {
+                if (ReferenceEquals(resourceMan, null))
+                {
+                    ResourceManager temp = new ResourceManager("CodePlex.DependencyInjection.Properties.Resources", typeof(Resources).Assembly);
+                    resourceMan = temp;
+                }
+                return resourceMan;
+            }
         }
 
         /// <summary>

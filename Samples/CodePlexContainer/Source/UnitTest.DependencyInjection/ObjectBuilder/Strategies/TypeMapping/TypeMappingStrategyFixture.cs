@@ -46,8 +46,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         class MockStrategy : BuilderStrategy
         {
-            public bool WasRun = false;
             public Type IncomingType = null;
+            public bool WasRun = false;
 
             public override object BuildUp(IBuilderContext context,
                                            Type t,

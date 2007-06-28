@@ -5,8 +5,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public abstract class BuilderStrategy : IBuilderStrategy
     {
-        // Methods
-
         public TItem BuildUp<TItem>(IBuilderContext context,
                                     TItem existing,
                                     string idToBuild)

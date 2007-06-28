@@ -6,212 +6,7 @@ namespace CodePlex.NUnitExtensions
 {
     public static class Assert
     {
-        public new static bool Equals(object a,
-                                      object b)
-        {
-            throw new InvalidOperationException("Assert.Equals should not be used");
-        }
-
-        public new static bool ReferenceEquals(object a,
-                                               object b)
-        {
-            throw new InvalidOperationException("Assert.ReferenceEquals should not be used");
-        }
-
-        public static void Equal<T>(T expected,
-                                    T actual)
-        {
-            Equal(expected, actual, (string)null);
-        }
-
-        public static void Equal<T>(T expected,
-                                    T actual,
-                                    string userMessage)
-        {
-            Equal(expected, actual, GetComparer<T>(), userMessage);
-        }
-
-        public static void Equal<T>(T expected,
-                                    T actual,
-                                    IComparer<T> comparer)
-        {
-            Equal(expected, actual, comparer, null);
-        }
-
-        public static void Equal<T>(T expected,
-                                    T actual,
-                                    IComparer<T> comparer,
-                                    string userMessage)
-        {
-            if (comparer.Compare(actual, expected) == 0) return;
-
-            throw new EqualException(expected, actual, userMessage);
-        }
-
-        public static void NotEqual<T>(T expected,
-                                       T actual)
-        {
-            NotEqual(expected, actual, (string)null);
-        }
-
-        public static void NotEqual<T>(T expected,
-                                       T actual,
-                                       string userMessage)
-        {
-            NotEqual(actual, expected, GetComparer<T>(), userMessage);
-        }
-
-        public static void NotEqual<T>(T expected,
-                                       T actual,
-                                       IComparer<T> comparer)
-        {
-            NotEqual(actual, expected, comparer, null);
-        }
-
-        public static void NotEqual<T>(T actual,
-                                       T expected,
-                                       IComparer<T> comparer,
-                                       string userMessage)
-        {
-            if (comparer.Compare(actual, expected) != 0) return;
-
-            throw new NotEqualException(userMessage);
-        }
-
-        public static void True(bool condition)
-        {
-            True(condition, null);
-        }
-
-        public static void True(bool condition,
-                                string userMessage)
-        {
-            if (condition) return;
-
-            throw new TrueException(userMessage);
-        }
-
-        public static void False(bool condition)
-        {
-            False(condition, null);
-        }
-
-        public static void False(bool condition,
-                                 string userMessage)
-        {
-            if (!condition) return;
-
-            throw new FalseException(userMessage);
-        }
-
-        public static void Null(object @object)
-        {
-            Null(@object, null);
-        }
-
-        public static void Null(object @object,
-                                string userMessage)
-        {
-            if (@object == null) return;
-
-            throw new NullException(@object, userMessage);
-        }
-
-        public static void NotNull(object @object)
-        {
-            NotNull(@object, null);
-        }
-
-        public static void NotNull(object @object,
-                                   string userMessage)
-        {
-            if (@object != null) return;
-
-            throw new NotNullException(userMessage);
-        }
-
-        public static T IsType<T>(object @object)
-        {
-            return (T)IsType(typeof(T), @object);
-        }
-
-        public static object IsType(Type expectedType,
-                                    object @object)
-        {
-            return IsType(expectedType, @object, null);
-        }
-
-        public static T IsType<T>(object @object,
-                                  string userMessage)
-        {
-            return (T)IsType(typeof(T), @object, userMessage);
-        }
-
-        public static object IsType(Type expectedType,
-                                    object @object,
-                                    string userMessage)
-        {
-            if (expectedType.Equals(@object.GetType())) return @object;
-
-            throw new IsTypeException(expectedType, @object, userMessage);
-        }
-
-        public static void InRange<T>(T actualValue,
-                                      T low,
-                                      T high)
-        {
-            InRange(actualValue, low, high, null);
-        }
-
-        public static void InRange<T>(T actualValue,
-                                      T low,
-                                      T high,
-                                      string userMessage)
-        {
-            IComparer<T> comparer = GetComparer<T>();
-            InRange(actualValue, low, high, comparer, userMessage);
-        }
-
-        public static void InRange<T>(T actualValue,
-                                      T low,
-                                      T high,
-                                      IComparer<T> comparer,
-                                      string userMessage)
-        {
-            if (comparer.Compare(low, actualValue) <= 0 && comparer.Compare(actualValue, high) <= 0) return;
-
-            throw new InRangeException(actualValue, low, high, userMessage);
-        }
-
-        public static void Same(object expected,
-                                object actual)
-        {
-            Same(expected, actual, null);
-        }
-
-        public static void Same(object expected,
-                                object actual,
-                                string userMessage)
-        {
-            if (object.ReferenceEquals(actual, expected)) return;
-
-            throw new SameException(expected, actual, userMessage);
-        }
-
-        public static void NotSame(object expected,
-                                   object actual)
-        {
-            NotSame(expected, actual, null);
-        }
-
-        public static void NotSame(object expected,
-                                   object actual,
-                                   string userMessage)
-        {
-            if (!object.ReferenceEquals(actual, expected)) return;
-
-            throw new NotSameException(userMessage);
-        }
+        public delegate void ExceptionDelegate();
 
         public static void Contains<T>(T expected,
                                        IEnumerable<T> collection)
@@ -273,12 +68,124 @@ namespace CodePlex.NUnitExtensions
                 throw new DoesNotContainException(expectedSubString);
         }
 
+        public static void DoesNotThrow(ExceptionDelegate testCode)
+        {
+            testCode();
+        }
+
         public static void Empty(IEnumerable collection)
         {
             if (collection == null) throw new ArgumentNullException("cannot be null");
 
             foreach (object @object in collection)
                 throw new EmptyException();
+        }
+
+        public static void Equal<T>(T expected,
+                                    T actual)
+        {
+            Equal(expected, actual, (string)null);
+        }
+
+        public static void Equal<T>(T expected,
+                                    T actual,
+                                    string userMessage)
+        {
+            Equal(expected, actual, GetComparer<T>(), userMessage);
+        }
+
+        public static void Equal<T>(T expected,
+                                    T actual,
+                                    IComparer<T> comparer)
+        {
+            Equal(expected, actual, comparer, null);
+        }
+
+        public static void Equal<T>(T expected,
+                                    T actual,
+                                    IComparer<T> comparer,
+                                    string userMessage)
+        {
+            if (comparer.Compare(actual, expected) == 0) return;
+
+            throw new EqualException(expected, actual, userMessage);
+        }
+
+        public new static bool Equals(object a,
+                                      object b)
+        {
+            throw new InvalidOperationException("Assert.Equals should not be used");
+        }
+
+        public static void False(bool condition)
+        {
+            False(condition, null);
+        }
+
+        public static void False(bool condition,
+                                 string userMessage)
+        {
+            if (!condition) return;
+
+            throw new FalseException(userMessage);
+        }
+
+        static IComparer<T> GetComparer<T>()
+        {
+            return new AssertComparer<T>();
+        }
+
+        public static void InRange<T>(T actualValue,
+                                      T low,
+                                      T high)
+        {
+            InRange(actualValue, low, high, null);
+        }
+
+        public static void InRange<T>(T actualValue,
+                                      T low,
+                                      T high,
+                                      string userMessage)
+        {
+            IComparer<T> comparer = GetComparer<T>();
+            InRange(actualValue, low, high, comparer, userMessage);
+        }
+
+        public static void InRange<T>(T actualValue,
+                                      T low,
+                                      T high,
+                                      IComparer<T> comparer,
+                                      string userMessage)
+        {
+            if (comparer.Compare(low, actualValue) <= 0 && comparer.Compare(actualValue, high) <= 0) return;
+
+            throw new InRangeException(actualValue, low, high, userMessage);
+        }
+
+        public static T IsType<T>(object @object)
+        {
+            return (T)IsType(typeof(T), @object);
+        }
+
+        public static object IsType(Type expectedType,
+                                    object @object)
+        {
+            return IsType(expectedType, @object, null);
+        }
+
+        public static T IsType<T>(object @object,
+                                  string userMessage)
+        {
+            return (T)IsType(typeof(T), @object, userMessage);
+        }
+
+        public static object IsType(Type expectedType,
+                                    object @object,
+                                    string userMessage)
+        {
+            if (expectedType.Equals(@object.GetType())) return @object;
+
+            throw new IsTypeException(expectedType, @object, userMessage);
         }
 
         public static void NotEmpty<T>(ICollection<T> collection)
@@ -288,7 +195,97 @@ namespace CodePlex.NUnitExtensions
             throw new NotEmptyException();
         }
 
-        public delegate void ExceptionDelegate();
+        public static void NotEqual<T>(T expected,
+                                       T actual)
+        {
+            NotEqual(expected, actual, (string)null);
+        }
+
+        public static void NotEqual<T>(T expected,
+                                       T actual,
+                                       string userMessage)
+        {
+            NotEqual(actual, expected, GetComparer<T>(), userMessage);
+        }
+
+        public static void NotEqual<T>(T expected,
+                                       T actual,
+                                       IComparer<T> comparer)
+        {
+            NotEqual(actual, expected, comparer, null);
+        }
+
+        public static void NotEqual<T>(T actual,
+                                       T expected,
+                                       IComparer<T> comparer,
+                                       string userMessage)
+        {
+            if (comparer.Compare(actual, expected) != 0) return;
+
+            throw new NotEqualException(userMessage);
+        }
+
+        public static void NotNull(object @object)
+        {
+            NotNull(@object, null);
+        }
+
+        public static void NotNull(object @object,
+                                   string userMessage)
+        {
+            if (@object != null) return;
+
+            throw new NotNullException(userMessage);
+        }
+
+        public static void NotSame(object expected,
+                                   object actual)
+        {
+            NotSame(expected, actual, null);
+        }
+
+        public static void NotSame(object expected,
+                                   object actual,
+                                   string userMessage)
+        {
+            if (!object.ReferenceEquals(actual, expected)) return;
+
+            throw new NotSameException(userMessage);
+        }
+
+        public static void Null(object @object)
+        {
+            Null(@object, null);
+        }
+
+        public static void Null(object @object,
+                                string userMessage)
+        {
+            if (@object == null) return;
+
+            throw new NullException(@object, userMessage);
+        }
+
+        public new static bool ReferenceEquals(object a,
+                                               object b)
+        {
+            throw new InvalidOperationException("Assert.ReferenceEquals should not be used");
+        }
+
+        public static void Same(object expected,
+                                object actual)
+        {
+            Same(expected, actual, null);
+        }
+
+        public static void Same(object expected,
+                                object actual,
+                                string userMessage)
+        {
+            if (object.ReferenceEquals(actual, expected)) return;
+
+            throw new SameException(expected, actual, userMessage);
+        }
 
         public static T Throws<T>(ExceptionDelegate testCode)
             where T : Exception
@@ -319,14 +316,17 @@ namespace CodePlex.NUnitExtensions
             return exception;
         }
 
-        public static void DoesNotThrow(ExceptionDelegate testCode)
+        public static void True(bool condition)
         {
-            testCode();
+            True(condition, null);
         }
 
-        static IComparer<T> GetComparer<T>()
+        public static void True(bool condition,
+                                string userMessage)
         {
-            return new AssertComparer<T>();
+            if (condition) return;
+
+            throw new TrueException(userMessage);
         }
 
         class AssertComparer<T> : IComparer<T>

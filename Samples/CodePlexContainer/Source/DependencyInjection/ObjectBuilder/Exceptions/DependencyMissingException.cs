@@ -6,8 +6,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     [Serializable]
     public class DependencyMissingException : Exception
     {
-        // Lifetime
-
         public DependencyMissingException() {}
 
         public DependencyMissingException(string message)

@@ -4,13 +4,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class DependencyParameter : KnownTypeParameter
     {
-        // Fields
-
-        string name;
-        Type createType;
-        NotPresentBehavior notPresentBehavior;
-
-        // Lifetime
+        readonly Type createType;
+        readonly string name;
+        readonly NotPresentBehavior notPresentBehavior;
 
         public DependencyParameter(Type parameterType,
                                    string name,
@@ -23,12 +19,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             this.notPresentBehavior = notPresentBehavior;
         }
 
-        // Methods
-
         public override object GetValue(IBuilderContext context)
         {
-            return new DependencyResolver(context).Resolve(
-                base.type, createType, name, notPresentBehavior);
+            return new DependencyResolver(context).Resolve(type, createType, name, notPresentBehavior);
         }
     }
 }

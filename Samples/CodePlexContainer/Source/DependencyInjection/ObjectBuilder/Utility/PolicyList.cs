@@ -5,23 +5,17 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class PolicyList : IPolicyList
     {
-        // Fields
-
-        IPolicyList innerPolicyList;
-        object lockObject = new object();
-        Dictionary<BuilderPolicyKey, IBuilderPolicy> policies = new Dictionary<BuilderPolicyKey, IBuilderPolicy>();
-
-        // Lifetime
+        readonly IPolicyList innerPolicyList;
+        readonly object lockObject = new object();
+        readonly Dictionary<BuilderPolicyKey, IBuilderPolicy> policies = new Dictionary<BuilderPolicyKey, IBuilderPolicy>();
 
         public PolicyList()
             : this(null) {}
 
-        public PolicyList(PolicyList innerPolicyList)
+        public PolicyList(IPolicyList innerPolicyList)
         {
-            this.innerPolicyList = (IPolicyList)innerPolicyList ?? new NullPolicyList();
+            this.innerPolicyList = innerPolicyList ?? new NullPolicyList();
         }
-
-        // Properties
 
         public int Count
         {
@@ -31,8 +25,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     return policies.Count;
             }
         }
-
-        // Methods
 
         public void AddPolicies(PolicyList policiesToCopy)
         {

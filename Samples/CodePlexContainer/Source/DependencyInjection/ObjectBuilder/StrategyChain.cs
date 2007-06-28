@@ -5,20 +5,14 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class StrategyChain : IStrategyChain
     {
-        // Fields
-
-        List<IBuilderStrategy> strategies = new List<IBuilderStrategy>();
-
-        // Lifetime
+        readonly List<IBuilderStrategy> strategies = new List<IBuilderStrategy>();
 
         public StrategyChain() {}
 
-        public StrategyChain(IEnumerable<IBuilderStrategy> strategies)
+        public StrategyChain(IEnumerable strategies)
         {
             AddRange(strategies);
         }
-
-        // Properties
 
         public IBuilderStrategy Head
         {
@@ -29,8 +23,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 return null;
             }
         }
-
-        // Methods
 
         public void Add(IBuilderStrategy strategy)
         {

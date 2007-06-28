@@ -4,15 +4,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class MethodInvocation : IMethodInvocation
     {
-        // Fields
-
-        InputParameterCollection inputParams;
-        ParameterCollection allParams;
-        object target;
-        object[] arguments;
-        MethodBase methodBase;
-
-        // Lifetime
+        readonly ParameterCollection allParams;
+        readonly object[] arguments;
+        readonly InputParameterCollection inputParams;
+        readonly MethodBase methodBase;
+        readonly object target;
 
         public MethodInvocation(object target,
                                 MethodBase methodBase,
@@ -26,8 +22,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             inputParams = new InputParameterCollection(arguments, paramInfos);
             allParams = new ParameterCollection(arguments, paramInfos);
         }
-
-        // Properties
 
         IParameterCollection IMethodInvocation.Arguments
         {

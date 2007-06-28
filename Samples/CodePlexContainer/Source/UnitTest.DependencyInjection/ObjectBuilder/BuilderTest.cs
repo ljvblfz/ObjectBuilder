@@ -65,6 +65,74 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
         }
 
+        // Helpers
+
+        class FakePolicy : IBuilderPolicy {}
+
+        class PolicyGettingStrategy : BuilderStrategy
+        {
+            public FakePolicy Policy = null;
+
+            public override object BuildUp(IBuilderContext context,
+                                           Type typeToBuild,
+                                           object existing,
+                                           string idToBuild)
+            {
+                Policy = context.Policies.Get<FakePolicy>(typeof(object), null);
+                return base.BuildUp(context, typeToBuild, existing, idToBuild);
+            }
+        }
+
+        class PolicySettingStrategy : BuilderStrategy
+        {
+            public FakePolicy Policy = new FakePolicy();
+
+            public override object BuildUp(IBuilderContext context,
+                                           Type typeToBuild,
+                                           object existing,
+                                           string idToBuild)
+            {
+                context.Policies.Set(Policy, typeof(object), null);
+                return base.BuildUp(context, typeToBuild, existing, idToBuild);
+            }
+        }
+
+        class StringConcatStrategy : BuilderStrategy
+        {
+            public string StringValue;
+
+            public StringConcatStrategy(string value)
+            {
+                StringValue = value;
+            }
+
+            string AppendString(object item)
+            {
+                string result;
+
+                if (item == null)
+                    result = StringValue;
+                else
+                    result = ((string)item) + StringValue;
+
+                return result;
+            }
+
+            public override object BuildUp(IBuilderContext context,
+                                           Type typeToBuild,
+                                           object existing,
+                                           string idToBuild)
+            {
+                return base.BuildUp(context, typeToBuild, AppendString(existing), idToBuild);
+            }
+
+            public override object TearDown(IBuilderContext context,
+                                            object item)
+            {
+                return base.TearDown(context, AppendString(item));
+            }
+        }
+
         [TestFixture]
         public class TearDown
         {
@@ -116,74 +184,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 string s = builder.TearDown(null, null, null, strategies, "");
 
                 Assert.Equal("4321", s);
-            }
-        }
-
-        // Helpers
-
-        class FakePolicy : IBuilderPolicy {}
-
-        class PolicySettingStrategy : BuilderStrategy
-        {
-            public FakePolicy Policy = new FakePolicy();
-
-            public override object BuildUp(IBuilderContext context,
-                                           Type typeToBuild,
-                                           object existing,
-                                           string idToBuild)
-            {
-                context.Policies.Set(Policy, typeof(object), null);
-                return base.BuildUp(context, typeToBuild, existing, idToBuild);
-            }
-        }
-
-        class PolicyGettingStrategy : BuilderStrategy
-        {
-            public FakePolicy Policy = null;
-
-            public override object BuildUp(IBuilderContext context,
-                                           Type typeToBuild,
-                                           object existing,
-                                           string idToBuild)
-            {
-                Policy = context.Policies.Get<FakePolicy>(typeof(object), null);
-                return base.BuildUp(context, typeToBuild, existing, idToBuild);
-            }
-        }
-
-        class StringConcatStrategy : BuilderStrategy
-        {
-            public string StringValue;
-
-            public StringConcatStrategy(string value)
-            {
-                StringValue = value;
-            }
-
-            public override object BuildUp(IBuilderContext context,
-                                           Type typeToBuild,
-                                           object existing,
-                                           string idToBuild)
-            {
-                return base.BuildUp(context, typeToBuild, AppendString(existing), idToBuild);
-            }
-
-            public override object TearDown(IBuilderContext context,
-                                            object item)
-            {
-                return base.TearDown(context, AppendString(item));
-            }
-
-            string AppendString(object item)
-            {
-                string result;
-
-                if (item == null)
-                    result = StringValue;
-                else
-                    result = ((string)item) + StringValue;
-
-                return result;
             }
         }
     }

@@ -6,8 +6,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     [Serializable]
     public class IncompatibleTypesException : Exception
     {
-        // Lifetime
-
         public IncompatibleTypesException() {}
 
         public IncompatibleTypesException(string message)

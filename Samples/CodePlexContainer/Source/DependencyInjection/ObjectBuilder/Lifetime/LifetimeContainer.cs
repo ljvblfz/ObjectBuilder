@@ -6,11 +6,22 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class LifetimeContainer : ILifetimeContainer
     {
-        // Fields
+        readonly List<object> items = new List<object>();
 
-        List<object> items = new List<object>();
+        public int Count
+        {
+            get { return items.Count; }
+        }
 
-        // Lifetime
+        public void Add(object item)
+        {
+            items.Add(item);
+        }
+
+        public bool Contains(object item)
+        {
+            return items.Contains(item);
+        }
 
         public void Dispose()
         {
@@ -34,25 +45,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
                 items.Clear();
             }
-        }
-
-        // Properties
-
-        public int Count
-        {
-            get { return items.Count; }
-        }
-
-        // Methods
-
-        public void Add(object item)
-        {
-            items.Add(item);
-        }
-
-        public bool Contains(object item)
-        {
-            return items.Contains(item);
         }
 
         public IEnumerator<object> GetEnumerator()

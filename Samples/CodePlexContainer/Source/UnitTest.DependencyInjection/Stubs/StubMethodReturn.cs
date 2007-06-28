@@ -6,9 +6,15 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     {
         // Fields
 
+        Exception exception;
         IParameterCollection outputs;
         object returnValue;
-        Exception exception;
+
+        public Exception Exception
+        {
+            get { return exception; }
+            set { exception = value; }
+        }
 
         // Properties
 
@@ -22,12 +28,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             get { return returnValue; }
             set { returnValue = value; }
-        }
-
-        public Exception Exception
-        {
-            get { return exception; }
-            set { exception = value; }
         }
     }
 }

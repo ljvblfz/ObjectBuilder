@@ -6,11 +6,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class ListDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, List<TValue>>>
     {
-        // Fields
+        readonly Dictionary<TKey, List<TValue>> innerValues = new Dictionary<TKey, List<TValue>>();
 
-        Dictionary<TKey, List<TValue>> innerValues = new Dictionary<TKey, List<TValue>>();
-
-        // Properties
+        public int Count
+        {
+            get { return innerValues.Count; }
+        }
 
         public List<TValue> this[TKey key]
         {
@@ -22,11 +23,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 return innerValues[key];
             }
             set { innerValues[key] = value; }
-        }
-
-        public int Count
-        {
-            get { return innerValues.Count; }
         }
 
         public ICollection<TKey> Keys
@@ -46,8 +42,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 return values;
             }
         }
-
-        // Methods
 
         public void Add(TKey key)
         {
@@ -76,6 +70,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             innerValues.Clear();
         }
 
+        public bool ContainsKey(TKey key)
+        {
+            Guard.ArgumentNotNull(key, "key");
+
+            return innerValues.ContainsKey(key);
+        }
+
         public bool ContainsValue(TValue value)
         {
             foreach (KeyValuePair<TKey, List<TValue>> pair in innerValues)
@@ -85,13 +86,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return false;
         }
 
-        public bool ContainsKey(TKey key)
-        {
-            Guard.ArgumentNotNull(key, "key");
-
-            return innerValues.ContainsKey(key);
-        }
-
         List<TValue> CreateNewList(TKey key)
         {
             List<TValue> values = new List<TValue>();
@@ -99,29 +93,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return values;
         }
 
-        public IEnumerator<KeyValuePair<TKey, List<TValue>>> GetEnumerator()
-        {
-            return innerValues.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return innerValues.GetEnumerator();
-        }
-
         public IEnumerable<TValue> FindByKey(Predicate<TKey> keyFilter)
         {
             foreach (KeyValuePair<TKey, List<TValue>> pair in this)
                 if (keyFilter(pair.Key))
                     foreach (TValue value in pair.Value)
-                        yield return value;
-        }
-
-        public IEnumerable<TValue> FindByValue(Predicate<TValue> valueFilter)
-        {
-            foreach (KeyValuePair<TKey, List<TValue>> pair in this)
-                foreach (TValue value in pair.Value)
-                    if (valueFilter(value))
                         yield return value;
         }
 
@@ -133,6 +109,24 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     foreach (TValue value in pair.Value)
                         if (valueFilter(value))
                             yield return value;
+        }
+
+        public IEnumerable<TValue> FindByValue(Predicate<TValue> valueFilter)
+        {
+            foreach (KeyValuePair<TKey, List<TValue>> pair in this)
+                foreach (TValue value in pair.Value)
+                    if (valueFilter(value))
+                        yield return value;
+        }
+
+        public IEnumerator<KeyValuePair<TKey, List<TValue>>> GetEnumerator()
+        {
+            return innerValues.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return innerValues.GetEnumerator();
         }
 
         public bool Remove(TKey key)

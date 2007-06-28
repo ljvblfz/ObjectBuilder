@@ -6,16 +6,12 @@ namespace CodePlex.DependencyInjection
 {
     public class DependencyContainer : IObjectFactory, IDisposable
     {
-        // Fields
-
+        readonly Builder builder = new Builder();
         bool disposed = false;
-        Builder builder = new Builder();
-        LifetimeContainer lifetime = new LifetimeContainer();
-        Locator locator;
-        PolicyList policies;
-        StagedStrategyChain<BuilderStage> strategies;
-
-        // Lifetime
+        readonly LifetimeContainer lifetime = new LifetimeContainer();
+        readonly Locator locator;
+        readonly PolicyList policies;
+        readonly StagedStrategyChain<BuilderStage> strategies;
 
         public DependencyContainer()
             : this(null, null, null) {}
@@ -23,8 +19,8 @@ namespace CodePlex.DependencyInjection
         public DependencyContainer(DependencyContainer innerContainer)
             : this(innerContainer.locator, innerContainer.policies, innerContainer.strategies) {}
 
-        DependencyContainer(Locator innerLocator,
-                            PolicyList innerPolicies,
+        DependencyContainer(IReadableLocator innerLocator,
+                            IPolicyList innerPolicies,
                             StagedStrategyChain<BuilderStage> innerStrategies)
         {
             locator = new Locator(innerLocator);
@@ -52,6 +48,7 @@ namespace CodePlex.DependencyInjection
 
                 strategies.AddNew<BuilderAwareStrategy>(BuilderStage.PostInitialization);
                 strategies.AddNew<RemotingInterceptionStrategy>(BuilderStage.PostInitialization);
+                strategies.AddNew<VirtualMethodInterceptionStrategy>(BuilderStage.PostInitialization);
             }
 
             if (innerPolicies == null)
@@ -59,17 +56,6 @@ namespace CodePlex.DependencyInjection
 
             locator.Add(typeof(EventBrokerService), new EventBrokerService());
         }
-
-        public void Dispose()
-        {
-            if (!disposed)
-            {
-                disposed = true;
-                lifetime.Dispose();
-            }
-        }
-
-        // Methods
 
         public void CacheInstancesOf<T>()
         {
@@ -79,6 +65,15 @@ namespace CodePlex.DependencyInjection
         public void CacheInstancesOf(Type typeToCache)
         {
             policies.Set<ISingletonPolicy>(new SingletonPolicy(true), typeToCache, null);
+        }
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                disposed = true;
+                lifetime.Dispose();
+            }
         }
 
         public TToBuild Get<TToBuild>()

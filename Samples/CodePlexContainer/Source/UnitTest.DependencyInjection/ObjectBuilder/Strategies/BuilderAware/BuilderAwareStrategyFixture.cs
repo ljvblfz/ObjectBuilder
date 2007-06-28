@@ -83,9 +83,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         class IgnorantObject
         {
+            public string AssembledID = null;
             public bool OnAssembledCalled = false;
             public bool OnDisassemblingCalled = false;
-            public string AssembledID = null;
 
             public void OnBuiltUp(string id)
             {

@@ -4,11 +4,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class MethodPolicy : IMethodPolicy
     {
-        // Fields
-
-        Dictionary<string, IMethodCallInfo> methods = new Dictionary<string, IMethodCallInfo>();
-
-        // Properties
+        readonly Dictionary<string, IMethodCallInfo> methods = new Dictionary<string, IMethodCallInfo>();
 
         public Dictionary<string, IMethodCallInfo> Methods
         {

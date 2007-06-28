@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class VirtualMethodInterceptor<T>
+    public class VirtualMethodInterceptor
     {
         static void GenerateConstructor(TypeBuilder typeBuilder,
                                         Type targetType,
@@ -39,19 +39,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             il.Emit(OpCodes.Ret);
         }
 
-        static object GenerateObject(T target,
-                                     IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers)
-        {
-            AssemblyName assemblyName = new AssemblyName();
-            assemblyName.Name = "InterceptedClasses";
-            AssemblyBuilder assemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
-            ModuleBuilder module = assemblyBuilder.DefineDynamicModule("InterceptedClasses.dll");
-            Type wrapperType = GenerateWrapperType(typeof(T), module);
-            VirtualMethodProxy proxy = new VirtualMethodProxy(handlers);
-            ConstructorInfo ci = wrapperType.GetConstructor(new Type[] { typeof(VirtualMethodProxy), typeof(object) });
-            return ci.Invoke(new object[] { proxy, target });
-        }
-
         static void GenerateOverloadedMethod(TypeBuilder typeBuilder,
                                              MethodInfo methodInfo,
                                              FieldInfo fieldProxy,
@@ -60,9 +47,17 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             string methodName = methodInfo.Name;
             ParameterInfo[] parameters = methodInfo.GetParameters();
             List<Type> parameterTypes = new List<Type>();
+            List<Type> parameterRealTypes = new List<Type>();
 
             foreach (ParameterInfo parameter in parameters)
+            {
                 parameterTypes.Add(parameter.ParameterType);
+
+                if (parameter.IsOut || parameter.ParameterType.IsByRef)
+                    parameterRealTypes.Add(parameter.ParameterType.GetElementType());
+                else
+                    parameterRealTypes.Add(parameter.ParameterType);
+            }
 
             MethodBuilder method =
                 typeBuilder.DefineMethod(methodName,
@@ -87,8 +82,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 if (parameters[idx].IsOut && !parameters[idx].IsIn)
                 {
                     il.Emit(OpCodes.Ldarg_S, idx + 1);
-                    il.Emit(OpCodes.Ldnull);
-                    il.Emit(OpCodes.Stind_Ref);
+                    il.Emit(OpCodes.Initobj, parameterRealTypes[idx]);
                 }
             }
 
@@ -107,16 +101,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             {
                 il.Emit(OpCodes.Ldloc_1);
                 il.Emit(OpCodes.Ldc_I4_S, idx);
-                il.Emit(OpCodes.Ldarg_S, idx + 1); // +1 for the "this" parameter
+                il.Emit(OpCodes.Ldarg_S, idx + 1);
 
                 if (parameters[idx].IsOut || parameters[idx].ParameterType.IsByRef)
-                    if (parameters[idx].ParameterType.GetElementType().IsValueType)
-                        il.Emit(OpCodes.Ldind_I4);
-                    else
-                        il.Emit(OpCodes.Ldind_Ref);
+                    il.Emit(OpCodes.Ldobj, parameterRealTypes[idx]);
 
-                if (parameters[idx].ParameterType.IsValueType)
-                    il.Emit(OpCodes.Box, parameters[idx].ParameterType);
+                if (parameterRealTypes[idx].IsValueType)
+                    il.Emit(OpCodes.Box, parameterRealTypes[idx]);
 
                 il.Emit(OpCodes.Stelem_Ref);
             }
@@ -172,16 +163,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     il.Emit(OpCodes.Ldc_I4_S, idx);
                     il.Emit(OpCodes.Ldelem_Ref);
 
-                    if (parameters[idx].ParameterType.GetElementType().IsValueType)
-                    {
-                        il.Emit(OpCodes.Unbox_Any, parameters[idx].ParameterType.GetElementType());
-                        il.Emit(OpCodes.Stind_I4);
-                    }
+                    if (parameterRealTypes[idx].IsValueType)
+                        il.Emit(OpCodes.Unbox_Any, parameterRealTypes[idx]);
                     else
-                    {
-                        il.Emit(OpCodes.Castclass, parameters[idx].ParameterType.GetElementType());
-                        il.Emit(OpCodes.Stind_Ref);
-                    }
+                        il.Emit(OpCodes.Castclass, parameterRealTypes[idx]);
+
+                    il.Emit(OpCodes.Stobj, parameterRealTypes[idx]);
                 }
             }
 
@@ -189,8 +176,14 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         }
 
         static Type GenerateWrapperType(Type targetType,
-                                        ModuleBuilder module)
+                                        ModuleBuilder module,
+                                        IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers)
         {
+            List<MethodBase> methods = new List<MethodBase>();
+
+            foreach (KeyValuePair<MethodBase, List<IInterceptionHandler>> kvp in handlers)
+                methods.Add(kvp.Key);
+
             TypeBuilder typeBuilder = module.DefineType(
                 targetType.Name + "__Wrapper",
                 TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.BeforeFieldInit,
@@ -199,18 +192,46 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             FieldBuilder fieldProxy = typeBuilder.DefineField("proxy", typeof(VirtualMethodProxy), FieldAttributes.Private);
             FieldBuilder fieldTarget = typeBuilder.DefineField("target", typeof(object), FieldAttributes.Private);
 
-            foreach (MethodInfo methodInfo in targetType.GetMethods())
-                if (methodInfo.IsPublic && methodInfo.IsVirtual && !methodInfo.IsFinal)
-                    GenerateOverloadedMethod(typeBuilder, methodInfo, fieldProxy, fieldTarget);
+            foreach (MethodInfo method in targetType.GetMethods())
+                if (methods.Contains(method))
+                {
+                    if (!method.IsVirtual || method.IsFinal)
+                        throw new InvalidOperationException("Could not wrap " + method.Name + " on " + targetType.FullName + " because it must be virtual and non-sealed");
+
+                    GenerateOverloadedMethod(typeBuilder, method, fieldProxy, fieldTarget);
+                    methods.Remove(method);
+                }
+
+            if (methods.Count > 0)
+            {
+                string message = "While wrapping " + targetType.FullName + ", invalid handlers were discovered:";
+
+                foreach (MethodBase method in methods)
+                {
+                    message += Environment.NewLine + "* " + method.DeclaringType.FullName + "." + method.Name;
+
+                    if (method.ReflectedType != targetType && method.DeclaringType != targetType)
+                        message += " (incorrect type)";
+                    else
+                        message += " (non-public method)";
+                }
+
+                throw new InvalidOperationException(message);
+            }
 
             GenerateConstructor(typeBuilder, targetType, fieldProxy, fieldTarget);
             return typeBuilder.CreateType();
         }
 
-        public static T Wrap(T target,
-                             Dictionary<MethodBase, List<IInterceptionHandler>> handlers)
+        public static object Wrap(object target,
+                                  IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers)
         {
-            return (T)GenerateObject(target, handlers);
+            AssemblyBuilder assemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(new AssemblyName("InterceptedClasses"), AssemblyBuilderAccess.RunAndSave);
+            ModuleBuilder module = assemblyBuilder.DefineDynamicModule("InterceptedClasses.dll");
+            Type wrapperType = GenerateWrapperType(target.GetType(), module, handlers);
+            VirtualMethodProxy proxy = new VirtualMethodProxy(handlers);
+            ConstructorInfo ci = wrapperType.GetConstructor(new Type[] { typeof(VirtualMethodProxy), typeof(object) });
+            return ci.Invoke(new object[] { proxy, target });
         }
     }
 }

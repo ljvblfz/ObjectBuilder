@@ -5,14 +5,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class StagedStrategyChain<TStageEnum>
     {
-        // Fields
-
+        readonly StagedStrategyChain<TStageEnum> innerChain;
+        readonly object lockObject = new object();
+        readonly Dictionary<TStageEnum, List<IBuilderStrategy>> stages;
         static readonly Array stageValues = Enum.GetValues(typeof(TStageEnum));
-        Dictionary<TStageEnum, List<IBuilderStrategy>> stages;
-        object lockObject = new object();
-        StagedStrategyChain<TStageEnum> innerChain;
-
-        // Lifetime
 
         public StagedStrategyChain()
         {
@@ -27,8 +23,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             this.innerChain = innerChain;
         }
-
-        // Methods
 
         public void Add(IBuilderStrategy strategy,
                         TStageEnum stage)

@@ -4,18 +4,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class LifetimeEventArgs : EventArgs
     {
-        // Fields
-
-        object item;
-
-        // Lifetime
+        readonly object item;
 
         public LifetimeEventArgs(object item)
         {
             this.item = item;
         }
-
-        // Properties
 
         public object Item
         {

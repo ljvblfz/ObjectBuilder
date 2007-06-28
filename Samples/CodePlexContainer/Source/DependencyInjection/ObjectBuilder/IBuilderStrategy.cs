@@ -4,8 +4,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IBuilderStrategy
     {
-        // Methods
-
         object BuildUp(IBuilderContext context,
                        Type typeToBuild,
                        object existing,

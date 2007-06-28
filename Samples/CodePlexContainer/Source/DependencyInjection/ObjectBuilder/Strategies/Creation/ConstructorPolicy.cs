@@ -6,12 +6,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class ConstructorPolicy : ICreationPolicy
     {
-        // Fields
-
-        ConstructorInfo constructor;
-        List<IParameter> parameters = new List<IParameter>();
-
-        // Lifetime
+        readonly ConstructorInfo constructor;
+        readonly List<IParameter> parameters = new List<IParameter>();
 
         public ConstructorPolicy() {}
 
@@ -28,8 +24,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             this.constructor = constructor;
         }
 
-        // Methods
-
         public void AddParameter(IParameter parameter)
         {
             parameters.Add(parameter);
@@ -38,7 +32,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public object[] GetParameters(IBuilderContext context,
                                       Type type,
                                       string id,
-                                      ConstructorInfo constructor)
+                                      ConstructorInfo ctor)
         {
             List<object> results = new List<object>();
 

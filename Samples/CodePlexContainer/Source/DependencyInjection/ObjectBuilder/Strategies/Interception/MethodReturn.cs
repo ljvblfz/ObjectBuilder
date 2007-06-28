@@ -5,13 +5,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     class MethodReturn : IMethodReturn
     {
-        // Fields
-
-        object returnValue;
         Exception exception;
-        OutputParameterCollection outputs;
-
-        // Lifetime
+        readonly OutputParameterCollection outputs;
+        object returnValue;
 
         public MethodReturn(object[] arguments,
                             ParameterInfo[] parameters,
@@ -29,8 +25,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             this.exception = exception;
         }
-
-        // Properties
 
         public Exception Exception
         {

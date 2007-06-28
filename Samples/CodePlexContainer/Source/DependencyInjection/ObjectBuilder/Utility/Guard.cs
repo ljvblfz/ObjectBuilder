@@ -7,6 +7,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     static class Guard
     {
+        public static void ArgumentNotNull(object argumentValue,
+                                           string argumentName)
+        {
+            if (argumentValue == null)
+                throw new ArgumentNullException(argumentName);
+        }
+
         public static void ArgumentNotNullOrEmptyString(string argumentValue,
                                                         string argumentName)
         {
@@ -16,13 +23,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.StringCannotBeEmpty, argumentName));
         }
 
-        public static void ArgumentNotNull(object argumentValue,
-                                           string argumentName)
-        {
-            if (argumentValue == null)
-                throw new ArgumentNullException(argumentName);
-        }
-
         public static void EnumValueIsDefined(Type enumType,
                                               object value,
                                               string argumentName)
@@ -30,7 +30,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             if (Enum.IsDefined(enumType, value) == false)
                 throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
                                                           Resources.InvalidEnumValue,
-                                                          argumentName, enumType.ToString()));
+                                                          argumentName, enumType));
         }
 
         public static void TypeIsAssignableFromType(Type assignee,

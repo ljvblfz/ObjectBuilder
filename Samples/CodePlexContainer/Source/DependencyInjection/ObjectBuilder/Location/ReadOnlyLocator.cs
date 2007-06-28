@@ -5,21 +5,14 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class ReadOnlyLocator : ReadableLocator
     {
-        // Fields
-
-        IReadableLocator innerLocator;
-
-        // Lifetime
+        readonly IReadableLocator innerLocator;
 
         public ReadOnlyLocator(IReadableLocator innerLocator)
         {
-            if (innerLocator == null)
-                throw new ArgumentNullException("innerLocator");
+            Guard.ArgumentNotNull(innerLocator, "innerLocator");
 
             this.innerLocator = innerLocator;
         }
-
-        // Properties
 
         public override int Count
         {
@@ -35,8 +28,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             get { return true; }
         }
-
-        // Methods
 
         public override bool Contains(object key)
         {

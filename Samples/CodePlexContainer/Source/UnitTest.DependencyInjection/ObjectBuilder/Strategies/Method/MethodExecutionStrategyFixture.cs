@@ -207,27 +207,14 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         public class MockObject
         {
-            int currentOrder = 0;
-
-            public bool ParameterlessWasCalled = false;
             public bool AmbiguousWasCalled = false;
-            public int IntValue = 0;
-            public int CallOrderParameterless = 0;
             public int CallOrderInt = 0;
+            public int CallOrderParameterless = 0;
+            int currentOrder = 0;
+            public int IntValue = 0;
             public double MultiDouble = 0.0;
             public string MultiString = null;
-
-            public void ParameterlessMethod()
-            {
-                CallOrderParameterless = ++currentOrder;
-                ParameterlessWasCalled = true;
-            }
-
-            public void IntMethod(int intValue)
-            {
-                CallOrderInt = ++currentOrder;
-                IntValue = intValue;
-            }
+            public bool ParameterlessWasCalled = false;
 
             public void AmbiguousMethod(IFoo foo)
             {
@@ -239,11 +226,23 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 AmbiguousWasCalled = true;
             }
 
+            public void IntMethod(int intValue)
+            {
+                CallOrderInt = ++currentOrder;
+                IntValue = intValue;
+            }
+
             public void MultiParamMethod(double d,
                                          string s)
             {
                 MultiDouble = d;
                 MultiString = s;
+            }
+
+            public void ParameterlessMethod()
+            {
+                CallOrderParameterless = ++currentOrder;
+                ParameterlessWasCalled = true;
             }
         }
 

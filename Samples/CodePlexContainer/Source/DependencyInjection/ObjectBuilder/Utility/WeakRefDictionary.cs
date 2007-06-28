@@ -6,11 +6,16 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class WeakRefDictionary<TKey, TValue>
     {
-        // Fields
+        readonly Dictionary<TKey, WeakReference> inner = new Dictionary<TKey, WeakReference>();
 
-        Dictionary<TKey, WeakReference> inner = new Dictionary<TKey, WeakReference>();
-
-        // Properties
+        public int Count
+        {
+            get
+            {
+                CleanAbandonedItems();
+                return inner.Count;
+            }
+        }
 
         public TValue this[TKey key]
         {
@@ -24,17 +29,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 throw new KeyNotFoundException();
             }
         }
-
-        public int Count
-        {
-            get
-            {
-                CleanAbandonedItems();
-                return inner.Count;
-            }
-        }
-
-        // Methods
 
         public void Add(TKey key,
                         TValue value)

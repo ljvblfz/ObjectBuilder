@@ -9,83 +9,78 @@ namespace CodePlex.DependencyInjection
     public class DependencyContainerTest
     {
         [TestFixture]
-        public class Singletons
+        public class EventBroker
         {
             [Test]
-            public void ObjectsAreNotSingletonByDefault()
+            public void RegisterByCode()
             {
                 DependencyContainer container = new DependencyContainer();
+                container.RegisterEventSource<EventSourceCode>("TheEvent", "MyEventID");
+                container.RegisterEventSink<EventSinkCode>("TheHandler", "MyEventID");
+                EventSourceCode source = container.Get<EventSourceCode>();
+                EventSinkCode sink = container.Get<EventSinkCode>();
 
-                object obj1 = container.Get<object>();
-                object obj2 = container.Get<object>();
+                source.Invoke();
 
-                Assert.NotSame(obj1, obj2);
+                Assert.NotNull(sink.HandlerArgs);
             }
 
             [Test]
-            public void CanRegisterTypesToBeConsideredCached()
+            public void RegisterByAttributes()
             {
                 DependencyContainer container = new DependencyContainer();
-                container.CacheInstancesOf<MyObject>();
+                EventSourceAttr source = container.Get<EventSourceAttr>();
+                EventSinkAttr sink = container.Get<EventSinkAttr>();
 
-                MyObject result1 = container.Get<MyObject>();
-                MyObject result2 = container.Get<MyObject>();
+                source.Invoke();
 
-                Assert.NotNull(result1);
-                Assert.NotNull(result2);
-                Assert.Same(result1, result2);
+                Assert.NotNull(sink.HandlerArgs);
             }
 
-            [Test]
-            public void CanRegisterSingletonInstance()
+            internal class EventSourceCode
             {
-                DependencyContainer container = new DependencyContainer();
-                MyObject obj = new MyObject();
-                container.RegisterSingletonInstance<IMyObject>(obj);
+                public void Invoke()
+                {
+                    if (TheEvent != null)
+                        TheEvent(this, EventArgs.Empty);
+                }
 
-                IMyObject result = container.Get<IMyObject>();
-
-                Assert.Same(result, obj);
+                public event EventHandler<EventArgs> TheEvent;
             }
 
-            [Test]
-            public void NestedContainerCanReturnObjectsFromInnerContainer()
+            internal class EventSourceAttr
             {
-                DependencyContainer innerContainer = new DependencyContainer();
-                DependencyContainer outerContainer = new DependencyContainer(innerContainer);
-                innerContainer.RegisterSingletonInstance("Hello world");
+                public void Invoke()
+                {
+                    if (TheEvent != null)
+                        TheEvent(this, EventArgs.Empty);
+                }
 
-                string result = outerContainer.Get<string>();
-
-                Assert.Equal("Hello world", result);
-            }
-        }
-
-        [TestFixture]
-        public class TypeMapping
-        {
-            [Test]
-            public void CanRegisterTypeMapping()
-            {
-                DependencyContainer container = new DependencyContainer();
-                container.RegisterTypeMapping<IMyObject, MyObject>();
-
-                IMyObject result = container.Get<IMyObject>();
-
-                Assert.NotNull(result);
-                Assert.IsType<MyObject>(result);
+                [EventSource("MyEvent")]
+                public event EventHandler<EventArgs> TheEvent;
             }
 
-            [Test]
-            public void SettingTypeMappingOnInnerContainerAffectsOuterContainer()
+            internal class EventSinkCode
             {
-                DependencyContainer innerContainer = new DependencyContainer();
-                DependencyContainer outerContainer = new DependencyContainer(innerContainer);
-                innerContainer.RegisterTypeMapping<IMyObject, MyObject>();
+                public EventArgs HandlerArgs;
 
-                IMyObject result = outerContainer.Get<IMyObject>();
+                public void TheHandler(object sender,
+                                       EventArgs e)
+                {
+                    HandlerArgs = e;
+                }
+            }
 
-                Assert.IsType<MyObject>(result);
+            internal class EventSinkAttr
+            {
+                public EventArgs HandlerArgs;
+
+                [EventSink("MyEvent")]
+                public void TheHandler(object sender,
+                                       EventArgs e)
+                {
+                    HandlerArgs = e;
+                }
             }
         }
 
@@ -129,6 +124,10 @@ namespace CodePlex.DependencyInjection
                 }
             }
         }
+
+        // Helpers
+
+        interface IMyObject {}
 
         [TestFixture]
         public class MethodInterception
@@ -216,7 +215,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[3]);
             }
 
-            [Test][Ignore("Still working towards this...")]
+            [Test]
             public void CanInterceptWithVirtualMethodOverride()
             {
                 Recorder.Records.Clear();
@@ -296,7 +295,7 @@ namespace CodePlex.DependencyInjection
                 }
             }
 
-            internal class SpyVirtual
+            public class SpyVirtual
             {
                 public virtual void InterceptedMethod()
                 {
@@ -305,86 +304,87 @@ namespace CodePlex.DependencyInjection
             }
         }
 
+        class MyObject : IMyObject {}
+
         [TestFixture]
-        public class EventBroker
+        public class Singletons
         {
             [Test]
-            public void RegisterByCode()
+            public void ObjectsAreNotSingletonByDefault()
             {
                 DependencyContainer container = new DependencyContainer();
-                container.RegisterEventSource<EventSourceCode>("TheEvent", "MyEventID");
-                container.RegisterEventSink<EventSinkCode>("TheHandler", "MyEventID");
-                EventSourceCode source = container.Get<EventSourceCode>();
-                EventSinkCode sink = container.Get<EventSinkCode>();
 
-                source.Invoke();
+                object obj1 = container.Get<object>();
+                object obj2 = container.Get<object>();
 
-                Assert.NotNull(sink.HandlerArgs);
+                Assert.NotSame(obj1, obj2);
             }
 
             [Test]
-            public void RegisterByAttributes()
+            public void CanRegisterTypesToBeConsideredCached()
             {
                 DependencyContainer container = new DependencyContainer();
-                EventSourceAttr source = container.Get<EventSourceAttr>();
-                EventSinkAttr sink = container.Get<EventSinkAttr>();
+                container.CacheInstancesOf<MyObject>();
 
-                source.Invoke();
+                MyObject result1 = container.Get<MyObject>();
+                MyObject result2 = container.Get<MyObject>();
 
-                Assert.NotNull(sink.HandlerArgs);
+                Assert.NotNull(result1);
+                Assert.NotNull(result2);
+                Assert.Same(result1, result2);
             }
 
-            internal class EventSourceCode
+            [Test]
+            public void CanRegisterSingletonInstance()
             {
-                public event EventHandler<EventArgs> TheEvent;
+                DependencyContainer container = new DependencyContainer();
+                MyObject obj = new MyObject();
+                container.RegisterSingletonInstance<IMyObject>(obj);
 
-                public void Invoke()
-                {
-                    if (TheEvent != null)
-                        TheEvent(this, EventArgs.Empty);
-                }
+                IMyObject result = container.Get<IMyObject>();
+
+                Assert.Same(result, obj);
             }
 
-            internal class EventSourceAttr
+            [Test]
+            public void NestedContainerCanReturnObjectsFromInnerContainer()
             {
-                [EventSource("MyEvent")]
-                public event EventHandler<EventArgs> TheEvent;
+                DependencyContainer innerContainer = new DependencyContainer();
+                DependencyContainer outerContainer = new DependencyContainer(innerContainer);
+                innerContainer.RegisterSingletonInstance("Hello world");
 
-                public void Invoke()
-                {
-                    if (TheEvent != null)
-                        TheEvent(this, EventArgs.Empty);
-                }
-            }
+                string result = outerContainer.Get<string>();
 
-            internal class EventSinkCode
-            {
-                public EventArgs HandlerArgs;
-
-                public void TheHandler(object sender,
-                                       EventArgs e)
-                {
-                    HandlerArgs = e;
-                }
-            }
-
-            internal class EventSinkAttr
-            {
-                public EventArgs HandlerArgs;
-
-                [EventSink("MyEvent")]
-                public void TheHandler(object sender,
-                                       EventArgs e)
-                {
-                    HandlerArgs = e;
-                }
+                Assert.Equal("Hello world", result);
             }
         }
 
-        // Helpers
+        [TestFixture]
+        public class TypeMapping
+        {
+            [Test]
+            public void CanRegisterTypeMapping()
+            {
+                DependencyContainer container = new DependencyContainer();
+                container.RegisterTypeMapping<IMyObject, MyObject>();
 
-        interface IMyObject {}
+                IMyObject result = container.Get<IMyObject>();
 
-        class MyObject : IMyObject {}
+                Assert.NotNull(result);
+                Assert.IsType<MyObject>(result);
+            }
+
+            [Test]
+            public void SettingTypeMappingOnInnerContainerAffectsOuterContainer()
+            {
+                DependencyContainer innerContainer = new DependencyContainer();
+                DependencyContainer outerContainer = new DependencyContainer(innerContainer);
+                innerContainer.RegisterTypeMapping<IMyObject, MyObject>();
+
+                IMyObject result = outerContainer.Get<IMyObject>();
+
+                Assert.IsType<MyObject>(result);
+            }
+        }
     }
 }

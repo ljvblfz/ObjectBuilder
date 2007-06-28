@@ -6,8 +6,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public abstract class ReflectionStrategy<TMemberInfo> : BuilderStrategy
     {
-        // Methods
-
         protected abstract void AddParametersToPolicy(IBuilderContext context,
                                                       Type typeToBuild,
                                                       string idToBuild,
@@ -31,7 +29,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return base.BuildUp(context, typeToBuild, existing, idToBuild);
         }
 
-        static IEnumerable<IParameter> GenerateIParametersFromParameterInfos(ParameterInfo[] parameterInfos)
+        static IEnumerable<IParameter> GenerateIParametersFromParameterInfos(IEnumerable<ParameterInfo> parameterInfos)
         {
             List<IParameter> result = new List<IParameter>();
 
@@ -44,12 +42,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return result;
         }
 
-        protected abstract IEnumerable<IReflectionMemberInfo<TMemberInfo>> GetMembers(IBuilderContext context,
-                                                                                      Type typeToBuild,
-                                                                                      object existing,
-                                                                                      string idToBuild);
-
-        static ParameterAttribute GetInjectionAttribute(ParameterInfo parameterInfo)
+        static ParameterAttribute GetInjectionAttribute(ICustomAttributeProvider parameterInfo)
         {
             ParameterAttribute[] attributes = (ParameterAttribute[])parameterInfo.GetCustomAttributes(typeof(ParameterAttribute), true);
 
@@ -65,6 +58,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     throw new InvalidAttributeException();
             }
         }
+
+        protected abstract IEnumerable<IReflectionMemberInfo<TMemberInfo>> GetMembers(IBuilderContext context,
+                                                                                      Type typeToBuild,
+                                                                                      object existing,
+                                                                                      string idToBuild);
 
         protected abstract bool MemberRequiresProcessing(IReflectionMemberInfo<TMemberInfo> member);
     }

@@ -6,9 +6,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     {
         // Fields
 
-        Type PolicyType;
-        Type BuildType;
-        string BuildID;
+        public readonly string BuildID;
+        public readonly Type BuildType;
+        public readonly Type PolicyType;
 
         // Lifetime
 

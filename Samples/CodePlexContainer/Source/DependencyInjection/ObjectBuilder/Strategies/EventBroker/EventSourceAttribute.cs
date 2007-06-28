@@ -5,18 +5,12 @@ namespace CodePlex.DependencyInjection
     [AttributeUsage(AttributeTargets.Event, AllowMultiple = true, Inherited = true)]
     public class EventSourceAttribute : Attribute
     {
-        // Fields
-
-        string name;
-
-        // Lifetime
+        readonly string name;
 
         public EventSourceAttribute(string name)
         {
             this.name = name;
         }
-
-        // Properties
 
         public string Name
         {

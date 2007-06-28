@@ -5,20 +5,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class DefaultCreationPolicy : ICreationPolicy
     {
-        // Methods
-
-        public ConstructorInfo SelectConstructor(IBuilderContext context,
-                                                 Type typeToBuild,
-                                                 string idToBuild)
-        {
-            ConstructorInfo[] constructors = typeToBuild.GetConstructors();
-
-            if (constructors.Length > 0)
-                return constructors[0];
-
-            return null;
-        }
-
         public object[] GetParameters(IBuilderContext context,
                                       Type type,
                                       string id,
@@ -31,6 +17,18 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 parmsValueArray[i] = context.HeadOfChain.BuildUp(context, parms[i].ParameterType, null, id);
 
             return parmsValueArray;
+        }
+
+        public ConstructorInfo SelectConstructor(IBuilderContext context,
+                                                 Type typeToBuild,
+                                                 string idToBuild)
+        {
+            ConstructorInfo[] constructors = typeToBuild.GetConstructors();
+
+            if (constructors.Length > 0)
+                return constructors[0];
+
+            return null;
         }
     }
 }

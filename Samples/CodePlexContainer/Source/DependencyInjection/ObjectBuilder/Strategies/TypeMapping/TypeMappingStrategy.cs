@@ -4,8 +4,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class TypeMappingStrategy : BuilderStrategy
     {
-        // Methods
-
         public override object BuildUp(IBuilderContext context,
                                        Type t,
                                        object existing,

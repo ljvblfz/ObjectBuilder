@@ -6,12 +6,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     {
         // Fields
 
-        StrategyChain strategies = new StrategyChain();
         ILifetimeContainer lifetime = new LifetimeContainer();
         IReadWriteLocator locator;
-        PolicyList policies = new PolicyList();
         string originalID;
         Type originalType;
+        PolicyList policies = new PolicyList();
+        StrategyChain strategies = new StrategyChain();
 
         // Lifetime
 

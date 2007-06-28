@@ -4,12 +4,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public sealed class DependencyResolutionLocatorKey
     {
-        // Fields
-
-        Type type;
-        string id;
-
-        // Lifetime
+        readonly string id;
+        readonly Type type;
 
         public DependencyResolutionLocatorKey()
             : this(null, null) {}
@@ -21,8 +17,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             this.id = id;
         }
 
-        // Properties
-
         public string ID
         {
             get { return id; }
@@ -32,8 +26,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             get { return type; }
         }
-
-        // Methods
 
         public override bool Equals(object obj)
         {

@@ -6,11 +6,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class DependencyResolver
     {
-        // Fields
-
-        IBuilderContext context;
-
-        // Lifetime
+        readonly IBuilderContext context;
 
         public DependencyResolver(IBuilderContext context)
         {
@@ -19,8 +15,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             this.context = context;
         }
-
-        // Methods
 
         public object Resolve(Type typeToResolve,
                               Type typeToCreate,

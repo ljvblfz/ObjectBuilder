@@ -4,19 +4,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class ValueParameter<TValue> : KnownTypeParameter
     {
-        // Fields
-
-        TValue value;
-
-        // Lifetime
+        readonly TValue value;
 
         public ValueParameter(TValue value)
             : base(typeof(TValue))
         {
             this.value = value;
         }
-
-        // Methods
 
         public override object GetValue(IBuilderContext context)
         {
@@ -26,11 +20,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
     public class ValueParameter : KnownTypeParameter
     {
-        // Fields
-
-        object value;
-
-        // Lifetime
+        readonly object value;
 
         public ValueParameter(Type valueType,
                               object value)
@@ -38,8 +28,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             this.value = value;
         }
-
-        // Methods
 
         public override object GetValue(IBuilderContext context)
         {

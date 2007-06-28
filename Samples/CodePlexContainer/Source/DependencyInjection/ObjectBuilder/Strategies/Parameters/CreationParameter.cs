@@ -4,11 +4,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class CreationParameter : KnownTypeParameter
     {
-        // Fields
-
-        string creationID;
-
-        // Lifetime
+        readonly string creationID;
 
         public CreationParameter(Type type)
             : this(type, null) {}
@@ -19,8 +15,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             creationID = id;
         }
-
-        // Methods
 
         public override object GetValue(IBuilderContext context)
         {

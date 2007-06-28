@@ -7,8 +7,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class CreationStrategy : BuilderStrategy
     {
-        // Methods
-
         public override object BuildUp(IBuilderContext context,
                                        Type typeToBuild,
                                        object existing,

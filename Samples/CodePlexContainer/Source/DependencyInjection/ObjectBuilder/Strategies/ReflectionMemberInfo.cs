@@ -6,18 +6,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class ReflectionMemberInfo<TMemberInfo> : IReflectionMemberInfo<TMemberInfo>
         where TMemberInfo : MethodBase
     {
-        // Fields
-
-        TMemberInfo memberInfo;
-
-        // Lifetime
+        readonly TMemberInfo memberInfo;
 
         public ReflectionMemberInfo(TMemberInfo memberInfo)
         {
             this.memberInfo = memberInfo;
         }
-
-        // Properties
 
         public TMemberInfo MemberInfo
         {
@@ -28,8 +22,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             get { return memberInfo.Name; }
         }
-
-        // Methods
 
         public object[] GetCustomAttributes(Type attributeType,
                                             bool inherit)

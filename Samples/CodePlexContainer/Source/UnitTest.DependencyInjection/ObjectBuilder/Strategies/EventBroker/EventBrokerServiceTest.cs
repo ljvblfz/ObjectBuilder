@@ -8,6 +8,73 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class EventBrokerServiceTest
     {
         [TestFixture]
+        public class AcceptanceTests
+        {
+            [Test]
+            public void RegistrationSourceFirst()
+            {
+                EventBrokerService service = new EventBrokerService();
+                SpyEventSource source = new SpyEventSource();
+                SpyEventSink sink = new SpyEventSink();
+                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
+                MethodInfo sinkMethod = sink.GetType().GetMethod("MySink");
+                service.RegisterSource(source, sourceEvent, "MyEvent");
+                service.RegisterSink(sink, sinkMethod, "MyEvent");
+
+                source.InvokeMySource();
+
+                Assert.Equal(source.SourceText, sink.EventValue);
+            }
+
+            [Test]
+            public void RegistrationSinkFirst()
+            {
+                EventBrokerService service = new EventBrokerService();
+                SpyEventSource source = new SpyEventSource();
+                SpyEventSink sink = new SpyEventSink();
+                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
+                MethodInfo sinkMethod = sink.GetType().GetMethod("MySink");
+                service.RegisterSink(sink, sinkMethod, "MyEvent");
+                service.RegisterSource(source, sourceEvent, "MyEvent");
+
+                source.InvokeMySource();
+
+                Assert.Equal(source.SourceText, sink.EventValue);
+            }
+
+            [Test]
+            public void ExceptionsAreCollectedAndRethrown()
+            {
+                EventBrokerService service = new EventBrokerService();
+                SpyEventSource source = new SpyEventSource();
+                ExceptionThrowingSink sink1 = new ExceptionThrowingSink();
+                ExceptionThrowingSink sink2 = new ExceptionThrowingSink();
+                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
+                MethodInfo sinkMethod = sink1.GetType().GetMethod("MySink");
+                service.RegisterSink(sink1, sinkMethod, "MyEvent");
+                service.RegisterSink(sink2, sinkMethod, "MyEvent");
+                service.RegisterSource(source, sourceEvent, "MyEvent");
+
+                EventBrokerException ex =
+                    Assert.Throws<EventBrokerException>(delegate
+                                                        {
+                                                            source.InvokeMySource();
+                                                        });
+
+                Assert.Equal(2, ex.Exceptions.Count);
+            }
+        }
+
+        internal class ExceptionThrowingSink
+        {
+            public void MySink(object sender,
+                               EventArgs<string> e)
+            {
+                throw new Exception("No thanks");
+            }
+        }
+
+        [TestFixture]
         public class RegisterSink
         {
             [Test]
@@ -102,6 +169,45 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                                          service.RegisterSource(source, sourceEvent, null);
                                                      });
             }
+        }
+
+        internal class SpyEventSink
+        {
+            public string EventValue;
+            public bool WasCalled;
+
+            public void MySink(object sender,
+                               EventArgs<string> e)
+            {
+                WasCalled = true;
+                EventValue = e.Data;
+            }
+
+            public void NonSinkMethod() {}
+        }
+
+        internal class SpyEventSource
+        {
+            public static bool FinalizerCalled;
+            public string SourceText = "Hello, world!";
+
+            public bool HasHandlers
+            {
+                get { return MySource != null; }
+            }
+
+            ~SpyEventSource()
+            {
+                FinalizerCalled = true;
+            }
+
+            public void InvokeMySource()
+            {
+                if (MySource != null)
+                    MySource(this, new EventArgs<string>(SourceText));
+            }
+
+            public event EventHandler<EventArgs<string>> MySource;
         }
 
         [TestFixture]
@@ -217,117 +323,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 GC.WaitForPendingFinalizers();
 
                 Assert.True(SpyEventSource.FinalizerCalled);
-            }
-        }
-
-        [TestFixture]
-        public class AcceptanceTests
-        {
-            [Test]
-            public void RegistrationSourceFirst()
-            {
-                EventBrokerService service = new EventBrokerService();
-                SpyEventSource source = new SpyEventSource();
-                SpyEventSink sink = new SpyEventSink();
-                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
-                MethodInfo sinkMethod = sink.GetType().GetMethod("MySink");
-                service.RegisterSource(source, sourceEvent, "MyEvent");
-                service.RegisterSink(sink, sinkMethod, "MyEvent");
-
-                source.InvokeMySource();
-
-                Assert.Equal(source.SourceText, sink.EventValue);
-            }
-
-            [Test]
-            public void RegistrationSinkFirst()
-            {
-                EventBrokerService service = new EventBrokerService();
-                SpyEventSource source = new SpyEventSource();
-                SpyEventSink sink = new SpyEventSink();
-                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
-                MethodInfo sinkMethod = sink.GetType().GetMethod("MySink");
-                service.RegisterSink(sink, sinkMethod, "MyEvent");
-                service.RegisterSource(source, sourceEvent, "MyEvent");
-
-                source.InvokeMySource();
-
-                Assert.Equal(source.SourceText, sink.EventValue);
-            }
-
-            [Test]
-            public void ExceptionsAreCollectedAndRethrown()
-            {
-                EventBrokerService service = new EventBrokerService();
-                SpyEventSource source = new SpyEventSource();
-                ExceptionThrowingSink sink1 = new ExceptionThrowingSink();
-                ExceptionThrowingSink sink2 = new ExceptionThrowingSink();
-                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
-                MethodInfo sinkMethod = sink1.GetType().GetMethod("MySink");
-                service.RegisterSink(sink1, sinkMethod, "MyEvent");
-                service.RegisterSink(sink2, sinkMethod, "MyEvent");
-                service.RegisterSource(source, sourceEvent, "MyEvent");
-
-                EventBrokerException ex =
-                    Assert.Throws<EventBrokerException>(delegate
-                                                        {
-                                                            source.InvokeMySource();
-                                                        });
-
-                Assert.Equal(2, ex.Exceptions.Count);
-            }
-        }
-
-        // Static methods
-        // Static events?
-        // Hierarchy?
-
-        // Helpers
-
-        internal class SpyEventSource
-        {
-            public static bool FinalizerCalled;
-            public event EventHandler<EventArgs<string>> MySource;
-            public string SourceText = "Hello, world!";
-
-            ~SpyEventSource()
-            {
-                FinalizerCalled = true;
-            }
-
-            public bool HasHandlers
-            {
-                get { return MySource != null; }
-            }
-
-            public void InvokeMySource()
-            {
-                if (MySource != null)
-                    MySource(this, new EventArgs<string>(SourceText));
-            }
-        }
-
-        internal class SpyEventSink
-        {
-            public bool WasCalled;
-            public string EventValue;
-
-            public void MySink(object sender,
-                               EventArgs<string> e)
-            {
-                WasCalled = true;
-                EventValue = e.Data;
-            }
-
-            public void NonSinkMethod() {}
-        }
-
-        internal class ExceptionThrowingSink
-        {
-            public void MySink(object sender,
-                               EventArgs<string> e)
-            {
-                throw new Exception("No thanks");
             }
         }
     }

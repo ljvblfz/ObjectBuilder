@@ -6,25 +6,14 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class InterceptionPolicy : IInterceptionPolicy
     {
-        // Fields
-
-        Dictionary<MethodBase, List<IInterceptionHandler>> handlers;
-        InterceptionType interceptionType;
-
-        // Lifetime
+        readonly Dictionary<MethodBase, List<IInterceptionHandler>> handlers;
+        readonly InterceptionType interceptionType;
 
         public InterceptionPolicy(InterceptionType interceptionType)
         {
             this.interceptionType = interceptionType;
 
             handlers = new Dictionary<MethodBase, List<IInterceptionHandler>>();
-        }
-
-        // Properties
-
-        public IList<IInterceptionHandler> this[MethodBase method]
-        {
-            get { return handlers[method].AsReadOnly(); }
         }
 
         public int Count
@@ -37,12 +26,15 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             get { return interceptionType; }
         }
 
+        public IList<IInterceptionHandler> this[MethodBase method]
+        {
+            get { return handlers[method].AsReadOnly(); }
+        }
+
         public IEnumerable<MethodBase> Methods
         {
             get { return handlers.Keys; }
         }
-
-        // Methods
 
         public void Add(MethodBase method,
                         IEnumerable<IInterceptionHandler> methodHandlers)
