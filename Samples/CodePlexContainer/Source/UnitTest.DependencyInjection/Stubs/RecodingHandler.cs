@@ -6,7 +6,7 @@ namespace CodePlex.DependencyInjection
     {
         // Fields
 
-        string message;
+        readonly string message;
 
         // Lifetime
 

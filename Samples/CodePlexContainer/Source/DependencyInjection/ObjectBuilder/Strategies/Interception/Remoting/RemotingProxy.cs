@@ -11,10 +11,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     {
         // Fields
 
-        Dictionary<MethodBase, HandlerPipeline> handlers;
-        object target;
-        Type typeToProxy;
-        Type typeOfTarget;
+        readonly Dictionary<MethodBase, HandlerPipeline> handlers;
+        readonly object target;
+        readonly Type typeOfTarget;
 
         // Lifetime
 
@@ -24,7 +23,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             : base(typeToProxy)
         {
             this.target = target;
-            this.typeToProxy = typeToProxy;
             this.handlers = new Dictionary<MethodBase, HandlerPipeline>();
 
             foreach (KeyValuePair<MethodBase, List<IInterceptionHandler>> kvp in handlers)

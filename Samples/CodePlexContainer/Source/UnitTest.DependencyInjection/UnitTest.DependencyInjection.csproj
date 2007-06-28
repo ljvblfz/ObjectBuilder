@@ -61,6 +61,7 @@
     <Compile Include="ObjectBuilder\Strategies\Interception\InterceptionReflectorTest.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\Remoting\RemotingInterceptorTest.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\MethodInvocationTest.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\VirtualMethod\VirtualMethodInterceptorTest.cs" />
     <Compile Include="Stubs\RecodingHandler.cs" />
     <Compile Include="Stubs\Recorder.cs" />
     <Compile Include="Stubs\StubMethodReturn.cs" />

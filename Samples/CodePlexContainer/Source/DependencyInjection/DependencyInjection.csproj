@@ -67,6 +67,8 @@
     <Compile Include="ObjectBuilder\Strategies\Interception\Remoting\RemotingInterceptor.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\Remoting\RemotingProxy.cs" />
     <Compile Include="IObjectFactory.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\VirtualMethod\VirtualMethodInterceptor.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\VirtualMethod\VirtualMethodProxy.cs" />
     <Compile Include="ObjectBuilder\Strategies\Lifetime\LifetimeStrategy.cs" />
     <Compile Include="ObjectBuilder\Builder.cs" />
     <Compile Include="ObjectBuilder\BuilderContext.cs" />

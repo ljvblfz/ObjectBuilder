@@ -216,8 +216,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[3]);
             }
 
-            [Test]
-            [Ignore("Not done yet...")]
+            [Test][Ignore("Still working towards this...")]
             public void CanInterceptWithVirtualMethodOverride()
             {
                 Recorder.Records.Clear();

@@ -5,11 +5,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class Locator : ReadWriteLocator
     {
-        // Fields
-
-        WeakRefDictionary<object, object> references = new WeakRefDictionary<object, object>();
-
-        // Lifetime
+        readonly WeakRefDictionary<object, object> references = new WeakRefDictionary<object, object>();
 
         public Locator()
             : this(null) {}
@@ -17,30 +13,23 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         public Locator(IReadableLocator parentLocator)
             : base(parentLocator) {}
 
-        // Properties
-
         public override int Count
         {
             get { return references.Count; }
         }
 
-        // Methods
-
         public override void Add(object key,
                                  object value)
         {
-            if (key == null)
-                throw new ArgumentNullException("key");
-            if (value == null)
-                throw new ArgumentNullException("value");
+            Guard.ArgumentNotNull(key, "key");
+            Guard.ArgumentNotNull(value, "value");
 
             references.Add(key, value);
         }
 
         public override bool Contains(object key)
         {
-            if (key == null)
-                throw new ArgumentNullException("key");
+            Guard.ArgumentNotNull(key, "key");
 
             if (references.ContainsKey(key))
                 return true;
@@ -65,17 +54,16 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return null;
         }
 
-        public override bool Remove(object key)
-        {
-            if (key == null)
-                throw new ArgumentNullException("key");
-
-            return references.Remove(key);
-        }
-
         public override IEnumerator<KeyValuePair<object, object>> GetEnumerator()
         {
             return references.GetEnumerator();
+        }
+
+        public override bool Remove(object key)
+        {
+            Guard.ArgumentNotNull(key, "key");
+
+            return references.Remove(key);
         }
     }
 }
