@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -5,6 +6,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class VirtualMethodProxy
     {
+        public delegate object InvokeDelegate(object[] arguments);
+
         readonly Dictionary<MethodBase, HandlerPipeline> handlers;
 
         public VirtualMethodProxy(IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers)
@@ -17,7 +20,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         public object Invoke(object target,
                              MethodBase method,
-                             object[] arguments)
+                             object[] arguments,
+                             InvokeDelegate @delegate)
         {
             HandlerPipeline pipeline;
 
@@ -34,17 +38,21 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                 {
                                     try
                                     {
-                                        object returnValue = method.Invoke(target, invocation.Arguments);
+                                        object returnValue = @delegate(arguments);
                                         return new MethodReturn(invocation.Arguments, method.GetParameters(), returnValue);
                                     }
-                                    catch (TargetInvocationException ex)
+                                    catch (Exception ex)
                                     {
-                                        return new MethodReturn(ex.InnerException, method.GetParameters());
+                                        return new MethodReturn(ex, method.GetParameters());
                                     }
                                 });
 
             if (result.Exception != null)
-                throw result.Exception; // UGH! Lost the stack trace. What can we do?
+            {
+                FieldInfo remoteStackTraceString = typeof(Exception).GetField("_remoteStackTraceString", BindingFlags.Instance | BindingFlags.NonPublic);
+                remoteStackTraceString.SetValue(result.Exception, result.Exception.StackTrace + Environment.NewLine);
+                throw result.Exception;
+            }
 
             return result.ReturnValue;
         }

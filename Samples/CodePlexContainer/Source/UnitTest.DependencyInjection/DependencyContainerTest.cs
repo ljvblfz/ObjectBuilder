@@ -226,6 +226,29 @@ namespace CodePlex.DependencyInjection
 
                 SpyVirtual obj = container.Get<SpyVirtual>();
                 obj.InterceptedMethod();
+                obj.NonInterceptedMethod();
+
+                Assert.Equal(4, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In Method", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+                Assert.Equal("In Non-Intercepted Method", Recorder.Records[3]);
+            }
+
+            [Test]
+            public void InterceptedExceptionsAreUnchanged()
+            {
+                DependencyContainer container = new DependencyContainer();
+                container.SetInterceptionType<SpyVirtual>(InterceptionType.VirtualMethod);
+                container.Intercept<SpyVirtual>(typeof(SpyVirtual).GetMethod("ThrowsException"),
+                                                new RecordingHandler());
+
+                SpyVirtual obj = container.Get<SpyVirtual>();
+
+                Assert.Throws<Exception>(delegate
+                                         {
+                                             obj.ThrowsException();
+                                         });
 
                 Assert.Equal(3, Recorder.Records.Count);
                 Assert.Equal("Before Method", Recorder.Records[0]);
@@ -300,6 +323,17 @@ namespace CodePlex.DependencyInjection
                 public virtual void InterceptedMethod()
                 {
                     Recorder.Records.Add("In Method");
+                }
+
+                public void NonInterceptedMethod()
+                {
+                    Recorder.Records.Add("In Non-Intercepted Method");
+                }
+
+                public virtual void ThrowsException()
+                {
+                    Recorder.Records.Add("In Method");
+                    throw new Exception("This is my exception!");
                 }
             }
         }
