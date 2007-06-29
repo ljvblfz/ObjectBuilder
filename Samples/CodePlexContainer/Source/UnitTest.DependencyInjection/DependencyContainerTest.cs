@@ -238,6 +238,7 @@ namespace CodePlex.DependencyInjection
             [Test]
             public void InterceptedExceptionsAreUnchanged()
             {
+                Recorder.Records.Clear();
                 DependencyContainer container = new DependencyContainer();
                 container.SetInterceptionType<SpyVirtual>(InterceptionType.VirtualMethod);
                 container.Intercept<SpyVirtual>(typeof(SpyVirtual).GetMethod("ThrowsException"),
