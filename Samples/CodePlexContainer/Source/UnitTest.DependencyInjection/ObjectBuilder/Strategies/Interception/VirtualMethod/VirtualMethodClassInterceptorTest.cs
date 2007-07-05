@@ -6,12 +6,12 @@ using Assert=CodePlex.NUnitExtensions.Assert;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class VirtualMethodInterceptorTest
+    public class VirtualMethodClassInterceptorTest
     {
         static T WrapAndCreateType<T>(IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers,
                                       params object[] ctorArgs)
         {
-            Type wrappedType = VirtualMethodInterceptor.WrapType(typeof(T));
+            Type wrappedType = VirtualMethodClassInterceptor.WrapClass(typeof(T));
             VirtualMethodProxy proxy = new VirtualMethodProxy(handlers);
             List<object> wrappedCtorArgs = new List<object>();
             wrappedCtorArgs.Add(proxy);
@@ -44,7 +44,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Throws<TypeLoadException>(
                     delegate
                     {
-                        VirtualMethodInterceptor.WrapType(typeof(SealedClass));
+                        VirtualMethodClassInterceptor.WrapClass(typeof(SealedClass));
                     });
             }
 
@@ -54,7 +54,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Throws<TypeLoadException>(
                     delegate
                     {
-                        VirtualMethodInterceptor.WrapType(typeof(PrivateClass));
+                        VirtualMethodClassInterceptor.WrapClass(typeof(PrivateClass));
                     });
             }
 

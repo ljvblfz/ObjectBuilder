@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class VirtualMethodInterceptor
+    public class VirtualMethodClassInterceptor
     {
         static readonly Dictionary<Type, Type> wrappers = new Dictionary<Type, Type>();
 
@@ -305,7 +305,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return typeBuilder.CreateType();
         }
 
-        public static Type WrapType(Type type)
+        public static Type WrapClass(Type type)
         {
             lock (wrappers)
             {

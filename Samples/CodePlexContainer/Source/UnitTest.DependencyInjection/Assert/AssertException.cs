@@ -49,7 +49,7 @@ namespace CodePlex.NUnitExtensions
             List<string> results = new List<string>();
 
             foreach (string line in originalTrace)
-                if (!line.StartsWith("   at CodePlex.Xunit.Assert."))
+                if (!line.StartsWith("   at CodePlex.NUnitExtensions.Assert."))
                     results.Add(line);
 
             return string.Join("\r\n", results.ToArray());

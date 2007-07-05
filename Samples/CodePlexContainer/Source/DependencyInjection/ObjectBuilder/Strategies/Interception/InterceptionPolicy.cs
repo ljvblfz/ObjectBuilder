@@ -4,26 +4,13 @@ using System.Reflection;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class InterceptionPolicy : IInterceptionPolicy
+    public abstract class InterceptionPolicy : IInterceptionPolicy
     {
-        readonly Dictionary<MethodBase, List<IInterceptionHandler>> handlers;
-        readonly InterceptionType interceptionType;
-
-        public InterceptionPolicy(InterceptionType interceptionType)
-        {
-            this.interceptionType = interceptionType;
-
-            handlers = new Dictionary<MethodBase, List<IInterceptionHandler>>();
-        }
+        readonly Dictionary<MethodBase, List<IInterceptionHandler>> handlers = new Dictionary<MethodBase, List<IInterceptionHandler>>();
 
         public int Count
         {
             get { return handlers.Count; }
-        }
-
-        public InterceptionType InterceptionType
-        {
-            get { return interceptionType; }
         }
 
         public IList<IInterceptionHandler> this[MethodBase method]

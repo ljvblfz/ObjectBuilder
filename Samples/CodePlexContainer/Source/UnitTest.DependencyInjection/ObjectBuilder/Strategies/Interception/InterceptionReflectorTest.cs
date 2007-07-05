@@ -8,19 +8,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class InterceptionReflectorTest
     {
         [TestFixture]
-        public class NoInterceptionType
-        {
-            [Test]
-            public void ClassWithNoDecorationsReturnsNullPolicy()
-            {
-                IInterceptionPolicy policy = InterceptionReflector.Reflect<object>(new StubObjectFactory());
-
-                Assert.Null(policy);
-            }
-        }
-
-        [TestFixture]
-        public class RemotingInterception
+        public class InterceptionViaRemoting
         {
             [Test]
             public void NoInterceptedMethods()
@@ -37,7 +25,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
                 IInterceptionPolicy policy = InterceptionReflector.Reflect<OneMethod>(new StubObjectFactory());
 
-                Assert.Equal(InterceptionType.Remoting, policy.InterceptionType);
+                Assert.IsType<RemotingInterceptionPolicy>(policy);
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
                 Assert.IsType<RecordingHandler>(policy[method][0]);
@@ -51,7 +39,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
                 IInterceptionPolicy policy = InterceptionReflector.Reflect<TwoMethods>(new StubObjectFactory());
 
-                Assert.Equal(InterceptionType.Remoting, policy.InterceptionType);
+                Assert.IsType<RemotingInterceptionPolicy>(policy);
                 Assert.Equal(2, policy.Count);
                 Assert.Equal(1, policy[method1].Count);
                 Assert.IsType<RecordingHandler>(policy[method1][0]);
@@ -66,7 +54,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
                 IInterceptionPolicy policy = InterceptionReflector.Reflect<OneMethodTwoAttributes>(new StubObjectFactory());
 
-                Assert.Equal(InterceptionType.Remoting, policy.InterceptionType);
+                Assert.IsType<RemotingInterceptionPolicy>(policy);
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
                 Assert.IsType<RecordingHandler>(policy[method][0]);
@@ -76,10 +64,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             [Test]
             public void ConcreteTypeIncompatibleWithRemoting()
             {
-                Assert.Throws<ArgumentException>(delegate
-                                                 {
-                                                     InterceptionReflector.Reflect<NonMBRO>(new StubObjectFactory());
-                                                 });
+                Assert.Throws<InvalidOperationException>(
+                    delegate
+                    {
+                        InterceptionReflector.Reflect<NonMBRO>(new StubObjectFactory());
+                    });
             }
 
             [Test]
@@ -89,7 +78,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
                 IInterceptionPolicy policy = InterceptionReflector.Reflect<INonMBRO, NonMBRO>(new StubObjectFactory());
 
-                Assert.Equal(InterceptionType.Remoting, policy.InterceptionType);
+                Assert.IsType<RemotingInterceptionPolicy>(policy);
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
                 Assert.IsType<RecordingHandler>(policy[method][0]);
@@ -102,7 +91,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
                 IInterceptionPolicy policy = InterceptionReflector.Reflect<DerivedOneMethod>(new StubObjectFactory());
 
-                Assert.Equal(InterceptionType.Remoting, policy.InterceptionType);
+                Assert.IsType<RemotingInterceptionPolicy>(policy);
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
                 Assert.IsType<RecordingHandler>(policy[method][0]);
@@ -115,7 +104,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
                 IInterceptionPolicy policy = InterceptionReflector.Reflect<DerivedWithAddedIntercepts>(new StubObjectFactory());
 
-                Assert.Equal(InterceptionType.Remoting, policy.InterceptionType);
+                Assert.IsType<RemotingInterceptionPolicy>(policy);
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
                 Assert.IsType<RecordingHandler>(policy[method][0]);
@@ -124,10 +113,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             // Helpers
 
-            [InterceptType(InterceptionType.Remoting)]
+            [RemotingInterception]
             internal class ZeroMethods : MarshalByRefObject {}
 
-            [InterceptType(InterceptionType.Remoting)]
+            [RemotingInterception]
             internal class OneMethod : MarshalByRefObject
             {
                 [Intercept(typeof(RecordingHandler))]
@@ -136,7 +125,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 public void NonInterceptedMethod() {}
             }
 
-            [InterceptType(InterceptionType.Remoting)]
+            [RemotingInterception]
             internal class TwoMethods : MarshalByRefObject
             {
                 [Intercept(typeof(RecordingHandler))]
@@ -146,7 +135,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 public void InterceptedMethod2() {}
             }
 
-            [InterceptType(InterceptionType.Remoting)]
+            [RemotingInterception]
             internal class OneMethodTwoAttributes : MarshalByRefObject
             {
                 [Intercept(typeof(RecordingHandler))]
@@ -159,7 +148,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 void InterceptedMethod();
             }
 
-            [InterceptType(InterceptionType.Remoting)]
+            [RemotingInterception]
             internal class NonMBRO : INonMBRO
             {
                 [Intercept(typeof(RecordingHandler))]
@@ -172,6 +161,18 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             {
                 [Intercept(typeof(RecordingHandler))]
                 public override void InterceptedMethod() {}
+            }
+        }
+
+        [TestFixture]
+        public class NoInterceptionType
+        {
+            [Test]
+            public void ClassWithNoDecorationsReturnsNullPolicy()
+            {
+                IInterceptionPolicy policy = InterceptionReflector.Reflect<object>(new StubObjectFactory());
+
+                Assert.Null(policy);
             }
         }
     }

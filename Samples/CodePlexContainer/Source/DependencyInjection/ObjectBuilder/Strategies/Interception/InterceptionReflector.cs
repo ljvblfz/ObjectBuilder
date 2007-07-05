@@ -21,13 +21,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                                   Type typeBeingBuilt,
                                                   IObjectFactory objectFactory)
         {
-            foreach (InterceptTypeAttribute interceptTypeAttribute in typeBeingBuilt.GetCustomAttributes(typeof(InterceptTypeAttribute), true))
+            foreach (InterceptedClassAttribute interceptTypeAttribute in typeBeingBuilt.GetCustomAttributes(typeof(InterceptedClassAttribute), true))
             {
-                InterceptionPolicy policy = new InterceptionPolicy(interceptTypeAttribute.InterceptionType);
-
-                if (interceptTypeAttribute.InterceptionType == InterceptionType.Remoting)
-                    if (!typeRequested.IsInterface && !typeof(MarshalByRefObject).IsAssignableFrom(typeRequested))
-                        throw new ArgumentException("Type " + typeRequested.FullName + " is not compatible with remoting", "typeBeingBuilt");
+                InterceptionPolicy policy = interceptTypeAttribute.CreatePolicy(typeRequested, typeBeingBuilt);
 
                 foreach (MethodInfo method in typeBeingBuilt.GetMethods())
                 {

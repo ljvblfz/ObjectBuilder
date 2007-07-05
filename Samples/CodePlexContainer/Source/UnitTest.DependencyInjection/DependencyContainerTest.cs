@@ -148,21 +148,13 @@ namespace CodePlex.DependencyInjection
             public void SetInterceptionTypeTwiceWithDifferentTypes()
             {
                 DependencyContainer container = new DependencyContainer();
-                container.SetInterceptionType<object>(InterceptionType.Remoting);
+                container.SetInterceptionPolicy<object>(new RemotingInterceptionPolicy());
 
                 Assert.Throws<ArgumentException>(
                     delegate
                     {
-                        container.SetInterceptionType<object>(InterceptionType.VirtualMethod);
+                        container.SetInterceptionPolicy<object>(new VirtualMethodInterceptionPolicy());
                     });
-            }
-
-            [Test]
-            public void SetInterceptionTypeTwiceWithSameTypeDoesNotThrow()
-            {
-                DependencyContainer container = new DependencyContainer();
-                container.SetInterceptionType<object>(InterceptionType.Remoting);
-                container.SetInterceptionType<object>(InterceptionType.Remoting);
             }
 
             [Test]
@@ -170,7 +162,7 @@ namespace CodePlex.DependencyInjection
             {
                 Recorder.Records.Clear();
                 DependencyContainer container = new DependencyContainer();
-                container.SetInterceptionType<SpyMBRO>(InterceptionType.Remoting);
+                container.SetInterceptionPolicy<SpyMBRO>(new RemotingInterceptionPolicy());
                 container.Intercept<SpyMBRO>(typeof(SpyMBRO).GetMethod("InterceptedMethod"),
                                              new RecordingHandler());
 
@@ -220,7 +212,7 @@ namespace CodePlex.DependencyInjection
             {
                 Recorder.Records.Clear();
                 DependencyContainer container = new DependencyContainer();
-                container.SetInterceptionType<SpyVirtual>(InterceptionType.VirtualMethod);
+                container.SetInterceptionPolicy<SpyVirtual>(new VirtualMethodInterceptionPolicy());
                 container.Intercept<SpyVirtual>(typeof(SpyVirtual).GetMethod("InterceptedMethod"),
                                                 new RecordingHandler());
 
@@ -240,7 +232,7 @@ namespace CodePlex.DependencyInjection
             {
                 Recorder.Records.Clear();
                 DependencyContainer container = new DependencyContainer();
-                container.SetInterceptionType<SpyVirtual>(InterceptionType.VirtualMethod);
+                container.SetInterceptionPolicy<SpyVirtual>(new VirtualMethodInterceptionPolicy());
                 container.Intercept<SpyVirtual>(typeof(SpyVirtual).GetMethod("ThrowsException"),
                                                 new RecordingHandler());
 
@@ -284,7 +276,7 @@ namespace CodePlex.DependencyInjection
                 }
             }
 
-            [InterceptType(InterceptionType.Remoting)]
+            [RemotingInterception]
             internal class SpyMBROWithAttribute : MarshalByRefObject
             {
                 [Intercept(typeof(RecordingHandler))]
@@ -299,7 +291,7 @@ namespace CodePlex.DependencyInjection
                 void InterceptedMethod();
             }
 
-            [InterceptType(InterceptionType.Remoting)]
+            [RemotingInterception]
             internal class SpyInterfaceImplWithAttribute : ISpy, IBuilderAware
             {
                 [Intercept(typeof(RecordingHandler))]

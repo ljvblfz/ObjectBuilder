@@ -119,7 +119,7 @@ namespace CodePlex.DependencyInjection
             InterceptionPolicy policy = (InterceptionPolicy)policies.GetLocal<IInterceptionPolicy>(typeToIntercept, null);
 
             if (policy == null)
-                throw new InvalidOperationException("Must call SetInterceptionType before calling Intercept");
+                throw new InvalidOperationException("Must call SetInterceptionPolicy before calling Intercept");
 
             policy.Add(method, handlers);
         }
@@ -178,20 +178,18 @@ namespace CodePlex.DependencyInjection
             policies.Set<ITypeMappingPolicy>(new TypeMappingPolicy(typeToBuild, null), typeRequested, null);
         }
 
-        public void SetInterceptionType<T>(InterceptionType interceptionType)
+        public void SetInterceptionPolicy<T>(InterceptionPolicy policy)
         {
-            SetInterceptionType(typeof(T), interceptionType);
+            SetInterceptionPolicy(typeof(T), policy);
         }
 
-        public void SetInterceptionType(Type typeToIntercept,
-                                        InterceptionType interceptionType)
+        public void SetInterceptionPolicy(Type typeToIntercept,
+                                          InterceptionPolicy policy)
         {
-            IInterceptionPolicy policy = policies.GetLocal<IInterceptionPolicy>(typeToIntercept, null);
+            if (policies.GetLocal<IInterceptionPolicy>(typeToIntercept, null) != null)
+                throw new ArgumentException("Interception policy type has already been set for " + typeToIntercept.FullName, "policy");
 
-            if (policy == null)
-                policies.Set<IInterceptionPolicy>(new InterceptionPolicy(interceptionType), typeToIntercept, null);
-            else if (policy.InterceptionType != interceptionType)
-                throw new ArgumentException("Called SetInterceptionType when a conflicting interception type has already been requested", "interceptionType");
+            policies.Set<IInterceptionPolicy>(policy, typeToIntercept, null);
         }
 
         public void TearDown(object existingObject)
