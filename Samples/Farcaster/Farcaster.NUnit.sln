@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{858CAF15-DD37-4295-8458-81DA8C54CCCC}"
+	ProjectSection(SolutionItems) = preProject
+		Farcaster.testrunconfig = Farcaster.testrunconfig
+		Farcaster.vsmdi = Farcaster.vsmdi
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farcaster", "Source\Farcaster.csproj", "{83E19FE6-DB83-4316-A339-AAA5AC92E96B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farcaster.Tests.NUnit", "UnitTests\Farcaster.Tests.NUnit.csproj", "{30C19B4F-C456-4AC6-89BD-6318410FE749}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectBuilder", "..\..\Main\ObjectBuilder\ObjectBuilder.csproj", "{2AE49F19-392B-4C50-A13C-F49B2579849D}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs01.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Source\\Farcaster.csproj
+		SccProjectName1 = Source
+		SccLocalPath1 = Source
+		SccProjectUniqueName2 = UnitTests\\Farcaster.Tests.NUnit.csproj
+		SccProjectName2 = UnitTests
+		SccLocalPath2 = UnitTests
+		SccProjectUniqueName3 = ..\\..\\Main\\ObjectBuilder\\ObjectBuilder.csproj
+		SccProjectName3 = ../../Main/ObjectBuilder
+		SccLocalPath3 = ..\\..\\Main\\ObjectBuilder
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Farcaster.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83E19FE6-DB83-4316-A339-AAA5AC92E96B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83E19FE6-DB83-4316-A339-AAA5AC92E96B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83E19FE6-DB83-4316-A339-AAA5AC92E96B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83E19FE6-DB83-4316-A339-AAA5AC92E96B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30C19B4F-C456-4AC6-89BD-6318410FE749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30C19B4F-C456-4AC6-89BD-6318410FE749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30C19B4F-C456-4AC6-89BD-6318410FE749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30C19B4F-C456-4AC6-89BD-6318410FE749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AE49F19-392B-4C50-A13C-F49B2579849D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AE49F19-392B-4C50-A13C-F49B2579849D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AE49F19-392B-4C50-A13C-F49B2579849D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AE49F19-392B-4C50-A13C-F49B2579849D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
