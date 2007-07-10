@@ -44,7 +44,11 @@
     <Compile Include="StrongTypedStrategiesFixture.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\Farcaster\Farcaster.csproj">
+    <ProjectReference Include="..\..\..\Main\ObjectBuilder\ObjectBuilder.csproj">
+      <Project>{2AE49F19-392B-4C50-A13C-F49B2579849D}</Project>
+      <Name>ObjectBuilder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Source\Farcaster.csproj">
       <Project>{83E19FE6-DB83-4316-A339-AAA5AC92E96B}</Project>
       <Name>Farcaster</Name>
     </ProjectReference>
