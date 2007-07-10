@@ -6,6 +6,18 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.UnitTest", "Test.UnitTest\Test.UnitTest.csproj", "{5C5262F7-FE62-415F-BC8D-3C49CC071403}"
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs01.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = ObjectBuilder\\ObjectBuilder.csproj
+		SccProjectName1 = ObjectBuilder
+		SccLocalPath1 = ObjectBuilder
+		SccProjectUniqueName2 = Test.UnitTest\\Test.UnitTest.csproj
+		SccProjectName2 = Test.UnitTest
+		SccLocalPath2 = Test.UnitTest
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
