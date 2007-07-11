@@ -223,6 +223,139 @@ namespace CodePlex.DependencyInjection
         }
 
         [TestFixture]
+        public class InterceptInterface_GenericMethods
+        {
+            //[Test]
+            //public void GenericMethodOnNonGenericInterface()
+            //{
+            //    Recorder.Records.Clear();
+            //    DependencyContainer container = new DependencyContainer();
+            //    container.RegisterTypeMapping<IFoo, Foo>();
+
+            //    IFoo obj = container.Get<IFoo>();
+            //    obj.Bar(42);
+            //    obj.Bar("world");
+
+            //    Assert.Equal(6, Recorder.Records.Count);
+            //    Assert.Equal("Before Method", Recorder.Records[0]);
+            //    Assert.Equal("Passed: 42", Recorder.Records[1]);
+            //    Assert.Equal("After Method", Recorder.Records[2]);
+            //    Assert.Equal("Before Method", Recorder.Records[3]);
+            //    Assert.Equal("Passed: world", Recorder.Records[4]);
+            //    Assert.Equal("After Method", Recorder.Records[5]);
+            //}
+
+            //public class DerivedFoo : IFoo {
+            //    readonly ILEmitProxy proxy;
+            //    readonly IFoo target;
+            //    readonly MethodInfo method0;
+            //    readonly Type[] method0GenericArgs;
+
+            //    public DerivedFoo(ILEmitProxy proxy, IFoo target)
+            //    {
+            //        this.proxy = proxy;
+            //        this.target = target;
+
+            //        MethodInfo tempMethod = typeof(IFoo).GetMethod("Bar");
+            //        method0 = tempMethod.GetGenericMethodDefinition();
+            //        method0GenericArgs = tempMethod.GetGenericArguments();
+            //    }
+
+            //    public void Bar<T>(T value)
+            //    {
+            //        MethodInfo realMethod = method0.MakeGenericMethod(method0GenericArgs);
+            //        proxy.Invoke(target, realMethod, new object[] { value }, Bar__Delegate);
+            //    }
+
+            //    public object Bar__Delegate(object[] arguments)
+            //    {
+            //        // What to write here???
+            //        return null;
+            //    }
+            //}
+
+            public interface IFoo
+            {
+                void Bar<T>(T value);
+            }
+
+            public class Foo : IFoo
+            {
+                [InterfaceIntercept(typeof(RecordingHandler))]
+                public void Bar<T>(T value)
+                {
+                    Recorder.Records.Add("Passed " + value);
+                }
+            }
+
+            public interface IGenericFoo<T>
+            {
+                void Bar(T value);
+            }
+
+            public class GenericFoo<T> : IGenericFoo<T>
+            {
+                public void Bar(T value)
+                {
+                    Recorder.Records.Add("Passed " + value);
+                }
+            }
+
+            public class ConcreteFoo : IGenericFoo<int>
+            {
+                public void Bar(int value)
+                {
+                    Recorder.Records.Add("Passed " + value);
+                }
+            }
+        }
+
+        [TestFixture]
+        public class InterceptInterface_Properties
+        {
+            [Test]
+            public void CanInterceptPropertySettersAndGetters()
+            {
+                Recorder.Records.Clear();
+                DependencyContainer container = new DependencyContainer();
+                container.RegisterTypeMapping<IFoo, Foo>();
+
+                IFoo obj = container.Get<IFoo>();
+                obj.MyProperty = "foo";
+                string unused = obj.MyProperty;
+
+                Assert.Equal(6, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("PropSet: foo", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+                Assert.Equal("Before Method", Recorder.Records[3]);
+                Assert.Equal("PropGet", Recorder.Records[4]);
+                Assert.Equal("After Method", Recorder.Records[5]);
+            }
+
+            public interface IFoo
+            {
+                string MyProperty { get; set; }
+            }
+
+            public class Foo : IFoo
+            {
+                public string MyProperty
+                {
+                    [InterfaceIntercept(typeof(RecordingHandler))]
+                    get
+                    {
+                        Recorder.Records.Add("PropGet");
+                        return null;
+                    }
+
+                    [InterfaceIntercept(typeof(RecordingHandler))]
+                    set { Recorder.Records.Add("PropSet: " + value); }
+                }
+            }
+        }
+
+        [TestFixture]
         public class InterceptRemoting
         {
             [Test]

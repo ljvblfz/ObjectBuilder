@@ -19,18 +19,15 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         public abstract Type PolicyType { get; }
 
-        public virtual MethodBase GetMethodBaseForPolicy(Type typeRequested, MethodBase method)
+        public virtual MethodBase GetMethodBaseForPolicy(Type typeRequested,
+                                                         MethodBase method)
         {
             return method;
         }
 
-        public virtual void ValidateInterceptionForMethod(MethodBase method)
-        {
-        }
+        public virtual void ValidateInterceptionForMethod(MethodBase method) {}
 
         public virtual void ValidateInterceptionForType(Type typeRequested,
-                                                         Type typeBeingBuilt)
-        {
-        }
+                                                        Type typeBeingBuilt) {}
     }
 }
