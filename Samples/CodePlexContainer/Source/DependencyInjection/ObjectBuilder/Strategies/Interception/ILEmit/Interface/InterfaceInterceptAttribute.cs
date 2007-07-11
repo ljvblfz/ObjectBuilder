@@ -14,9 +14,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             get { return typeof(InterfaceInterceptionPolicy); }
         }
 
-        static MethodInfo GetBaseTypeMethod(Type typeRequested,
-                                            MethodBase method)
+        public override MethodBase GetMethodBaseForPolicy(Type typeRequested,
+                                                          MethodBase method)
         {
+            if (!typeRequested.IsInterface)
+                return null;
+
             ParameterInfo[] paramInfos = method.GetParameters();
             Type[] paramTypes = new Type[paramInfos.Length];
 
@@ -29,15 +32,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                            method.CallingConvention,
                                            paramTypes,
                                            null);
-        }
-
-        public override bool ShouldInterceptMethod(Type typeRequested,
-                                                   MethodBase method)
-        {
-            if (!typeRequested.IsInterface)
-                return false;
-
-            return (GetBaseTypeMethod(typeRequested, method) != null);
         }
 
         public override void ValidateInterceptionForType(Type typeRequested,

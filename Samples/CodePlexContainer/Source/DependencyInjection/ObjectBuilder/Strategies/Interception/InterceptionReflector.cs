@@ -43,6 +43,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                     IObjectFactory factory)
         {
             Dictionary<Type, List<IInterceptionHandler>> methodHandlers = new Dictionary<Type, List<IInterceptionHandler>>();
+            MethodBase methodForPolicy = method;
 
             foreach (InterceptAttribute attr in method.GetCustomAttributes(typeof(InterceptAttribute), true))
             {
@@ -53,7 +54,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
                     attr.ValidateInterceptionForMethod(method);
 
-                    if (!attr.ShouldInterceptMethod(typeRequested, method))
+                    methodForPolicy = attr.GetMethodBaseForPolicy(typeRequested, method);
+                    if (methodForPolicy == null)
                         return;
 
                     methodHandlers[attr.PolicyType] = new List<IInterceptionHandler>();
@@ -67,7 +69,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 if (!typePolicies.ContainsKey(policyType))
                     typePolicies[policyType] = (InterceptionPolicy)factory.Get(policyType);
 
-                typePolicies[policyType].Add(method, methodHandlers[policyType]);
+                typePolicies[policyType].Add(methodForPolicy, methodHandlers[policyType]);
             }
         }
     }

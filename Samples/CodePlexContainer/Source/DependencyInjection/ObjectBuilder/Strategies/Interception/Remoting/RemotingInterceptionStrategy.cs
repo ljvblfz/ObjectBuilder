@@ -9,8 +9,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                        object existing,
                                        string idToBuild)
         {
-            RemotingInterceptionPolicy policy =
-                context.Policies.Get<IInterceptionPolicy>(typeToBuild, idToBuild) as RemotingInterceptionPolicy;
+            RemotingInterceptionPolicy policy = context.Policies.Get<RemotingInterceptionPolicy>(typeToBuild, idToBuild);
 
             if (existing != null && policy != null)
                 existing = RemotingInterceptor.Wrap(existing, context.OriginalType, policy);

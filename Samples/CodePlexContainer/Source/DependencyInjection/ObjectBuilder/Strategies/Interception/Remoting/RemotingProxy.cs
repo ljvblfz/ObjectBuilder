@@ -50,27 +50,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             IMethodCallMessage callMessage = (IMethodCallMessage)msg;
             HandlerPipeline pipeline;
-            MethodBase method = callMessage.MethodBase;
-
-            if (method.ReflectedType != typeOfTarget)
-            {
-                List<Type> paramTypes = new List<Type>();
-
-                foreach (ParameterInfo paramInfo in method.GetParameters())
-                    paramTypes.Add(paramInfo.ParameterType);
-
-                method = typeOfTarget.GetMethod(method.Name,
-                                                BindingFlags.Public | BindingFlags.Instance,
-                                                null,
-                                                method.CallingConvention,
-                                                paramTypes.ToArray(),
-                                                null);
-            }
 
             if (handlers.ContainsKey(callMessage.MethodBase))
                 pipeline = handlers[callMessage.MethodBase];
-            else if (handlers.ContainsKey(method))
-                pipeline = handlers[method];
             else
                 pipeline = new HandlerPipeline();
 

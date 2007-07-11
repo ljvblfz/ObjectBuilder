@@ -38,9 +38,10 @@ namespace CodePlex.DependencyInjection
                 strategies.AddNew<MethodReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<PropertyReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<EventBrokerReflectionStrategy>(BuilderStage.PreCreation);
-                //strategies.AddNew<InterceptionReflectionStrategy>(BuilderStage.PreCreation);
+                strategies.AddNew<InterceptionReflectionStrategy>(BuilderStage.PreCreation);
 
-                //strategies.AddNew<VirtualMethodInterceptionStrategy>(BuilderStage.Creation);
+                strategies.AddNew<InterfaceInterceptionStrategy>(BuilderStage.Creation);
+                strategies.AddNew<VirtualInterceptionStrategy>(BuilderStage.Creation);
                 strategies.AddNew<CreationStrategy>(BuilderStage.Creation);
 
                 strategies.AddNew<PropertySetterStrategy>(BuilderStage.Initialization);
@@ -48,7 +49,7 @@ namespace CodePlex.DependencyInjection
                 strategies.AddNew<EventBrokerStrategy>(BuilderStage.Initialization);
 
                 strategies.AddNew<BuilderAwareStrategy>(BuilderStage.PostInitialization);
-                //strategies.AddNew<RemotingInterceptionStrategy>(BuilderStage.PostInitialization);
+                strategies.AddNew<RemotingInterceptionStrategy>(BuilderStage.PostInitialization);
             }
 
             if (innerPolicies == null)
@@ -106,22 +107,59 @@ namespace CodePlex.DependencyInjection
             return builder.BuildUp(locator, lifetime, policies, strategies.MakeStrategyChain(), @object.GetType(), null, @object);
         }
 
-        public void Intercept<T>(MethodInfo method,
-                                 params IInterceptionHandler[] handlers)
+        void Intercept<T>(Type typeToIntercept,
+                          MethodBase method,
+                          IInterceptionHandler[] handlers)
+            where T : InterceptionPolicy, new()
         {
-            Intercept(typeof(T), method, handlers);
-        }
-
-        public void Intercept(Type typeToIntercept,
-                              MethodInfo method,
-                              params IInterceptionHandler[] handlers)
-        {
-            InterceptionPolicy policy = (InterceptionPolicy)policies.GetLocal<IInterceptionPolicy>(typeToIntercept, null);
+            T policy = policies.GetLocal<T>(typeToIntercept, null);
 
             if (policy == null)
-                throw new InvalidOperationException("Must call SetInterceptionPolicy before calling Intercept");
+            {
+                policy = new T();
+                policies.Set(policy, typeToIntercept, null);
+            }
 
             policy.Add(method, handlers);
+        }
+
+        public void InterceptInterface<T>(MethodInfo interfaceMethod,
+                                          params IInterceptionHandler[] handlers)
+        {
+            Intercept<InterfaceInterceptionPolicy>(typeof(T), interfaceMethod, handlers);
+        }
+
+        public void InterceptInterface(Type typeToIntercept,
+                                       MethodInfo interfaceMethod,
+                                       params IInterceptionHandler[] handlers)
+        {
+            Intercept<InterfaceInterceptionPolicy>(typeToIntercept, interfaceMethod, handlers);
+        }
+
+        public void InterceptRemoting<T>(MethodInfo method,
+                                         params IInterceptionHandler[] handlers)
+        {
+            Intercept<RemotingInterceptionPolicy>(typeof(T), method, handlers);
+        }
+
+        public void InterceptRemoting(Type typeToIntercept,
+                                      MethodInfo method,
+                                      params IInterceptionHandler[] handlers)
+        {
+            Intercept<RemotingInterceptionPolicy>(typeToIntercept, method, handlers);
+        }
+
+        public void InterceptVirtual<T>(MethodInfo method,
+                                        params IInterceptionHandler[] handlers)
+        {
+            Intercept<VirtualInterceptionPolicy>(typeof(T), method, handlers);
+        }
+
+        public void InterceptVirtual(Type typeToIntercept,
+                                     MethodInfo method,
+                                     params IInterceptionHandler[] handlers)
+        {
+            Intercept<VirtualInterceptionPolicy>(typeToIntercept, method, handlers);
         }
 
         public void RegisterEventSink<T>(string methodName,
@@ -176,20 +214,6 @@ namespace CodePlex.DependencyInjection
                                         Type typeToBuild)
         {
             policies.Set<ITypeMappingPolicy>(new TypeMappingPolicy(typeToBuild, null), typeRequested, null);
-        }
-
-        public void SetInterceptionPolicy<T>(InterceptionPolicy policy)
-        {
-            SetInterceptionPolicy(typeof(T), policy);
-        }
-
-        public void SetInterceptionPolicy(Type typeToIntercept,
-                                          InterceptionPolicy policy)
-        {
-            if (policies.GetLocal<IInterceptionPolicy>(typeToIntercept, null) != null)
-                throw new ArgumentException("Interception policy type has already been set for " + typeToIntercept.FullName, "policy");
-
-            policies.Set<IInterceptionPolicy>(policy, typeToIntercept, null);
         }
 
         public void TearDown(object existingObject)

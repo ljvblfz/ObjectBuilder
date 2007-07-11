@@ -9,15 +9,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                        object existing,
                                        string idToBuild)
         {
-            //IObjectFactory factory = (IObjectFactory)context.Locator.Get(new DependencyResolutionLocatorKey(typeof(IObjectFactory), null));
+            IObjectFactory factory = (IObjectFactory)context.Locator.Get(new DependencyResolutionLocatorKey(typeof(IObjectFactory), null));
 
-            //if (factory != null)
-            //{
-            //    IInterceptionPolicy policy = InterceptionReflector.Reflect(context.OriginalType, typeToBuild, factory);
-
-            //    if (policy != null)
-            //        context.Policies.Set(policy, typeToBuild, idToBuild);
-            //}
+            if (factory != null)
+                InterceptionReflector.Reflect(context.OriginalType, typeToBuild, idToBuild, context.Policies, factory);
 
             return base.BuildUp(context, typeToBuild, existing, idToBuild);
         }

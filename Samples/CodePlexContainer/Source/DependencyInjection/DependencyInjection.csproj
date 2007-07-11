@@ -51,6 +51,7 @@
     <Compile Include="ObjectBuilder\Strategies\Interception\IInterceptionPolicy.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\ILEmit\Interface\InterfaceInterceptAttribute.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\ILEmit\Interface\InterfaceInterceptionPolicy.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\ILEmit\Interface\InterfaceInterceptionStrategy.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\IMethodInvocation.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\IMethodReturn.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\InputParameterCollection.cs" />
@@ -71,7 +72,7 @@
     <Compile Include="IObjectFactory.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\ILEmit\Virtual\VirtualInterceptAttribute.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\ILEmit\Virtual\VirtualInterceptionPolicy.cs" />
-    <Compile Include="ObjectBuilder\Strategies\Interception\ILEmit\VirtualMethodInterceptionStrategy.cs" />
+    <Compile Include="ObjectBuilder\Strategies\Interception\ILEmit\Virtual\VirtualInterceptionStrategy.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\ILEmit\Virtual\VirtualInterceptor.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\ILEmit\Interface\InterfaceInterceptor.cs" />
     <Compile Include="ObjectBuilder\Strategies\Interception\ILEmit\ILEmitProxy.cs" />

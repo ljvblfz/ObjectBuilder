@@ -19,9 +19,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         public abstract Type PolicyType { get; }
 
-        public virtual bool ShouldInterceptMethod(Type typeRequested, MethodBase method)
+        public virtual MethodBase GetMethodBaseForPolicy(Type typeRequested, MethodBase method)
         {
-            return true;
+            return method;
         }
 
         public virtual void ValidateInterceptionForMethod(MethodBase method)

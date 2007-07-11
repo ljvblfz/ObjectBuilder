@@ -36,7 +36,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void RequestingToBuildInterface1WillNotInterceptedInterface2Methods()
             {
                 PolicyList policies = new PolicyList();
-                MethodBase method = typeof(TwoInterfaceClass).GetMethod("InterceptedMethod1");
+                MethodBase method = typeof(IInterface1).GetMethod("InterceptedMethod1");
 
                 InterceptionReflector.Reflect<IInterface1, TwoInterfaceClass>(null, policies, new StubObjectFactory());
                 InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(TwoInterfaceClass), null);
@@ -50,7 +50,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void OneInterceptedMethod()
             {
                 PolicyList policies = new PolicyList();
-                MethodBase method = typeof(OneMethod).GetMethod("InterceptedMethod");
+                MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<IOneMethod, OneMethod>("foo", policies, new StubObjectFactory());
                 InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(OneMethod), "foo");
@@ -64,8 +64,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void TwoInterceptedMethods()
             {
                 PolicyList policies = new PolicyList();
-                MethodBase method1 = typeof(TwoMethods).GetMethod("InterceptedMethod1");
-                MethodBase method2 = typeof(TwoMethods).GetMethod("InterceptedMethod2");
+                MethodBase method1 = typeof(ITwoMethods).GetMethod("InterceptedMethod1");
+                MethodBase method2 = typeof(ITwoMethods).GetMethod("InterceptedMethod2");
 
                 InterceptionReflector.Reflect<ITwoMethods, TwoMethods>(null, policies, new StubObjectFactory());
                 InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(TwoMethods), null);
@@ -81,7 +81,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void TwoAttributesOnOneMethod()
             {
                 PolicyList policies = new PolicyList();
-                MethodBase method = typeof(OneMethodTwoAttributes).GetMethod("InterceptedMethod");
+                MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<IOneMethod, OneMethodTwoAttributes>(null, policies, new StubObjectFactory());
                 InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(OneMethodTwoAttributes), null);
@@ -96,7 +96,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void InterceptionIsInherited()
             {
                 PolicyList policies = new PolicyList();
-                MethodBase method = typeof(DerivedOneMethod).GetMethod("InterceptedMethod");
+                MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<IOneMethod, DerivedOneMethod>(null, policies, new StubObjectFactory());
                 InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(DerivedOneMethod), null);
@@ -110,7 +110,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void CanAddHandlersInInheritedClass()
             {
                 PolicyList policies = new PolicyList();
-                MethodBase method = typeof(DerivedWithAddedIntercepts).GetMethod("InterceptedMethod");
+                MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<IOneMethod, DerivedWithAddedIntercepts>(null, policies, new StubObjectFactory());
                 InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(DerivedWithAddedIntercepts), null);
@@ -260,20 +260,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
 
             [Test]
-            public void CanRequestInterfaceForNonMBROClass()
-            {
-                PolicyList policies = new PolicyList();
-                MethodBase method = typeof(NonMBRO).GetMethod("InterceptedMethod");
-
-                InterceptionReflector.Reflect<INonMBRO, NonMBRO>(null, policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(NonMBRO), null);
-
-                Assert.Equal(1, policy.Count);
-                Assert.Equal(1, policy[method].Count);
-                Assert.IsType<RecordingHandler>(policy[method][0]);
-            }
-
-            [Test]
             public void InterceptionIsInherited()
             {
                 PolicyList policies = new PolicyList();
@@ -328,12 +314,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 public void InterceptedMethod() {}
             }
 
-            internal interface INonMBRO
-            {
-                void InterceptedMethod();
-            }
-
-            internal class NonMBRO : INonMBRO
+            internal class NonMBRO
             {
                 [RemotingIntercept(typeof(RecordingHandler))]
                 public void InterceptedMethod() {}
@@ -536,6 +517,35 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         }
 
         [TestFixture]
+        public class MixedInterception
+        {
+            [Test]
+            public void CanMixInterceptionTypes()
+            {
+                PolicyList policies = new PolicyList();
+
+                InterceptionReflector.Reflect<IFoo, FooBar>(null, policies, new StubObjectFactory());
+
+                Assert.Equal(1, policies.Get<VirtualInterceptionPolicy>(typeof(FooBar), null).Count);
+                Assert.Equal(1, policies.Get<InterfaceInterceptionPolicy>(typeof(FooBar), null).Count);
+                Assert.Equal(1, policies.Get<RemotingInterceptionPolicy>(typeof(FooBar), null).Count);
+            }
+
+            public interface IFoo
+            {
+                void Foo();
+            }
+
+            public class FooBar : MarshalByRefObject, IFoo
+            {
+                [RemotingIntercept(typeof(RecordingHandler))]
+                [VirtualIntercept(typeof(RecordingHandler))]
+                [InterfaceIntercept(typeof(RecordingHandler))]
+                public virtual void Foo() {}
+            }
+        }
+
+        [TestFixture]
         public class NoInterceptionType
         {
             [Test]
@@ -548,8 +558,5 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Equal(0, policies.Count);
             }
         }
-
-        // Mixed interception in class
-        // Mixed interception on method
     }
 }

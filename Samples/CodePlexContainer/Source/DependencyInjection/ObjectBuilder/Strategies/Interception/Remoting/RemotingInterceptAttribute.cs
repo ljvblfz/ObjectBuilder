@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
@@ -15,11 +14,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         }
 
         public override void ValidateInterceptionForType(Type typeRequested,
-                                                  Type typeBeingBuilt)
+                                                         Type typeBeingBuilt)
         {
-            if (!typeRequested.IsInterface &&
-                !typeof(MarshalByRefObject).IsAssignableFrom(typeBeingBuilt))
-                throw new InvalidOperationException("Type " + typeBeingBuilt.FullName + " is not compatible with remoting interception");
+            if (!typeof(MarshalByRefObject).IsAssignableFrom(typeBeingBuilt))
+                throw new InvalidOperationException("Type " + typeBeingBuilt.FullName + " must derive from MarshalByRefObject to be intercepted.");
         }
     }
 }
