@@ -38,9 +38,9 @@ namespace CodePlex.DependencyInjection
                 strategies.AddNew<MethodReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<PropertyReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<EventBrokerReflectionStrategy>(BuilderStage.PreCreation);
-                strategies.AddNew<InterceptionReflectionStrategy>(BuilderStage.PreCreation);
+                //strategies.AddNew<InterceptionReflectionStrategy>(BuilderStage.PreCreation);
 
-                strategies.AddNew<VirtualMethodInterceptionStrategy>(BuilderStage.Creation);
+                //strategies.AddNew<VirtualMethodInterceptionStrategy>(BuilderStage.Creation);
                 strategies.AddNew<CreationStrategy>(BuilderStage.Creation);
 
                 strategies.AddNew<PropertySetterStrategy>(BuilderStage.Initialization);
@@ -48,7 +48,7 @@ namespace CodePlex.DependencyInjection
                 strategies.AddNew<EventBrokerStrategy>(BuilderStage.Initialization);
 
                 strategies.AddNew<BuilderAwareStrategy>(BuilderStage.PostInitialization);
-                strategies.AddNew<RemotingInterceptionStrategy>(BuilderStage.PostInitialization);
+                //strategies.AddNew<RemotingInterceptionStrategy>(BuilderStage.PostInitialization);
             }
 
             if (innerPolicies == null)

@@ -4,13 +4,13 @@ using System.Reflection;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class VirtualMethodProxy
+    public class ILEmitProxy
     {
         public delegate object InvokeDelegate(object[] arguments);
 
         readonly Dictionary<MethodBase, HandlerPipeline> handlers;
 
-        public VirtualMethodProxy(IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers)
+        public ILEmitProxy(IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers)
         {
             this.handlers = new Dictionary<MethodBase, HandlerPipeline>();
 

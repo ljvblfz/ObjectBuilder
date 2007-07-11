@@ -1,11 +1,14 @@
 using System;
-using System.Collections.Generic;
 using CodePlex.DependencyInjection.ObjectBuilder;
 using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Assert = CodePlex.NUnitExtensions.Assert;
 
 namespace CodePlex.DependencyInjection
 {
+    interface IMyObject { }
+
+    class MyObject : IMyObject { }
+
     public class DependencyContainerTest
     {
         [TestFixture]
@@ -125,213 +128,274 @@ namespace CodePlex.DependencyInjection
             }
         }
 
-        // Helpers
+        //[TestFixture]
+        //public class Interception
+        //{
+        //    [Test]
+        //    public void MustCallSetInterceptionTypeBeforeCallingIntercept()
+        //    {
+        //        DependencyContainer container = new DependencyContainer();
 
-        interface IMyObject {}
+        //        Assert.Throws<InvalidOperationException>(
+        //            delegate
+        //            {
+        //                container.Intercept<object>(typeof(object).GetMethod("GetType"), new RecordingHandler());
+        //            });
+        //    }
 
-        [TestFixture]
-        public class MethodInterception
-        {
-            [Test]
-            public void MustCallSetInterceptionTypeBeforeCallingIntercept()
-            {
-                DependencyContainer container = new DependencyContainer();
+        //    [Test]
+        //    public void SetInterceptionTypeTwiceWithDifferentTypes()
+        //    {
+        //        DependencyContainer container = new DependencyContainer();
+        //        container.SetInterceptionPolicy<object>(new RemotingInterceptionPolicy());
 
-                Assert.Throws<InvalidOperationException>(
-                    delegate
-                    {
-                        container.Intercept<object>(typeof(object).GetMethod("GetType"), new RecordingHandler());
-                    });
-            }
+        //        Assert.Throws<ArgumentException>(
+        //            delegate
+        //            {
+        //                container.SetInterceptionPolicy<object>(new VirtualMethodInterceptionPolicy());
+        //            });
+        //    }
+        //}
 
-            [Test]
-            public void SetInterceptionTypeTwiceWithDifferentTypes()
-            {
-                DependencyContainer container = new DependencyContainer();
-                container.SetInterceptionPolicy<object>(new RemotingInterceptionPolicy());
+        //[TestFixture]
+        //public class Interception_Remoting
+        //{
+        //    [Test]
+        //    public void InterceptClassViaCode()
+        //    {
+        //        Recorder.Records.Clear();
+        //        DependencyContainer container = new DependencyContainer();
+        //        container.SetInterceptionPolicy<SpyMBRO>(new RemotingInterceptionPolicy());
+        //        container.Intercept<SpyMBRO>(typeof(SpyMBRO).GetMethod("InterceptedMethod"),
+        //                                     new RecordingHandler());
 
-                Assert.Throws<ArgumentException>(
-                    delegate
-                    {
-                        container.SetInterceptionPolicy<object>(new VirtualMethodInterceptionPolicy());
-                    });
-            }
+        //        SpyMBRO obj = container.Get<SpyMBRO>();
+        //        obj.InterceptedMethod();
 
-            [Test]
-            public void RemotingInterceptionViaCode()
-            {
-                Recorder.Records.Clear();
-                DependencyContainer container = new DependencyContainer();
-                container.SetInterceptionPolicy<SpyMBRO>(new RemotingInterceptionPolicy());
-                container.Intercept<SpyMBRO>(typeof(SpyMBRO).GetMethod("InterceptedMethod"),
-                                             new RecordingHandler());
+        //        Assert.Equal(3, Recorder.Records.Count);
+        //        Assert.Equal("Before Method", Recorder.Records[0]);
+        //        Assert.Equal("In Method", Recorder.Records[1]);
+        //        Assert.Equal("After Method", Recorder.Records[2]);
+        //    }
 
-                SpyMBRO obj = container.Get<SpyMBRO>();
-                obj.InterceptedMethod();
+        //    [Test]
+        //    public void InterceptClassViaAttributes()
+        //    {
+        //        Recorder.Records.Clear();
+        //        DependencyContainer container = new DependencyContainer();
 
-                Assert.Equal(3, Recorder.Records.Count);
-                Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In Method", Recorder.Records[1]);
-                Assert.Equal("After Method", Recorder.Records[2]);
-            }
+        //        SpyMBROWithAttribute obj = container.Get<SpyMBROWithAttribute>();
+        //        obj.InterceptedMethod();
 
-            [Test]
-            public void RemotingInterceptionViaAttributes()
-            {
-                Recorder.Records.Clear();
-                DependencyContainer container = new DependencyContainer();
+        //        Assert.Equal(3, Recorder.Records.Count);
+        //        Assert.Equal("Before Method", Recorder.Records[0]);
+        //        Assert.Equal("In Method", Recorder.Records[1]);
+        //        Assert.Equal("After Method", Recorder.Records[2]);
+        //    }
 
-                SpyMBROWithAttribute obj = container.Get<SpyMBROWithAttribute>();
-                obj.InterceptedMethod();
+        //    [Test]
+        //    public void InterceptInterfaceViaAttributes()
+        //    {
+        //        Recorder.Records.Clear();
+        //        DependencyContainer container = new DependencyContainer();
+        //        container.RegisterTypeMapping<ISpy, SpyInterfaceImplWithAttribute>();
 
-                Assert.Equal(3, Recorder.Records.Count);
-                Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In Method", Recorder.Records[1]);
-                Assert.Equal("After Method", Recorder.Records[2]);
-            }
+        //        ISpy obj = container.Get<ISpy>();
+        //        obj.InterceptedMethod();
 
-            [Test]
-            public void RemotingInterceptionThroughInterfaceViaAttributes()
-            {
-                Recorder.Records.Clear();
-                DependencyContainer container = new DependencyContainer();
-                container.RegisterTypeMapping<ISpy, SpyInterfaceImplWithAttribute>();
+        //        Assert.Equal(4, Recorder.Records.Count);
+        //        Assert.Equal("OnBuiltUp", Recorder.Records[0]);
+        //        Assert.Equal("Before Method", Recorder.Records[1]);
+        //        Assert.Equal("In Method", Recorder.Records[2]);
+        //        Assert.Equal("After Method", Recorder.Records[3]);
+        //    }
 
-                ISpy obj = container.Get<ISpy>();
-                obj.InterceptedMethod();
+        //    internal class SpyMBRO : MarshalByRefObject
+        //    {
+        //        public void InterceptedMethod()
+        //        {
+        //            Recorder.Records.Add("In Method");
+        //        }
+        //    }
 
-                Assert.Equal(4, Recorder.Records.Count);
-                Assert.Equal("OnBuiltUp", Recorder.Records[0]);
-                Assert.Equal("Before Method", Recorder.Records[1]);
-                Assert.Equal("In Method", Recorder.Records[2]);
-                Assert.Equal("After Method", Recorder.Records[3]);
-            }
+        //    [RemotingInterception]
+        //    internal class SpyMBROWithAttribute : MarshalByRefObject
+        //    {
+        //        [Intercept(typeof(RecordingHandler))]
+        //        public void InterceptedMethod()
+        //        {
+        //            Recorder.Records.Add("In Method");
+        //        }
+        //    }
 
-            [Test]
-            public void CanInterceptWithVirtualMethodOverride()
-            {
-                Recorder.Records.Clear();
-                DependencyContainer container = new DependencyContainer();
-                container.SetInterceptionPolicy<SpyVirtual>(new VirtualMethodInterceptionPolicy());
-                container.Intercept<SpyVirtual>(typeof(SpyVirtual).GetMethod("InterceptedMethod"),
-                                                new RecordingHandler());
+        //    internal interface ISpy
+        //    {
+        //        void InterceptedMethod();
+        //    }
 
-                SpyVirtual obj = container.Get<SpyVirtual>();
-                obj.InterceptedMethod();
-                obj.NonInterceptedMethod();
+        //    [RemotingInterception]
+        //    internal class SpyInterfaceImplWithAttribute : ISpy, IBuilderAware
+        //    {
+        //        [Intercept(typeof(RecordingHandler))]
+        //        public void InterceptedMethod()
+        //        {
+        //            Recorder.Records.Add("In Method");
+        //        }
 
-                Assert.Equal(4, Recorder.Records.Count);
-                Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In Method", Recorder.Records[1]);
-                Assert.Equal("After Method", Recorder.Records[2]);
-                Assert.Equal("In Non-Intercepted Method", Recorder.Records[3]);
-            }
+        //        public void OnBuiltUp(string id)
+        //        {
+        //            Recorder.Records.Add("OnBuiltUp");
+        //        }
 
-            [Test]
-            public void InterceptedExceptionsAreUnchanged()
-            {
-                Recorder.Records.Clear();
-                DependencyContainer container = new DependencyContainer();
-                container.SetInterceptionPolicy<SpyVirtual>(new VirtualMethodInterceptionPolicy());
-                container.Intercept<SpyVirtual>(typeof(SpyVirtual).GetMethod("ThrowsException"),
-                                                new RecordingHandler());
+        //        public void OnTearingDown()
+        //        {
+        //            Recorder.Records.Add("OnTearingDown");
+        //        }
+        //    }
+        //}
 
-                SpyVirtual obj = container.Get<SpyVirtual>();
+        //[TestFixture]
+        //public class Interception_VirtualMethod
+        //{
+        //    [Test]
+        //    public void InterceptClassViaCode()
+        //    {
+        //        Recorder.Records.Clear();
+        //        DependencyContainer container = new DependencyContainer();
+        //        container.SetInterceptionPolicy<SpyVirtual>(new VirtualMethodInterceptionPolicy());
+        //        container.Intercept<SpyVirtual>(typeof(SpyVirtual).GetMethod("InterceptedMethod"),
+        //                                        new RecordingHandler());
 
-                Assert.Throws<Exception>(delegate
-                                         {
-                                             obj.ThrowsException();
-                                         });
+        //        SpyVirtual obj = container.Get<SpyVirtual>();
+        //        obj.InterceptedMethod();
+        //        obj.NonInterceptedMethod();
 
-                Assert.Equal(3, Recorder.Records.Count);
-                Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In Method", Recorder.Records[1]);
-                Assert.Equal("After Method", Recorder.Records[2]);
-            }
+        //        Assert.Equal(4, Recorder.Records.Count);
+        //        Assert.Equal("Before Method", Recorder.Records[0]);
+        //        Assert.Equal("In Method", Recorder.Records[1]);
+        //        Assert.Equal("After Method", Recorder.Records[2]);
+        //        Assert.Equal("In Non-Intercepted Method", Recorder.Records[3]);
+        //    }
 
-            // Helpers
+        //    [Test]
+        //    public void InterceptClassViaAttributes()
+        //    {
+        //        Recorder.Records.Clear();
+        //        DependencyContainer container = new DependencyContainer();
 
-            static class Recorder
-            {
-                public static List<string> Records = new List<string>();
-            }
+        //        SpyVirtualAttributes obj = container.Get<SpyVirtualAttributes>();
+        //        obj.InterceptedMethod();
 
-            class RecordingHandler : IInterceptionHandler
-            {
-                public IMethodReturn Invoke(IMethodInvocation call,
-                                            GetNextHandlerDelegate getNext)
-                {
-                    Recorder.Records.Add("Before Method");
-                    IMethodReturn result = getNext().Invoke(call, getNext);
-                    Recorder.Records.Add("After Method");
-                    return result;
-                }
-            }
+        //        Assert.Equal(3, Recorder.Records.Count);
+        //        Assert.Equal("Before Method", Recorder.Records[0]);
+        //        Assert.Equal("In Method", Recorder.Records[1]);
+        //        Assert.Equal("After Method", Recorder.Records[2]);
+        //    }
 
-            internal class SpyMBRO : MarshalByRefObject
-            {
-                public void InterceptedMethod()
-                {
-                    Recorder.Records.Add("In Method");
-                }
-            }
+        //    [Test]
+        //    public void InterceptInterfaceViaCode_PolicyOnClass()
+        //    {
+        //        Recorder.Records.Clear();
+        //        DependencyContainer container = new DependencyContainer();
+        //        container.RegisterTypeMapping<ISpy, SpyInterface>();
+        //        container.SetInterceptionPolicy<SpyInterface>(new VirtualMethodInterceptionPolicy());
+        //        container.Intercept<SpyInterface>(typeof(ISpy).GetMethod("InterceptedMethod"),
+        //                                        new RecordingHandler());
 
-            [RemotingInterception]
-            internal class SpyMBROWithAttribute : MarshalByRefObject
-            {
-                [Intercept(typeof(RecordingHandler))]
-                public void InterceptedMethod()
-                {
-                    Recorder.Records.Add("In Method");
-                }
-            }
+        //        ISpy obj = container.Get<ISpy>();
+        //        obj.InterceptedMethod();
 
-            internal interface ISpy
-            {
-                void InterceptedMethod();
-            }
+        //        Assert.Equal(3, Recorder.Records.Count);
+        //        Assert.Equal("Before Method", Recorder.Records[0]);
+        //        Assert.Equal("In Method", Recorder.Records[1]);
+        //        Assert.Equal("After Method", Recorder.Records[2]);
+        //    }
 
-            [RemotingInterception]
-            internal class SpyInterfaceImplWithAttribute : ISpy, IBuilderAware
-            {
-                [Intercept(typeof(RecordingHandler))]
-                public void InterceptedMethod()
-                {
-                    Recorder.Records.Add("In Method");
-                }
+        //    [Test]
+        //    public void InterceptInterfaceViaCode_PolicyOnInterface()
+        //    {
 
-                public void OnBuiltUp(string id)
-                {
-                    Recorder.Records.Add("OnBuiltUp");
-                }
+        //    }
 
-                public void OnTearingDown()
-                {
-                    Recorder.Records.Add("OnTearingDown");
-                }
-            }
+        //    [Test]
+        //    public void InterceptInterfaceViaAttributes()
+        //    {
 
-            public class SpyVirtual
-            {
-                public virtual void InterceptedMethod()
-                {
-                    Recorder.Records.Add("In Method");
-                }
+        //    }
 
-                public void NonInterceptedMethod()
-                {
-                    Recorder.Records.Add("In Non-Intercepted Method");
-                }
+        //    [Test]
+        //    public void ExceptionsAreUnchanged()
+        //    {
+        //        Recorder.Records.Clear();
+        //        DependencyContainer container = new DependencyContainer();
+        //        container.SetInterceptionPolicy<SpyVirtual>(new VirtualMethodInterceptionPolicy());
+        //        container.Intercept<SpyVirtual>(typeof(SpyVirtual).GetMethod("ThrowsException"),
+        //                                        new RecordingHandler());
 
-                public virtual void ThrowsException()
-                {
-                    Recorder.Records.Add("In Method");
-                    throw new Exception("This is my exception!");
-                }
-            }
-        }
+        //        SpyVirtual obj = container.Get<SpyVirtual>();
 
-        class MyObject : IMyObject {}
+        //        Assert.Throws<Exception>(delegate
+        //                                 {
+        //                                     obj.ThrowsException();
+        //                                 });
+
+        //        Assert.Equal(3, Recorder.Records.Count);
+        //        Assert.Equal("Before Method", Recorder.Records[0]);
+        //        Assert.Equal("In Method", Recorder.Records[1]);
+        //        Assert.Equal("After Method", Recorder.Records[2]);
+        //    }
+
+        //    public class SpyVirtual
+        //    {
+        //        public virtual void InterceptedMethod()
+        //        {
+        //            Recorder.Records.Add("In Method");
+        //        }
+
+        //        public void NonInterceptedMethod()
+        //        {
+        //            Recorder.Records.Add("In Non-Intercepted Method");
+        //        }
+
+        //        public virtual void ThrowsException()
+        //        {
+        //            Recorder.Records.Add("In Method");
+        //            throw new Exception("This is my exception!");
+        //        }
+        //    }
+
+        //    [VirtualMethodInterception]
+        //    public class SpyVirtualAttributes
+        //    {
+        //        [Intercept(typeof(RecordingHandler))]
+        //        public virtual void InterceptedMethod()
+        //        {
+        //            Recorder.Records.Add("In Method");
+        //        }
+        //    }
+
+        //    internal sealed class SpyInterface : ISpy
+        //    {
+        //        public void InterceptedMethod()
+        //        {
+        //            Recorder.Records.Add("In Method");
+        //        }
+        //    }
+
+        //    [VirtualMethodInterception]
+        //    internal sealed class SpyInterfaceAttributes : ISpy
+        //    {
+        //        public void InterceptedMethod()
+        //        {
+        //            Recorder.Records.Add("In Method");
+        //        }
+        //    }
+
+        //    public interface ISpy
+        //    {
+        //        void InterceptedMethod();
+        //    }
+        //}
 
         [TestFixture]
         public class Singletons

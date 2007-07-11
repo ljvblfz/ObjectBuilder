@@ -6,17 +6,18 @@ using Assert=CodePlex.NUnitExtensions.Assert;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class VirtualMethodClassInterceptorTest
+    public class InterfaceInterceptorTest
     {
-        static T WrapAndCreateType<T>(IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers,
-                                      params object[] ctorArgs)
+        static TInterface WrapAndCreateType<TInterface, TConcrete>(IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers)
+            where TConcrete : TInterface
         {
-            Type wrappedType = VirtualMethodClassInterceptor.WrapClass(typeof(T));
-            VirtualMethodProxy proxy = new VirtualMethodProxy(handlers);
+            Type wrappedType = InterfaceInterceptor.WrapInterface(typeof(TInterface));
+            ILEmitProxy proxy = new ILEmitProxy(handlers);
+            object target = Activator.CreateInstance(typeof(TConcrete));
             List<object> wrappedCtorArgs = new List<object>();
             wrappedCtorArgs.Add(proxy);
-            wrappedCtorArgs.AddRange(ctorArgs);
-            return (T)Activator.CreateInstance(wrappedType, wrappedCtorArgs.ToArray());
+            wrappedCtorArgs.Add(target);
+            return (TInterface)Activator.CreateInstance(wrappedType, wrappedCtorArgs.ToArray());
         }
 
         public struct ComplexValueType
@@ -36,137 +37,67 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         }
 
         [TestFixture]
-        public class Errors
-        {
-            [Test]
-            public void CannotInterceptSealedClass()
-            {
-                Assert.Throws<TypeLoadException>(
-                    delegate
-                    {
-                        VirtualMethodClassInterceptor.WrapClass(typeof(SealedClass));
-                    });
-            }
-
-            [Test]
-            public void CannotInterceptNonPublicClass()
-            {
-                Assert.Throws<TypeLoadException>(
-                    delegate
-                    {
-                        VirtualMethodClassInterceptor.WrapClass(typeof(PrivateClass));
-                    });
-            }
-
-            public sealed class SealedClass {}
-
-            class PrivateClass {}
-        }
+        public class Errors {}
 
         [TestFixture]
         public class InParameters
         {
             [Test]
-            public void OneParameter()
+            public void InReferenceParameter()
             {
                 Recorder.Records.Clear();
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyIn).GetMethod("OneParameter");
+                MethodBase method = typeof(ISpyIn).GetMethod("InReferenceParameter");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyIn result = WrapAndCreateType<SpyIn>(dictionary);
-                int retValue = result.OneParameter(21);
+                ISpyIn result = WrapAndCreateType<ISpyIn, SpyIn>(dictionary);
+                result.InReferenceParameter("Hello");
 
-                Assert.Equal(21 * 2, retValue);
                 Assert.Equal(3, Recorder.Records.Count);
                 Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In Method", Recorder.Records[1]);
+                Assert.Equal("In Method: Hello", Recorder.Records[1]);
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
             [Test]
-            public void TwoParameters()
+            public void InValueParameter()
             {
                 Recorder.Records.Clear();
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyIn).GetMethod("TwoParameters");
+                MethodBase method = typeof(ISpyIn).GetMethod("InValueParameter");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyIn result = WrapAndCreateType<SpyIn>(dictionary);
-                string retValue = result.TwoParameters(42, "Hello ");
+                ISpyIn result = WrapAndCreateType<ISpyIn, SpyIn>(dictionary);
+                result.InValueParameter(42);
 
-                Assert.Equal("Hello 42", retValue);
                 Assert.Equal(3, Recorder.Records.Count);
                 Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In Method", Recorder.Records[1]);
+                Assert.Equal("In Method: 42", Recorder.Records[1]);
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
-            public void TwentyParameters()
+            public interface ISpyIn
             {
-                Recorder.Records.Clear();
-                RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyIn).GetMethod("TwentyParameters");
-                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
-                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
-                handlers.Add(handler);
-                dictionary.Add(method, handlers);
-
-                SpyIn result = WrapAndCreateType<SpyIn>(dictionary);
-                int retValue = result.TwentyParameters(12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10);
-
-                Assert.Equal(120, retValue);
-                Assert.Equal(3, Recorder.Records.Count);
-                Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In Method", Recorder.Records[1]);
-                Assert.Equal("After Method", Recorder.Records[2]);
+                void InReferenceParameter(string s);
+                void InValueParameter(int x);
             }
 
-            public class SpyIn
+            sealed class SpyIn : ISpyIn
             {
-                public virtual int OneParameter(int x)
+                void ISpyIn.InReferenceParameter(string s)
                 {
-                    Recorder.Records.Add("In Method");
-                    return x * 2;
+                    Recorder.Records.Add("In Method: " + s);
                 }
 
-                public virtual int TwentyParameters(int p0,
-                                                    int p1,
-                                                    int p2,
-                                                    int p3,
-                                                    int p4,
-                                                    int p5,
-                                                    int p6,
-                                                    int p7,
-                                                    int p8,
-                                                    int p9,
-                                                    int p10,
-                                                    int p11,
-                                                    int p12,
-                                                    int p13,
-                                                    int p14,
-                                                    int p15,
-                                                    int p16,
-                                                    int p17,
-                                                    int p18,
-                                                    int p19)
+                public void InValueParameter(int x)
                 {
-                    Recorder.Records.Add("In Method");
-                    return p0 * p19;
-                }
-
-                public virtual string TwoParameters(int x,
-                                                    string y)
-                {
-                    Recorder.Records.Add("In Method");
-                    return y + x;
+                    Recorder.Records.Add("In Method: " + x);
                 }
             }
         }
@@ -178,13 +109,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void OutReferenceType()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyOut).GetMethod("OutReferenceType");
+                MethodBase method = typeof(ISpyOut).GetMethod("OutReferenceType");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyOut result = WrapAndCreateType<SpyOut>(dictionary);
+                ISpyOut result = WrapAndCreateType<ISpyOut, SpyOut>(dictionary);
                 string outReference;
                 result.OutReferenceType(out outReference);
 
@@ -195,13 +126,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void OutInt16()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyOut).GetMethod("OutInt16");
+                MethodBase method = typeof(ISpyOut).GetMethod("OutInt16");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyOut result = WrapAndCreateType<SpyOut>(dictionary);
+                ISpyOut result = WrapAndCreateType<ISpyOut, SpyOut>(dictionary);
                 short outValue;
                 result.OutInt16(out outValue);
 
@@ -212,13 +143,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void OutInt32()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyOut).GetMethod("OutInt32");
+                MethodBase method = typeof(ISpyOut).GetMethod("OutInt32");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyOut result = WrapAndCreateType<SpyOut>(dictionary);
+                ISpyOut result = WrapAndCreateType<ISpyOut, SpyOut>(dictionary);
                 int outValue;
                 result.OutInt32(out outValue);
 
@@ -229,13 +160,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void OutInt64()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyOut).GetMethod("OutInt64");
+                MethodBase method = typeof(ISpyOut).GetMethod("OutInt64");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyOut result = WrapAndCreateType<SpyOut>(dictionary);
+                ISpyOut result = WrapAndCreateType<ISpyOut, SpyOut>(dictionary);
                 long outValue;
                 result.OutInt64(out outValue);
 
@@ -246,13 +177,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void OutDouble()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyOut).GetMethod("OutDouble");
+                MethodBase method = typeof(ISpyOut).GetMethod("OutDouble");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyOut result = WrapAndCreateType<SpyOut>(dictionary);
+                ISpyOut result = WrapAndCreateType<ISpyOut, SpyOut>(dictionary);
                 double outValue;
                 result.OutDouble(out outValue);
 
@@ -263,13 +194,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void OutComplexValueType()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyOut).GetMethod("OutComplexValueType");
+                MethodBase method = typeof(ISpyOut).GetMethod("OutComplexValueType");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyOut result = WrapAndCreateType<SpyOut>(dictionary);
+                ISpyOut result = WrapAndCreateType<ISpyOut, SpyOut>(dictionary);
                 ComplexValueType outValue;
                 result.OutComplexValueType(out outValue);
 
@@ -287,14 +218,25 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Equal(ushort.MaxValue, outValue.UShort);
             }
 
-            public class SpyOut
+            public interface ISpyOut
             {
-                public virtual void OutChar(out char outValue)
+                void OutChar(out char outValue);
+                void OutComplexValueType(out ComplexValueType outValueType);
+                void OutDouble(out double outValue);
+                void OutInt16(out short outValue);
+                void OutInt32(out int outValue);
+                void OutInt64(out long outValue);
+                void OutReferenceType(out string outReference);
+            }
+
+            sealed class SpyOut : ISpyOut
+            {
+                public void OutChar(out char outValue)
                 {
                     outValue = 'a';
                 }
 
-                public virtual void OutComplexValueType(out ComplexValueType outValueType)
+                public void OutComplexValueType(out ComplexValueType outValueType)
                 {
                     outValueType = new ComplexValueType();
                     outValueType.Byte = byte.MaxValue;
@@ -311,27 +253,27 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     outValueType.UShort = ushort.MaxValue;
                 }
 
-                public virtual void OutDouble(out double outValue)
+                public void OutDouble(out double outValue)
                 {
                     outValue = double.MaxValue;
                 }
 
-                public virtual void OutInt16(out short outValue)
+                public void OutInt16(out short outValue)
                 {
                     outValue = short.MaxValue;
                 }
 
-                public virtual void OutInt32(out int outValue)
+                public void OutInt32(out int outValue)
                 {
                     outValue = int.MaxValue;
                 }
 
-                public virtual void OutInt64(out long outValue)
+                public void OutInt64(out long outValue)
                 {
                     outValue = long.MaxValue;
                 }
 
-                public virtual void OutReferenceType(out string outReference)
+                public void OutReferenceType(out string outReference)
                 {
                     outReference = "Hello, world!";
                 }
@@ -345,13 +287,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void RefClassParameter()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyRef).GetMethod("RefClassParameter");
+                MethodBase method = typeof(ISpyRef).GetMethod("RefClassParameter");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyRef result = WrapAndCreateType<SpyRef>(dictionary);
+                ISpyRef result = WrapAndCreateType<ISpyRef, SpyRef>(dictionary);
                 string refValue = "Hello, ";
                 result.RefClassParameter(ref refValue);
 
@@ -362,27 +304,33 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void RefValueType()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyRef).GetMethod("RefValueType");
+                MethodBase method = typeof(ISpyRef).GetMethod("RefValueType");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyRef result = WrapAndCreateType<SpyRef>(dictionary);
+                ISpyRef result = WrapAndCreateType<ISpyRef, SpyRef>(dictionary);
                 int refValue = 21;
                 result.RefValueType(ref refValue);
 
                 Assert.Equal(42, refValue);
             }
 
-            public class SpyRef
+            public interface ISpyRef
             {
-                public virtual void RefClassParameter(ref string value)
+                void RefClassParameter(ref string value);
+                void RefValueType(ref int value);
+            }
+
+            sealed class SpyRef : ISpyRef
+            {
+                public void RefClassParameter(ref string value)
                 {
                     value += "world!";
                 }
 
-                public virtual void RefValueType(ref int value)
+                public void RefValueType(ref int value)
                 {
                     value *= 2;
                 }
@@ -397,16 +345,15 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             {
                 Recorder.Records.Clear();
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyReturn).GetMethod("NoReturnValue");
+                MethodBase method = typeof(ISpyReturn).GetMethod("NoReturnValue");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyReturn result = WrapAndCreateType<SpyReturn>(dictionary, 42);
+                ISpyReturn result = WrapAndCreateType<ISpyReturn, SpyReturn>(dictionary);
                 result.NoReturnValue();
 
-                Assert.Equal(42, result.ConstructorValue);
                 Assert.Equal(3, Recorder.Records.Count);
                 Assert.Equal("Before Method", Recorder.Records[0]);
                 Assert.Equal("In Method", Recorder.Records[1]);
@@ -417,13 +364,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void ReturnsClassType()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyReturn).GetMethod("ReturnsClassType");
+                MethodBase method = typeof(ISpyReturn).GetMethod("ReturnsClassType");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyReturn result = WrapAndCreateType<SpyReturn>(dictionary, 42);
+                ISpyReturn result = WrapAndCreateType<ISpyReturn, SpyReturn>(dictionary);
                 object retValue = result.ReturnsClassType();
 
                 Assert.Same(SpyReturn.ObjectReturn, retValue);
@@ -433,13 +380,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void ReturnsValueType()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyReturn).GetMethod("ReturnsValueType");
+                MethodBase method = typeof(ISpyReturn).GetMethod("ReturnsValueType");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyReturn result = WrapAndCreateType<SpyReturn>(dictionary, 42);
+                ISpyReturn result = WrapAndCreateType<ISpyReturn, SpyReturn>(dictionary);
                 int retValue = result.ReturnsValueType();
 
                 Assert.Equal(SpyReturn.ValueReturn, retValue);
@@ -449,46 +396,48 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public void Exception()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(SpyReturn).GetMethod("Exception");
+                MethodBase method = typeof(ISpyReturn).GetMethod("Exception");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
-                SpyReturn result = WrapAndCreateType<SpyReturn>(dictionary, 42);
+                ISpyReturn result = WrapAndCreateType<ISpyReturn, SpyReturn>(dictionary);
                 Assert.Throws<ArgumentException>(delegate
                                                  {
                                                      result.Exception();
                                                  });
             }
 
-            public class SpyReturn
+            public interface ISpyReturn
+            {
+                void Exception();
+                void NoReturnValue();
+                object ReturnsClassType();
+                int ReturnsValueType();
+            }
+
+            sealed class SpyReturn : ISpyReturn
             {
                 public const int ValueReturn = 42;
-                public readonly int ConstructorValue;
                 public static object ObjectReturn = new object();
 
-                public SpyReturn(int x)
-                {
-                    ConstructorValue = x;
-                }
-
-                public virtual void Exception()
+                public void Exception()
                 {
                     throw new ArgumentException();
                 }
 
-                public virtual void NoReturnValue()
+                public void NoReturnValue()
                 {
                     Recorder.Records.Add("In Method");
                 }
 
-                public virtual object ReturnsClassType()
+                public object ReturnsClassType()
                 {
                     return ObjectReturn;
                 }
 
-                public virtual int ReturnsValueType()
+                public int ReturnsValueType()
                 {
                     return ValueReturn;
                 }

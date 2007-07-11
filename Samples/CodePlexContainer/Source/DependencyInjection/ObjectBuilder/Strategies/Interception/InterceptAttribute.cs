@@ -1,20 +1,36 @@
 using System;
+using System.Reflection;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple=true, Inherited=true)]
-    public class InterceptAttribute : Attribute
+    public abstract class InterceptAttribute : Attribute
     {
-        readonly Type interceptionHandlerType;
+        readonly Type handlerType;
 
-        public InterceptAttribute(Type interceptionHandlerType)
+        public InterceptAttribute(Type handlerType)
         {
-            this.interceptionHandlerType = interceptionHandlerType;
+            this.handlerType = handlerType;
         }
 
-        public Type InterceptionHandlerType
+        public Type HandlerType
         {
-            get { return interceptionHandlerType; }
+            get { return handlerType; }
+        }
+
+        public abstract Type PolicyType { get; }
+
+        public virtual bool ShouldInterceptMethod(Type typeRequested, MethodBase method)
+        {
+            return true;
+        }
+
+        public virtual void ValidateInterceptionForMethod(MethodBase method)
+        {
+        }
+
+        public virtual void ValidateInterceptionForType(Type typeRequested,
+                                                         Type typeBeingBuilt)
+        {
         }
     }
 }
