@@ -13,5 +13,10 @@ namespace CodePlex.DependencyInjection
         {
             return (TToBuild)Get(typeof(TToBuild));
         }
+
+        public object Inject(object @object)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DependencyContainer.cs" />
+    <Compile Include="IDependencyContainerConfigurator.cs" />
     <Compile Include="ObjectBuilder\Strategies\EventBroker\EventBrokerException.cs" />
     <Compile Include="ObjectBuilder\Strategies\EventBroker\EventBrokerPolicy.cs" />
     <Compile Include="ObjectBuilder\Strategies\EventBroker\EventBrokerReflectionStrategy.cs" />

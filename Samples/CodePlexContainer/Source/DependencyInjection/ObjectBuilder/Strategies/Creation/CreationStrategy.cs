@@ -47,7 +47,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     if (typeToBuild.IsValueType)
                         return Activator.CreateInstance(typeToBuild);
 
-                    throw new ArgumentException(Resources.NoAppropriateConstructor);
+                    string message = "Could not find constructor to build " + typeToBuild.FullName;
+                    if (idToBuild != null)
+                        message += " (id " + idToBuild + ")";
+
+                    throw new ArgumentException(message);
                 }
 
                 return constructor.Invoke(policy.GetParameters(context, typeToBuild, idToBuild, constructor));

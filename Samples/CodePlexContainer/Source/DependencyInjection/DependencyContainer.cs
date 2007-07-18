@@ -14,14 +14,22 @@ namespace CodePlex.DependencyInjection
         readonly StagedStrategyChain<BuilderStage> strategies;
 
         public DependencyContainer()
-            : this(null, null, null) {}
+            : this(null, null, null, null) {}
+
+        public DependencyContainer(IDependencyContainerConfigurator configurator)
+            : this(null, null, null, configurator) {}
 
         public DependencyContainer(DependencyContainer innerContainer)
-            : this(innerContainer.locator, innerContainer.policies, innerContainer.strategies) {}
+            : this(innerContainer.locator, innerContainer.policies, innerContainer.strategies, null) {}
+
+        public DependencyContainer(DependencyContainer innerContainer,
+                                   IDependencyContainerConfigurator configurator)
+            : this(innerContainer.locator, innerContainer.policies, innerContainer.strategies, configurator) {}
 
         DependencyContainer(IReadableLocator innerLocator,
                             IPolicyList innerPolicies,
-                            StagedStrategyChain<BuilderStage> innerStrategies)
+                            StagedStrategyChain<BuilderStage> innerStrategies,
+                            IDependencyContainerConfigurator configurator)
         {
             locator = new Locator(innerLocator);
             policies = new PolicyList(innerPolicies);
@@ -56,6 +64,9 @@ namespace CodePlex.DependencyInjection
                 policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
 
             locator.Add(typeof(EventBrokerService), new EventBrokerService());
+
+            if (configurator != null)
+                configurator.Configure(this);
         }
 
         public void CacheInstancesOf<T>()

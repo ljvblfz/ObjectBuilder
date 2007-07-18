@@ -6,5 +6,6 @@ namespace CodePlex.DependencyInjection
     {
         object Get(Type typeToBuild);
         TToBuild Get<TToBuild>();
+        object Inject(object @object);
     }
 }

@@ -12,6 +12,30 @@ namespace CodePlex.DependencyInjection
     public class DependencyContainerTest
     {
         [TestFixture]
+        public class Configuration
+        {
+            [Test]
+            public void CallsConfiguratorDuringInitialization()
+            {
+                SpyConfigurator configurator = new SpyConfigurator();
+
+                new DependencyContainer(configurator);
+
+                Assert.True(configurator.Configure__Called);
+            }
+
+            class SpyConfigurator : IDependencyContainerConfigurator
+            {
+                public bool Configure__Called = false;
+
+                public void Configure(DependencyContainer container)
+                {
+                    Configure__Called = true;
+                }
+            }
+        }
+
+        [TestFixture]
         public class EventBroker
         {
             [Test]
