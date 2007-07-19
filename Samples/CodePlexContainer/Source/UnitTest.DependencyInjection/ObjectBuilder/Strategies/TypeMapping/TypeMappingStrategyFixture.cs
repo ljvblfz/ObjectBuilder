@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using Assert=CodePlex.NUnitExtensions.Assert;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
@@ -20,28 +21,31 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             strategy.BuildUp<IFoo>(ctx, null, "sales");
 
-            Assert.IsTrue(mock.WasRun);
-            Assert.AreEqual(typeof(SalesFoo), mock.IncomingType);
+            Assert.True(mock.WasRun);
+            Assert.Equal(typeof(SalesFoo), mock.IncomingType);
 
             mock.WasRun = false;
             mock.IncomingType = null;
 
             strategy.BuildUp<IFoo>(ctx, null, "marketing");
 
-            Assert.IsTrue(mock.WasRun);
-            Assert.AreEqual(typeof(Foo), mock.IncomingType);
+            Assert.True(mock.WasRun);
+            Assert.Equal(typeof(Foo), mock.IncomingType);
         }
 
         [Test]
-        [ExpectedException(typeof(IncompatibleTypesException))]
-        public void IncompatibleTypes()
+        public void CanMapGenericsWithIdenticalGenericParameters()
         {
             MockBuilderContext ctx = new MockBuilderContext();
             TypeMappingStrategy strategy = new TypeMappingStrategy();
-            ctx.Policies.Set<ITypeMappingPolicy>(new TypeMappingPolicy(typeof(object), null), typeof(IFoo), "sales");
+            ctx.Policies.Set<ITypeMappingPolicy>(new TypeMappingPolicy(typeof(Foo<>), null), typeof(IFoo<>), null);
             ctx.Strategies.Add(strategy);
+            MockStrategy mock = new MockStrategy();
+            ctx.Strategies.Add(mock);
 
-            strategy.BuildUp<IFoo>(ctx, null, "sales");
+            strategy.BuildUp<IFoo<int>>(ctx, null, null);
+
+            Assert.Equal(typeof(Foo<int>), mock.IncomingType);
         }
 
         class MockStrategy : BuilderStrategy
@@ -62,7 +66,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         interface IFoo {}
 
+        interface IFoo<T> { }
+
         class Foo : IFoo {}
+
+        class Foo<T> : IFoo<T> { }
 
         class SalesFoo : IFoo {}
     }

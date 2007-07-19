@@ -5,20 +5,25 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class TypeMappingStrategy : BuilderStrategy
     {
         public override object BuildUp(IBuilderContext context,
-                                       Type t,
+                                       Type typeToBuild,
                                        object existing,
-                                       string id)
+                                       string idToBuild)
         {
-            DependencyResolutionLocatorKey result = new DependencyResolutionLocatorKey(t, id);
-            ITypeMappingPolicy policy = context.Policies.Get<ITypeMappingPolicy>(t, id);
+            ITypeMappingPolicy policy = context.Policies.Get<ITypeMappingPolicy>(typeToBuild, idToBuild);
 
             if (policy != null)
             {
-                result = policy.Map(result);
-                Guard.TypeIsAssignableFromType(t, result.Type, t);
+                DependencyResolutionLocatorKey resolution = policy.Map(new DependencyResolutionLocatorKey(typeToBuild, idToBuild));
+
+                if (resolution.Type.IsGenericType)
+                    typeToBuild = resolution.Type.MakeGenericType(typeToBuild.GetGenericArguments());
+                else
+                    typeToBuild = resolution.Type;
+
+                idToBuild = resolution.ID;
             }
 
-            return base.BuildUp(context, result.Type, existing, result.ID);
+            return base.BuildUp(context, typeToBuild, existing, idToBuild);
         }
     }
 }

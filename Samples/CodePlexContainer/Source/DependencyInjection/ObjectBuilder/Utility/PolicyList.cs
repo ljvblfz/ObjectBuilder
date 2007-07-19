@@ -88,9 +88,20 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             BuilderPolicyKey keyForDefaultAllTypes = new BuilderPolicyKey(policyInterface, null, null);
             IPolicyList thisPolicyList = this;
 
+            if (!typePolicyAppliesTo.IsGenericType)
+                return
+                    thisPolicyList.GetForKey(key, localOnly) ??
+                    thisPolicyList.GetForKey(keyForDefaultType, localOnly) ??
+                    thisPolicyList.GetForKey(keyForDefaultAllTypes, localOnly);
+
+            BuilderPolicyKey genericKey = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo.GetGenericTypeDefinition(), idPolicyAppliesTo ?? "");
+            BuilderPolicyKey genericKeyForDefaultType = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo.GetGenericTypeDefinition(), null);
+
             return
                 thisPolicyList.GetForKey(key, localOnly) ??
+                thisPolicyList.GetForKey(genericKey, localOnly) ??
                 thisPolicyList.GetForKey(keyForDefaultType, localOnly) ??
+                thisPolicyList.GetForKey(genericKeyForDefaultType, localOnly) ??
                 thisPolicyList.GetForKey(keyForDefaultAllTypes, localOnly);
         }
 

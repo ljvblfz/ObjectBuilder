@@ -153,6 +153,25 @@ namespace CodePlex.DependencyInjection
         }
 
         [TestFixture]
+        public class Generics
+        {
+            [Test]
+            public void TestMethodName()
+            {
+                DependencyContainer container = new DependencyContainer();
+                container.RegisterTypeMapping(typeof(IFoo<>), typeof(Foo<>));
+
+                IFoo<int> result = container.Get<IFoo<int>>();
+
+                Assert.IsType<Foo<int>>(result);
+            }
+
+            public interface IFoo<T> {}
+
+            public class Foo<T> : IFoo<T> {}
+        }
+
+        [TestFixture]
         public class InterceptInterface
         {
             [Test]

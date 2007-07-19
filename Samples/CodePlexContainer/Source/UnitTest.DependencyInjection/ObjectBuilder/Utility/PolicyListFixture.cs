@@ -239,6 +239,34 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             Assert.Null(result);
         }
 
+        [Test]
+        public void CanRegisterGenericPolicyAndRetrieveWithSpecificGenericInstance()
+        {
+            PolicyList list = new PolicyList();
+            FakePolicy policy = new FakePolicy();
+            list.Set(policy, typeof(IFoo<>), null);
+
+            FakePolicy result = list.Get<FakePolicy>(typeof(IFoo<int>), null);
+
+            Assert.Same(policy, result);
+        }
+
+        [Test]
+        public void SpecificGenericPolicyComesBeforeGenericPolicy()
+        {
+            PolicyList list = new PolicyList();
+            FakePolicy genericPolicy = new FakePolicy();
+            FakePolicy specificPolicy = new FakePolicy();
+            list.Set(genericPolicy, typeof(IFoo<>), null);
+            list.Set(specificPolicy, typeof(IFoo<int>), null);
+
+            FakePolicy result = list.Get<FakePolicy>(typeof(IFoo<int>), null);
+
+            Assert.Same(specificPolicy, result);
+        }
+
+        interface IFoo<T> {}
+
         class FakePolicy : IBuilderPolicy {}
     }
 }
