@@ -64,30 +64,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         }
 
         [TestFixture]
-        public class GenericMethods
+        public class GenericClasses
         {
             [Test]
-            public void NonGenericClass_GenericMethod()
-            {
-                Recorder.Records.Clear();
-                RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(NonGenericSpy).GetMethod("GenericMethod");
-                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
-                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
-                handlers.Add(handler);
-                dictionary.Add(method, handlers);
-
-                NonGenericSpy result = WrapAndCreateType<NonGenericSpy>(dictionary);
-                result.GenericMethod(21);
-
-                Assert.Equal(3, Recorder.Records.Count);
-                Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In method with data 21", Recorder.Records[1]);
-                Assert.Equal("After Method", Recorder.Records[2]);
-            }
-
-            [Test]
-            public void GenericClass_NonGenericMethod()
+            public void NonGenericMethod()
             {
                 Recorder.Records.Clear();
                 RecordingHandler handler = new RecordingHandler();
@@ -107,7 +87,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
 
             [Test]
-            public void GenericClass_GenericMethod()
+            public void GenericMethod()
             {
                 Recorder.Records.Clear();
                 RecordingHandler handler = new RecordingHandler();
@@ -126,12 +106,45 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            public class NonGenericSpy
+            [Test]
+            public void ReturnsDataOfGenericType()
             {
-                public virtual void GenericMethod<T>(T data)
-                {
-                    Recorder.Records.Add("In method with data " + data);
-                }
+                Recorder.Records.Clear();
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(GenericSpy<>).GetMethod("GenericReturn");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
+
+                GenericSpy<int> result = WrapAndCreateType<GenericSpy<int>>(dictionary);
+                int value = result.GenericReturn(256.9);
+
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In method with data 256.9", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+                Assert.Equal(default(int), value);
+            }
+
+            [Test]
+            public void WhereClauseOnClass()
+            {
+                Recorder.Records.Clear();
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(GenericSpyWithWhereClause<>).GetMethod("Method");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
+
+                GenericSpyWithWhereClause<Foo> result = WrapAndCreateType<GenericSpyWithWhereClause<Foo>>(dictionary);
+                result.Method(new Foo());
+
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In method with data " + typeof(Foo).FullName, Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
             }
 
             public class GenericSpy<T>
@@ -142,64 +155,119 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     Recorder.Records.Add("In method with data " + data + " and " + data1);
                 }
 
+                public virtual T GenericReturn<T1>(T1 data)
+                {
+                    Recorder.Records.Add("In method with data " + data);
+                    return default(T);
+                }
+
                 public virtual void MethodWhichTakesGenericData(T data)
                 {
                     Recorder.Records.Add("In method with data " + data);
                 }
             }
 
-            //public class DerivedGenericSpy<T> : GenericSpy<T>
-            //{
-            //    readonly ILEmitProxy proxy;
+            public class GenericSpyWithWhereClause<T>
+                where T : class, IFoo
+            {
+                public virtual void Method(T data)
+                {
+                    Recorder.Records.Add("In method with data " + data);
+                }
+            }
 
-            //    public DerivedGenericSpy(ILEmitProxy proxy)
-            //    {
-            //        this.proxy = proxy;
-            //    }
+            public interface IFoo {}
 
-            //    public override void MethodWhichTakesGenericData(T data)
-            //    {
-            //        proxy.Invoke(this, ((MethodInfo)MethodBase.GetCurrentMethod()).GetBaseDefinition(), new object[] { data }, MethodWhichTakesGenericDataDelegate);
-            //    }
+            public class Foo : IFoo {}
+        }
 
-            //    object MethodWhichTakesGenericDataDelegate(object[] arguments)
-            //    {
-            //        base.MethodWhichTakesGenericData((T)arguments[0]);
-            //        return null;
-            //    }
-            //}
+        [TestFixture]
+        public class GenericMethods
+        {
+            [Test]
+            public void GenericMethod()
+            {
+                Recorder.Records.Clear();
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(NonGenericSpy).GetMethod("GenericMethod");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
 
-            //public class DerivedNonGenericSpy : NonGenericSpy
-            //{
-            //    readonly ILEmitProxy proxy;
+                NonGenericSpy result = WrapAndCreateType<NonGenericSpy>(dictionary);
+                result.GenericMethod(21);
 
-            //    public DerivedSpy(ILEmitProxy proxy)
-            //    {
-            //        this.proxy = proxy;
-            //    }
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In method with data 21", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+            }
 
-            //    public override void NonGenericMethod(int data, int data2, int data3)
-            //    {
-            //        proxy.Invoke(this, ((MethodInfo)MethodBase.GetCurrentMethod()).GetBaseDefinition(), new object[] { data, data2, data3 }, NonGenericMethodDelegate);
-            //    }
+            [Test]
+            public void ReturnsDataOfGenericType()
+            {
+                Recorder.Records.Clear();
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(NonGenericSpy).GetMethod("GenericReturn");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
 
-            //    object NonGenericMethodDelegate(object[] arguments)
-            //    {
-            //        base.NonGenericMethod((int)arguments[0], (int)arguments[1], (int)arguments[2]);
-            //        return null;
-            //    }
+                NonGenericSpy result = WrapAndCreateType<NonGenericSpy>(dictionary);
+                int value = result.GenericReturn<int, double>(256.9);
 
-            //    public override void GenericMethod<T, T1>(T data, T1 data2, int data3)
-            //    {
-            //        proxy.Invoke(this, ((MethodInfo)MethodBase.GetCurrentMethod()).GetBaseDefinition(), new object[] { data, data2, data3 }, GenericMethodDelegate<T, T1>);
-            //    }
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In method with data 256.9", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+                Assert.Equal(default(int), value);
+            }
 
-            //    object GenericMethodDelegate<T, T1>(object[] arguments)
-            //    {
-            //        base.GenericMethod((T)arguments[0], (T1)arguments[1], (int)arguments[2]);
-            //        return null;
-            //    }
-            //}
+            [Test]
+            public void WhereClauseOnMethod()
+            {
+                Recorder.Records.Clear();
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(NonGenericSpy).GetMethod("WhereMethod");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
+
+                NonGenericSpy result = WrapAndCreateType<NonGenericSpy>(dictionary);
+                result.WhereMethod(new Foo());
+
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In method with data " + typeof(Foo).FullName, Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+            }
+
+            public class NonGenericSpy
+            {
+                public virtual void GenericMethod<T>(T data)
+                {
+                    Recorder.Records.Add("In method with data " + data);
+                }
+
+                public virtual T GenericReturn<T, T1>(T1 data)
+                {
+                    Recorder.Records.Add("In method with data " + data);
+                    return default(T);
+                }
+
+                public virtual void WhereMethod<T>(T data)
+                    where T : class, IFoo
+                {
+                    Recorder.Records.Add("In method with data " + data);
+                }
+            }
+
+            public interface IFoo {}
+
+            public class Foo : IFoo {}
         }
 
         [TestFixture]
