@@ -350,9 +350,15 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 {
                     string assemblyName = Guid.NewGuid().ToString("N");
                     AssemblyBuilder assemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(new AssemblyName(assemblyName), AssemblyBuilderAccess.RunAndSave);
+#if DEBUG
                     ModuleBuilder module = assemblyBuilder.DefineDynamicModule(assemblyName + ".dll", "GeneratedStuff.dll", true);
+#else
+                    ModuleBuilder module = assemblyBuilder.DefineDynamicModule(assemblyName + ".dll");
+#endif
                     wrappers[actualClassToWrap] = GenerateWrapperType(actualClassToWrap, module);
+#if DEBUG
                     assemblyBuilder.Save("Foo.dll");
+#endif
                 }
 
                 if (actualClassToWrap != classToWrap)

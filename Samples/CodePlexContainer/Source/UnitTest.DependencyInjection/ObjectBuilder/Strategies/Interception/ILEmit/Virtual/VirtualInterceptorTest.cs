@@ -107,7 +107,24 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
 
             [Test]
-            public void GenericClass_GenericMethod() {}
+            public void GenericClass_GenericMethod()
+            {
+                Recorder.Records.Clear();
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(GenericSpy<>).GetMethod("GenericMethod");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
+
+                GenericSpy<int> result = WrapAndCreateType<GenericSpy<int>>(dictionary);
+                result.GenericMethod(46, "2");
+
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In method with data 46 and 2", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+            }
 
             public class NonGenericSpy
             {
