@@ -18,18 +18,37 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 this.handlers.Add(kvp.Key, new HandlerPipeline(kvp.Value));
         }
 
+        HandlerPipeline GetPipeline(MethodInfo method,
+                                    object target)
+        {
+            // Non-generic method
+            if (handlers.ContainsKey(method))
+                return handlers[method];
+
+            // Generic method
+            if (method.IsGenericMethod && handlers.ContainsKey(method.GetGenericMethodDefinition()))
+                return handlers[method.GetGenericMethodDefinition()];
+
+            // Non-generic method on generic type
+            if (target.GetType().IsGenericType)
+            {
+                Type genericTarget = target.GetType().BaseType.GetGenericTypeDefinition();
+                MethodInfo methodToLookup = genericTarget.GetMethod(method.Name);
+
+                if (handlers.ContainsKey(methodToLookup))
+                    return handlers[methodToLookup];
+            }
+
+            // Empty pipeline as a last resort
+            return new HandlerPipeline();
+        }
+
         public object Invoke(object target,
-                             MethodBase method,
+                             MethodInfo method,
                              object[] arguments,
                              InvokeDelegate @delegate)
         {
-            HandlerPipeline pipeline;
-
-            if (handlers.ContainsKey(method))
-                pipeline = handlers[method];
-            else
-                pipeline = new HandlerPipeline();
-
+            HandlerPipeline pipeline = GetPipeline(method, target);
             MethodInvocation invocation = new MethodInvocation(target, method, arguments);
 
             IMethodReturn result =

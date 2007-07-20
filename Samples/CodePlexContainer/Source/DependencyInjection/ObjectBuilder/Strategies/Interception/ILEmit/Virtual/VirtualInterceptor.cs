@@ -14,22 +14,27 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                                        TypeBuilder typeBuilder)
         {
             ParameterInfo[] parameters = methodToIntercept.GetParameters();
+            List<string> genericParameterNames = new List<string>();
+
+            foreach (Type type in methodToIntercept.GetGenericArguments())
+                genericParameterNames.Add(type.Name);
 
             MethodBuilder anonymousDelegate =
-                typeBuilder.DefineMethod(methodToIntercept.Name + "<Delegate>",
+                typeBuilder.DefineMethod(methodToIntercept.Name + "{Delegate}",
                                          MethodAttributes.Private | MethodAttributes.HideBySig,
                                          typeof(object),
                                          new Type[] { typeof(object[]) });
+
+            if (genericParameterNames.Count > 0)
+                anonymousDelegate.DefineGenericParameters(genericParameterNames.ToArray());
 
             ILGenerator il = anonymousDelegate.GetILGenerator();
 
             il.DeclareLocal(typeof(object));
 
             foreach (ParameterInfo parameter in parameters)
-            {
                 if (parameter.IsOut || parameter.ParameterType.IsByRef)
                     il.DeclareLocal(parameter.ParameterType.GetElementType());
-            }
 
             il.Emit(OpCodes.Nop);
 
@@ -68,7 +73,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     il.Emit(OpCodes.Ldc_I4_S, idx);
                     il.Emit(OpCodes.Ldelem_Ref);
 
-                    if (parameters[idx].ParameterType.IsValueType)
+                    if (parameters[idx].ParameterType.IsValueType || parameters[idx].ParameterType.IsGenericParameter)
                         il.Emit(OpCodes.Unbox_Any, parameters[idx].ParameterType);
                 }
             }
@@ -148,6 +153,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                              MethodInfo anonymousDelegate,
                                              FieldInfo fieldProxy)
         {
+            // Get parameters
             ParameterInfo[] parameters = methodToIntercept.GetParameters();
             List<Type> parameterTypes = new List<Type>();
             List<Type> parameterRealTypes = new List<Type>();
@@ -162,12 +168,22 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     parameterRealTypes.Add(parameter.ParameterType);
             }
 
+            // Get generic parameters
+            List<Type> genericParameterTypes = new List<Type>(methodToIntercept.GetGenericArguments());
+            List<string> genericParameterNames = new List<string>();
+
+            foreach (Type type in genericParameterTypes)
+                genericParameterNames.Add(type.Name);
+
             // Create overriden method
             MethodBuilder method =
                 typeBuilder.DefineMethod(methodToIntercept.Name,
                                          MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual,
                                          methodToIntercept.ReturnType,
                                          parameterTypes.ToArray());
+
+            if (genericParameterNames.Count > 0)
+                method.DefineGenericParameters(genericParameterNames.ToArray());
 
             ILGenerator il = method.GetILGenerator();
 
@@ -211,7 +227,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 if (parameters[idx].IsOut || parameters[idx].ParameterType.IsByRef)
                     il.Emit(OpCodes.Ldobj, parameterRealTypes[idx]);
 
-                if (parameterRealTypes[idx].IsValueType)
+                if (parameterRealTypes[idx].IsValueType || parameterRealTypes[idx].IsGenericParameter)
                     il.Emit(OpCodes.Box, parameterRealTypes[idx]);
 
                 il.Emit(OpCodes.Stelem_Ref);
@@ -233,7 +249,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             // Parameter 4 (anonymous delegate) for the call to Invoke
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldftn, anonymousDelegate);
+
+            if (genericParameterTypes.Count > 0)
+                il.Emit(OpCodes.Ldftn, anonymousDelegate.MakeGenericMethod(genericParameterTypes.ToArray()));
+            else
+                il.Emit(OpCodes.Ldftn, anonymousDelegate);
+
             il.Emit(OpCodes.Newobj, typeof(ILEmitProxy.InvokeDelegate).GetConstructor(new Type[] { typeof(object), typeof(IntPtr) }));
 
             // Call Invoke
@@ -288,9 +309,20 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                         ModuleBuilder module)
         {
             TypeBuilder typeBuilder = module.DefineType(
-                classToWrap.FullName + "<Wrapper>",
+                classToWrap.FullName + "{Wrapper}",
                 TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.BeforeFieldInit,
                 classToWrap);
+
+            if (classToWrap.IsGenericTypeDefinition)
+            {
+                Type[] arguments = classToWrap.GetGenericArguments();
+                string[] parameters = new string[arguments.Length];
+                for (int idx = 0; idx < arguments.Length; idx++)
+                {
+                    parameters[idx] = arguments[idx].Name;
+                }
+                typeBuilder.DefineGenericParameters(parameters);
+            }
 
             FieldBuilder fieldProxy = typeBuilder.DefineField("proxy", typeof(ILEmitProxy), FieldAttributes.Private);
 
@@ -309,13 +341,22 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         {
             lock (wrappers)
             {
-                if (!wrappers.ContainsKey(classToWrap))
+                Type actualClassToWrap = classToWrap;
+
+                if (classToWrap.IsGenericType)
+                    actualClassToWrap = classToWrap.GetGenericTypeDefinition();
+
+                if (!wrappers.ContainsKey(actualClassToWrap))
                 {
                     string assemblyName = Guid.NewGuid().ToString("N");
                     AssemblyBuilder assemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(new AssemblyName(assemblyName), AssemblyBuilderAccess.RunAndSave);
-                    ModuleBuilder module = assemblyBuilder.DefineDynamicModule(assemblyName + ".dll");
-                    wrappers[classToWrap] = GenerateWrapperType(classToWrap, module);
+                    ModuleBuilder module = assemblyBuilder.DefineDynamicModule(assemblyName + ".dll", "GeneratedStuff.dll", true);
+                    wrappers[actualClassToWrap] = GenerateWrapperType(actualClassToWrap, module);
+                    assemblyBuilder.Save("Foo.dll");
                 }
+
+                if (actualClassToWrap != classToWrap)
+                    return wrappers[actualClassToWrap].MakeGenericType(classToWrap.GetGenericArguments());
 
                 return wrappers[classToWrap];
             }

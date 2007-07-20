@@ -64,6 +64,128 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         }
 
         [TestFixture]
+        public class GenericMethods
+        {
+            [Test]
+            public void NonGenericClass_GenericMethod()
+            {
+                Recorder.Records.Clear();
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(NonGenericSpy).GetMethod("GenericMethod");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
+
+                NonGenericSpy result = WrapAndCreateType<NonGenericSpy>(dictionary);
+                result.GenericMethod(21);
+
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In method with data 21", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+            }
+
+            [Test]
+            public void GenericClass_NonGenericMethod()
+            {
+                Recorder.Records.Clear();
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(GenericSpy<>).GetMethod("MethodWhichTakesGenericData");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
+
+                GenericSpy<int> result = WrapAndCreateType<GenericSpy<int>>(dictionary);
+                result.MethodWhichTakesGenericData(24);
+
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In method with data 24", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+            }
+
+            [Test]
+            public void GenericClass_GenericMethod() {}
+
+            public class NonGenericSpy
+            {
+                public virtual void GenericMethod<T>(T data)
+                {
+                    Recorder.Records.Add("In method with data " + data);
+                }
+            }
+
+            public class GenericSpy<T>
+            {
+                public virtual void GenericMethod<T1>(T data,
+                                                      T1 data1)
+                {
+                    Recorder.Records.Add("In method with data " + data + " and " + data1);
+                }
+
+                public virtual void MethodWhichTakesGenericData(T data)
+                {
+                    Recorder.Records.Add("In method with data " + data);
+                }
+            }
+
+            //public class DerivedGenericSpy<T> : GenericSpy<T>
+            //{
+            //    readonly ILEmitProxy proxy;
+
+            //    public DerivedGenericSpy(ILEmitProxy proxy)
+            //    {
+            //        this.proxy = proxy;
+            //    }
+
+            //    public override void MethodWhichTakesGenericData(T data)
+            //    {
+            //        proxy.Invoke(this, ((MethodInfo)MethodBase.GetCurrentMethod()).GetBaseDefinition(), new object[] { data }, MethodWhichTakesGenericDataDelegate);
+            //    }
+
+            //    object MethodWhichTakesGenericDataDelegate(object[] arguments)
+            //    {
+            //        base.MethodWhichTakesGenericData((T)arguments[0]);
+            //        return null;
+            //    }
+            //}
+
+            //public class DerivedNonGenericSpy : NonGenericSpy
+            //{
+            //    readonly ILEmitProxy proxy;
+
+            //    public DerivedSpy(ILEmitProxy proxy)
+            //    {
+            //        this.proxy = proxy;
+            //    }
+
+            //    public override void NonGenericMethod(int data, int data2, int data3)
+            //    {
+            //        proxy.Invoke(this, ((MethodInfo)MethodBase.GetCurrentMethod()).GetBaseDefinition(), new object[] { data, data2, data3 }, NonGenericMethodDelegate);
+            //    }
+
+            //    object NonGenericMethodDelegate(object[] arguments)
+            //    {
+            //        base.NonGenericMethod((int)arguments[0], (int)arguments[1], (int)arguments[2]);
+            //        return null;
+            //    }
+
+            //    public override void GenericMethod<T, T1>(T data, T1 data2, int data3)
+            //    {
+            //        proxy.Invoke(this, ((MethodInfo)MethodBase.GetCurrentMethod()).GetBaseDefinition(), new object[] { data, data2, data3 }, GenericMethodDelegate<T, T1>);
+            //    }
+
+            //    object GenericMethodDelegate<T, T1>(object[] arguments)
+            //    {
+            //        base.GenericMethod((T)arguments[0], (T1)arguments[1], (int)arguments[2]);
+            //        return null;
+            //    }
+            //}
+        }
+
+        [TestFixture]
         public class InParameters
         {
             [Test]
