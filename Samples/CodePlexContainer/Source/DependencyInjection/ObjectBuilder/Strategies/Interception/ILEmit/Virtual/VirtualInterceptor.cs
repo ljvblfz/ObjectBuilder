@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Threading;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
@@ -291,11 +290,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                         ModuleBuilder module)
         {
             // Define overriding type
-            TypeBuilder typeBuilder = module.DefineType(classToWrap.FullName + "{Wrapper}",
-                                                        TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.BeforeFieldInit,
-                                                        classToWrap);
-
-            SetupGenericClassArguments(classToWrap, typeBuilder);
+            TypeBuilder typeBuilder = module.DefineType("{Wrappers}." + classToWrap.Name, TypeAttributes.Public);
+            Type parentType = SetupGenericClassArguments(classToWrap, typeBuilder);
 
             // Declare a field for the proxy
             FieldBuilder fieldProxy = typeBuilder.DefineField("proxy", typeof(ILEmitProxy), FieldAttributes.Private);
@@ -312,15 +308,16 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             foreach (ConstructorInfo constructor in classToWrap.GetConstructors())
                 GenerateConstructor(typeBuilder, constructor, fieldProxy);
 
+            typeBuilder.SetParent(parentType);
             return typeBuilder.CreateType();
         }
 
-        static Type[] SetupGenericArguments(Type[] genericParameterTypes,
-                                            DefineGenericParametersDelegate @delegate)
+        static GenericTypeParameterBuilder[] SetupGenericArguments(Type[] genericParameterTypes,
+                                                                   DefineGenericParametersDelegate @delegate)
         {
             // Nothing to do if it's not generic
             if (genericParameterTypes.Length == 0)
-                return genericParameterTypes;
+                return null;
 
             // Extract parameter names
             string[] genericParameterNames = new string[genericParameterTypes.Length];
@@ -338,27 +335,35 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     genericBuilders[idx].SetBaseTypeConstraint(type);
             }
 
-            return genericParameterTypes;
+            return genericBuilders;
         }
 
-        static void SetupGenericClassArguments(Type classToWrap,
+        static Type SetupGenericClassArguments(Type classToWrap,
                                                TypeBuilder typeBuilder)
         {
-            SetupGenericArguments(classToWrap.GetGenericArguments(),
-                                  delegate(string[] names)
-                                  {
-                                      return typeBuilder.DefineGenericParameters(names);
-                                  });
+            GenericTypeParameterBuilder[] builders =
+                SetupGenericArguments(classToWrap.GetGenericArguments(),
+                                      delegate(string[] names)
+                                      {
+                                          return typeBuilder.DefineGenericParameters(names);
+                                      });
+
+            if (builders != null)
+                return classToWrap.MakeGenericType(builders);
+
+            return classToWrap;
         }
 
         static Type[] SetupGenericMethodArguments(MethodBase methodToIntercept,
                                                   MethodBuilder methodBuilder)
         {
-            return SetupGenericArguments(methodToIntercept.GetGenericArguments(),
-                                         delegate(string[] names)
-                                         {
-                                             return methodBuilder.DefineGenericParameters(names);
-                                         });
+            Type[] arguments = methodToIntercept.GetGenericArguments();
+            SetupGenericArguments(arguments,
+                                  delegate(string[] names)
+                                  {
+                                      return methodBuilder.DefineGenericParameters(names);
+                                  });
+            return arguments;
         }
 
         public static Type WrapClass(Type classToWrap)
@@ -373,7 +378,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 if (!wrappers.ContainsKey(actualClassToWrap))
                 {
                     string assemblyName = Guid.NewGuid().ToString("N");
-                    AssemblyBuilder assemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(new AssemblyName(assemblyName), AssemblyBuilderAccess.RunAndSave);
+                    AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(assemblyName), AssemblyBuilderAccess.Run);
                     ModuleBuilder module = assemblyBuilder.DefineDynamicModule(assemblyName + ".dll");
                     wrappers[actualClassToWrap] = GenerateWrapperType(actualClassToWrap, module);
                 }

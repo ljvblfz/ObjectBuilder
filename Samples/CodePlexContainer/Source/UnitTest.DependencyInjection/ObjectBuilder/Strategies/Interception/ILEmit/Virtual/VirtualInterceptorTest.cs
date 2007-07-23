@@ -64,7 +64,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         }
 
         [TestFixture]
-        [Ignore("Not working yet...")]
         public class GenericClasses
         {
             [Test]
