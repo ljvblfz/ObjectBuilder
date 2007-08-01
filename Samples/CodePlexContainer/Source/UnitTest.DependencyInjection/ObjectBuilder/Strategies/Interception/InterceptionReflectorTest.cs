@@ -8,7 +8,50 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class InterceptionReflectorTest
     {
         [TestFixture]
-        public class InterceptionViaInterface
+        public class MixedInterception
+        {
+            [Test]
+            public void CanMixInterceptionTypes()
+            {
+                PolicyList policies = new PolicyList();
+
+                InterceptionReflector.Reflect<IFoo, FooBar>(null, policies, new StubObjectFactory());
+
+                Assert.Equal(1, policies.Get<VirtualInterceptionPolicy>(typeof(FooBar), null).Count);
+                Assert.Equal(1, policies.Get<InterfaceInterceptionPolicy>(typeof(FooBar), null).Count);
+                Assert.Equal(1, policies.Get<RemotingInterceptionPolicy>(typeof(FooBar), null).Count);
+            }
+
+            public interface IFoo
+            {
+                void Foo();
+            }
+
+            public class FooBar : MarshalByRefObject, IFoo
+            {
+                [RemotingIntercept(typeof(RecordingHandler))]
+                [VirtualIntercept(typeof(RecordingHandler))]
+                [InterfaceIntercept(typeof(RecordingHandler))]
+                public virtual void Foo() {}
+            }
+        }
+
+        [TestFixture]
+        public class NoInterceptionType
+        {
+            [Test]
+            public void ClassWithNoDecorations()
+            {
+                PolicyList policies = new PolicyList();
+
+                InterceptionReflector.Reflect<object>(null, policies, new StubObjectFactory());
+
+                Assert.Equal(0, policies.Count);
+            }
+        }
+
+        [TestFixture]
+        public class ViaInterface
         {
             [Test]
             public void NonPublicInterfaceNotCompatible()
@@ -121,6 +164,20 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][1]);
             }
 
+            [Test]
+            public void ReflectShouldHappenOnGenericBaseClass()
+            {
+                PolicyList policies = new PolicyList();
+                MethodBase method = typeof(IGeneric<>).GetMethod("DoSomething");
+
+                InterceptionReflector.Reflect<IGeneric<int>, Generic<int>>(null, policies, new StubObjectFactory());
+                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(Generic<>), null);
+
+                Assert.Equal(1, policy.Count);
+                Assert.Equal(1, policy[method].Count);
+                Assert.IsType<RecordingHandler>(policy[method][0]);
+            }
+
             // Helpers
 
             internal interface INonPublicInterface
@@ -195,10 +252,21 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 [InterfaceIntercept(typeof(RecordingHandler))]
                 public void InterceptedMethod2() {}
             }
+
+            public interface IGeneric<T>
+            {
+                void DoSomething(T data);
+            }
+
+            internal class Generic<T> : IGeneric<T>
+            {
+                [InterfaceIntercept(typeof(RecordingHandler))]
+                public void DoSomething(T data) {}
+            }
         }
 
         [TestFixture]
-        public class InterceptionViaRemoting
+        public class ViaRemoting
         {
             [Test]
             public void NonMBROTypeIncompatibleWithRemoting()
@@ -330,7 +398,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
         }
 
         [TestFixture]
-        public class InterceptionViaVirtualMethod
+        public class ViaVirtualMethod
         {
             [Test]
             public void NonPublicTypesNotCompatible()
@@ -456,6 +524,20 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][1]);
             }
 
+            [Test]
+            public void ReflectShouldHappenOnGenericBaseClass()
+            {
+                PolicyList policies = new PolicyList();
+                MethodBase method = typeof(Generic<>).GetMethod("DoSomething");
+
+                InterceptionReflector.Reflect<Generic<int>>(null, policies, new StubObjectFactory());
+                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(Generic<>), null);
+
+                Assert.Equal(1, policy.Count);
+                Assert.Equal(1, policy[method].Count);
+                Assert.IsType<RecordingHandler>(policy[method][0]);
+            }
+
             // Helpers
 
             internal class InternalClass
@@ -514,48 +596,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 [VirtualIntercept(typeof(RecordingHandler))]
                 public override void InterceptedMethod() {}
             }
-        }
 
-        [TestFixture]
-        public class MixedInterception
-        {
-            [Test]
-            public void CanMixInterceptionTypes()
+            public class Generic<T>
             {
-                PolicyList policies = new PolicyList();
-
-                InterceptionReflector.Reflect<IFoo, FooBar>(null, policies, new StubObjectFactory());
-
-                Assert.Equal(1, policies.Get<VirtualInterceptionPolicy>(typeof(FooBar), null).Count);
-                Assert.Equal(1, policies.Get<InterfaceInterceptionPolicy>(typeof(FooBar), null).Count);
-                Assert.Equal(1, policies.Get<RemotingInterceptionPolicy>(typeof(FooBar), null).Count);
-            }
-
-            public interface IFoo
-            {
-                void Foo();
-            }
-
-            public class FooBar : MarshalByRefObject, IFoo
-            {
-                [RemotingIntercept(typeof(RecordingHandler))]
                 [VirtualIntercept(typeof(RecordingHandler))]
-                [InterfaceIntercept(typeof(RecordingHandler))]
-                public virtual void Foo() {}
-            }
-        }
-
-        [TestFixture]
-        public class NoInterceptionType
-        {
-            [Test]
-            public void ClassWithNoDecorations()
-            {
-                PolicyList policies = new PolicyList();
-
-                InterceptionReflector.Reflect<object>(null, policies, new StubObjectFactory());
-
-                Assert.Equal(0, policies.Count);
+                public virtual void DoSomething(T data) {}
             }
         }
     }

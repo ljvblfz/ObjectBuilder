@@ -21,17 +21,15 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 return null;
 
             ParameterInfo[] paramInfos = method.GetParameters();
-            Type[] paramTypes = new Type[paramInfos.Length];
+            object[] paramTypes = new object[paramInfos.Length];
 
             for (int idx = 0; idx < paramInfos.Length; ++idx)
-                paramTypes[idx] = paramInfos[idx].ParameterType;
+                if (paramInfos[idx].ParameterType.IsGenericParameter)
+                    paramTypes[idx] = paramInfos[idx].ParameterType.Name;
+                else
+                    paramTypes[idx] = paramInfos[idx].ParameterType;
 
-            return typeRequested.GetMethod(method.Name,
-                                           BindingFlags.Public | BindingFlags.Instance,
-                                           null,
-                                           method.CallingConvention,
-                                           paramTypes,
-                                           null);
+            return InterfaceInterceptor.FindMethod(method.Name, paramTypes, typeRequested.GetMethods());
         }
 
         public override void ValidateInterceptionForType(Type typeRequested,

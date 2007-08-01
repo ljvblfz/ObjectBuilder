@@ -27,6 +27,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                    PolicyList policyList,
                                    IObjectFactory factory)
         {
+            if (typeRequested.IsGenericType && typeBeingBuilt.IsGenericType)
+            {
+                typeRequested = typeRequested.GetGenericTypeDefinition();
+                typeBeingBuilt = typeBeingBuilt.GetGenericTypeDefinition();
+            }
+
             Dictionary<Type, InterceptionPolicy> typePolicies = new Dictionary<Type, InterceptionPolicy>();
 
             foreach (MethodInfo method in typeBeingBuilt.GetMethods())

@@ -29,8 +29,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             if (method.IsGenericMethod && handlers.ContainsKey(method.GetGenericMethodDefinition()))
                 return handlers[method.GetGenericMethodDefinition()];
 
-            // Non-generic method on generic type
-            if (target.GetType().IsGenericType)
+            // Non-generic method on generic type with generic base type (virtual method interception)
+            if (target.GetType().IsGenericType && target.GetType().BaseType.IsGenericType)
             {
                 Type genericTarget = target.GetType().BaseType.GetGenericTypeDefinition();
                 MethodInfo methodToLookup = genericTarget.GetMethod(method.Name);

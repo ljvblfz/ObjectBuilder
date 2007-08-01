@@ -5,9 +5,9 @@ using System.Reflection.Emit;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class VirtualInterceptor
+    public class VirtualInterceptor : ILEmitInterceptor
     {
-        static readonly Dictionary<Type, Type> wrappers = new Dictionary<Type, Type>();
+        static readonly VirtualInterceptor instance = new VirtualInterceptor();
 
         static void GenerateConstructor(TypeBuilder typeBuilder,
                                         ConstructorInfo constructor,
@@ -231,6 +231,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 }
             }
 
+            // Load target (this)
             il.Emit(OpCodes.Ldarg_0);
 
             // Push call values onto stack
@@ -286,12 +287,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             return method;
         }
 
-        static Type GenerateWrapperType(Type classToWrap,
-                                        ModuleBuilder module)
+        protected override Type GenerateWrapperType(Type classToWrap,
+                                                    ModuleBuilder module,
+                                                    string moduleName)
         {
             // Define overriding type
-            TypeBuilder typeBuilder = module.DefineType("{Wrappers}." + classToWrap.Name, TypeAttributes.Public);
-            Type parentType = SetupGenericClassArguments(classToWrap, typeBuilder);
+            TypeBuilder typeBuilder = module.DefineType(MakeTypeName(moduleName, classToWrap), TypeAttributes.Public);
+            typeBuilder.SetParent(SetupGenericClassArguments(classToWrap, typeBuilder));
 
             // Declare a field for the proxy
             FieldBuilder fieldProxy = typeBuilder.DefineField("proxy", typeof(ILEmitProxy), FieldAttributes.Private);
@@ -308,88 +310,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             foreach (ConstructorInfo constructor in classToWrap.GetConstructors())
                 GenerateConstructor(typeBuilder, constructor, fieldProxy);
 
-            typeBuilder.SetParent(parentType);
             return typeBuilder.CreateType();
-        }
-
-        static GenericTypeParameterBuilder[] SetupGenericArguments(Type[] genericParameterTypes,
-                                                                   DefineGenericParametersDelegate @delegate)
-        {
-            // Nothing to do if it's not generic
-            if (genericParameterTypes.Length == 0)
-                return null;
-
-            // Extract parameter names
-            string[] genericParameterNames = new string[genericParameterTypes.Length];
-            for (int idx = 0; idx < genericParameterTypes.Length; idx++)
-                genericParameterNames[idx] = genericParameterTypes[idx].Name;
-
-            // Setup constraints on generic types (i.e., "where" clauses)
-            GenericTypeParameterBuilder[] genericBuilders = @delegate(genericParameterNames);
-
-            for (int idx = 0; idx < genericBuilders.Length; idx++)
-            {
-                genericBuilders[idx].SetGenericParameterAttributes(genericParameterTypes[idx].GenericParameterAttributes);
-
-                foreach (Type type in genericParameterTypes[idx].GetGenericParameterConstraints())
-                    genericBuilders[idx].SetBaseTypeConstraint(type);
-            }
-
-            return genericBuilders;
-        }
-
-        static Type SetupGenericClassArguments(Type classToWrap,
-                                               TypeBuilder typeBuilder)
-        {
-            GenericTypeParameterBuilder[] builders =
-                SetupGenericArguments(classToWrap.GetGenericArguments(),
-                                      delegate(string[] names)
-                                      {
-                                          return typeBuilder.DefineGenericParameters(names);
-                                      });
-
-            if (builders != null)
-                return classToWrap.MakeGenericType(builders);
-
-            return classToWrap;
-        }
-
-        static Type[] SetupGenericMethodArguments(MethodBase methodToIntercept,
-                                                  MethodBuilder methodBuilder)
-        {
-            Type[] arguments = methodToIntercept.GetGenericArguments();
-            SetupGenericArguments(arguments,
-                                  delegate(string[] names)
-                                  {
-                                      return methodBuilder.DefineGenericParameters(names);
-                                  });
-            return arguments;
         }
 
         public static Type WrapClass(Type classToWrap)
         {
-            lock (wrappers)
-            {
-                Type actualClassToWrap = classToWrap;
-
-                if (classToWrap.IsGenericType)
-                    actualClassToWrap = classToWrap.GetGenericTypeDefinition();
-
-                if (!wrappers.ContainsKey(actualClassToWrap))
-                {
-                    string assemblyName = Guid.NewGuid().ToString("N");
-                    AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(assemblyName), AssemblyBuilderAccess.Run);
-                    ModuleBuilder module = assemblyBuilder.DefineDynamicModule(assemblyName + ".dll");
-                    wrappers[actualClassToWrap] = GenerateWrapperType(actualClassToWrap, module);
-                }
-
-                if (actualClassToWrap != classToWrap)
-                    return wrappers[actualClassToWrap].MakeGenericType(classToWrap.GetGenericArguments());
-
-                return wrappers[classToWrap];
-            }
+            return instance.Wrap(classToWrap);
         }
-
-        delegate GenericTypeParameterBuilder[] DefineGenericParametersDelegate(string[] parameterNames);
     }
 }

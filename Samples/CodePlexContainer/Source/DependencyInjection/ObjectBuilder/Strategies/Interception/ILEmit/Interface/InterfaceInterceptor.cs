@@ -2,113 +2,51 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Threading;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class InterfaceInterceptor
+    public class InterfaceInterceptor : ILEmitInterceptor
     {
-        static readonly Dictionary<Type, Type> wrappers = new Dictionary<Type, Type>();
+        static readonly InterfaceInterceptor instance = new InterfaceInterceptor();
 
-        static MethodBuilder GenerateAnonymousDelegate(MethodInfo methodToIntercept,
-                                                       TypeBuilder typeBuilder,
-                                                       FieldInfo fieldTarget)
+        public static MethodInfo FindMethod(string methodName,
+                                            object[] methodArgumentTypes,
+                                            IEnumerable<MethodInfo> methodsToSearch)
         {
-            ParameterInfo[] parameters = methodToIntercept.GetParameters();
+            if (methodsToSearch == null)
+                return null;
 
-            MethodBuilder anonymousDelegate =
-                typeBuilder.DefineMethod(methodToIntercept.Name + "<Delegate>",
-                                         MethodAttributes.Private | MethodAttributes.HideBySig,
-                                         typeof(object),
-                                         new Type[] { typeof(object[]) });
-
-            ILGenerator il = anonymousDelegate.GetILGenerator();
-
-            il.DeclareLocal(typeof(object));
-
-            foreach (ParameterInfo parameter in parameters)
-                if (parameter.IsOut || parameter.ParameterType.IsByRef)
-                    il.DeclareLocal(parameter.ParameterType.GetElementType());
-
-            il.Emit(OpCodes.Nop);
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, fieldTarget);
-
-            int localIndex = 1;
-
-            for (int idx = 0; idx < parameters.Length; ++idx)
+            foreach (MethodInfo method in methodsToSearch)
             {
-                if (parameters[idx].ParameterType.IsByRef && !parameters[idx].IsOut)
-                {
-                    il.Emit(OpCodes.Ldarg_1);
-                    il.Emit(OpCodes.Ldc_I4_S, idx);
-                    il.Emit(OpCodes.Ldelem_Ref);
+                if (method.Name != methodName)
+                    continue;
 
-                    if (parameters[idx].ParameterType.GetElementType().IsValueType)
-                        il.Emit(OpCodes.Unbox_Any, parameters[idx].ParameterType.GetElementType());
+                ParameterInfo[] parameters = method.GetParameters();
+                if (parameters.Length != methodArgumentTypes.Length)
+                    continue;
+
+                int idx = 0;
+                for (; idx < parameters.Length; idx++)
+                {
+                    Type methodArgumentType = methodArgumentTypes[idx] as Type;
+
+                    if (methodArgumentType != null)
+                    {
+                        if (methodArgumentType != parameters[idx].ParameterType)
+                            break;
+                    }
                     else
-                        il.Emit(OpCodes.Castclass, parameters[idx].ParameterType.GetElementType());
-
-                    il.Emit(OpCodes.Stloc_S, localIndex++);
+                    {
+                        if ((string)methodArgumentTypes[idx] != parameters[idx].ParameterType.Name)
+                            break;
+                    }
                 }
+
+                if (idx == parameters.Length)
+                    return method;
             }
 
-            localIndex = 1;
-
-            for (int idx = 0; idx < parameters.Length; ++idx)
-            {
-                if (parameters[idx].IsOut || parameters[idx].ParameterType.IsByRef)
-                    il.Emit(OpCodes.Ldloca_S, localIndex++);
-                else
-                {
-                    il.Emit(OpCodes.Ldarg_1);
-                    il.Emit(OpCodes.Ldc_I4_S, idx);
-                    il.Emit(OpCodes.Ldelem_Ref);
-
-                    if (parameters[idx].ParameterType.IsValueType)
-                        il.Emit(OpCodes.Unbox_Any, parameters[idx].ParameterType);
-                    else
-                        il.Emit(OpCodes.Castclass, parameters[idx].ParameterType);
-                }
-            }
-
-            il.Emit(OpCodes.Callvirt, methodToIntercept);
-
-            if (methodToIntercept.ReturnType == typeof(void))
-            {
-                il.Emit(OpCodes.Nop);
-                il.Emit(OpCodes.Ldnull);
-            }
-            else if (methodToIntercept.ReturnType.IsValueType)
-                il.Emit(OpCodes.Box, methodToIntercept.ReturnType);
-
-            il.Emit(OpCodes.Stloc_0);
-
-            localIndex = 1;
-
-            for (int idx = 0; idx < parameters.Length; ++idx)
-            {
-                if (parameters[idx].IsOut || parameters[idx].ParameterType.IsByRef)
-                {
-                    il.Emit(OpCodes.Ldarg_1);
-                    il.Emit(OpCodes.Ldc_I4_S, idx);
-                    il.Emit(OpCodes.Ldloc_S, localIndex++);
-
-                    if (parameters[idx].ParameterType.GetElementType().IsValueType)
-                        il.Emit(OpCodes.Box, parameters[idx].ParameterType.GetElementType());
-
-                    il.Emit(OpCodes.Stelem_Ref);
-                }
-            }
-
-            Label end = il.DefineLabel();
-            il.Emit(OpCodes.Br_S, end);
-            il.MarkLabel(end);
-
-            il.Emit(OpCodes.Ldloc_0);
-            il.Emit(OpCodes.Ret);
-
-            return anonymousDelegate;
+            return null;
         }
 
         static void GenerateConstructor(TypeBuilder typeBuilder,
@@ -127,13 +65,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             ILGenerator il = constructor.GetILGenerator();
 
             // Locals
-            il.DeclareLocal(typeof(Type[]));
+            il.DeclareLocal(typeof(MethodInfo[]));
+            il.DeclareLocal(typeof(object[]));
 
             // Call base constructor
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Call, defaultBaseConstructor);
-            il.Emit(OpCodes.Nop);
-            il.Emit(OpCodes.Nop);
 
             // Stash proxy into field
             il.Emit(OpCodes.Ldarg_0);
@@ -146,49 +83,60 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             il.Emit(OpCodes.Stfld, fieldTarget);
 
             MethodInfo getTypeFromHandleMethod = typeof(Type).GetMethod("GetTypeFromHandle", BindingFlags.Public | BindingFlags.Static);
-            MethodInfo getMethodMethod = typeof(Type).GetMethod("GetMethod", new Type[] { typeof(string), typeof(Type[]) });
+            MethodInfo getMethodsMethod = typeof(Type).GetMethod("GetMethods", new Type[0]);
+            MethodInfo findMethodMethod = typeof(InterfaceInterceptor).GetMethod("FindMethod", BindingFlags.Public | BindingFlags.Static);
             MethodInfo makeByRefTypeMethod = typeof(Type).GetMethod("MakeByRefType");
 
-            // Get interface methods via reflection
+            // Get all the methods on the generic version of the interface
+            il.Emit(OpCodes.Ldtoken, interfaceToWrap);
+            il.Emit(OpCodes.Call, getTypeFromHandleMethod);
+            il.Emit(OpCodes.Call, getMethodsMethod);
+            il.Emit(OpCodes.Stloc_0);
+
+            // Find all the methods
             foreach (KeyValuePair<FieldBuilder, MethodInfo> kvp in overloadedMethods)
             {
+                // Create array of parameter types
                 ParameterInfo[] parameters = kvp.Value.GetParameters();
-
-                il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Ldtoken, interfaceToWrap);
-                il.Emit(OpCodes.Call, getTypeFromHandleMethod);
-                il.Emit(OpCodes.Ldstr, kvp.Value.Name);
                 il.Emit(OpCodes.Ldc_I4_S, parameters.Length);
-                il.Emit(OpCodes.Newarr, typeof(Type));
-                il.Emit(OpCodes.Stloc_0);
+                il.Emit(OpCodes.Newarr, typeof(object));
+                il.Emit(OpCodes.Stloc_1);
 
-                for (int idx = 0; idx < parameters.Length; ++idx)
+                for (int idx = 0; idx < parameters.Length; idx++)
                 {
-                    il.Emit(OpCodes.Ldloc_0);
+                    ParameterInfo parameter = parameters[idx];
+                    il.Emit(OpCodes.Ldloc_1);
                     il.Emit(OpCodes.Ldc_I4_S, idx);
 
-                    if (parameters[idx].ParameterType.IsByRef)
+                    if (parameter.ParameterType.IsGenericParameter)
                     {
-                        il.Emit(OpCodes.Ldtoken, parameters[idx].ParameterType.GetElementType());
+                        il.Emit(OpCodes.Ldstr, parameter.ParameterType.Name);
+                    }
+                    else if (parameter.ParameterType.IsByRef)
+                    {
+                        il.Emit(OpCodes.Ldtoken, parameter.ParameterType.GetElementType());
                         il.Emit(OpCodes.Call, getTypeFromHandleMethod);
                         il.Emit(OpCodes.Callvirt, makeByRefTypeMethod);
                     }
                     else
                     {
-                        il.Emit(OpCodes.Ldtoken, parameters[idx].ParameterType);
+                        il.Emit(OpCodes.Ldtoken, parameter.ParameterType);
                         il.Emit(OpCodes.Call, getTypeFromHandleMethod);
                     }
 
                     il.Emit(OpCodes.Stelem_Ref);
                 }
 
+                // Call helper method
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldstr, kvp.Value.Name);
+                il.Emit(OpCodes.Ldloc_1);
                 il.Emit(OpCodes.Ldloc_0);
-                il.Emit(OpCodes.Call, getMethodMethod);
+                il.Emit(OpCodes.Call, findMethodMethod);
                 il.Emit(OpCodes.Stfld, kvp.Key);
             }
 
             // Return
-            il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ret);
         }
 
@@ -199,6 +147,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                              FieldInfo fieldTarget,
                                              FieldInfo fieldMethodInfo)
         {
+            // Get method parameters
             ParameterInfo[] parameters = methodToIntercept.GetParameters();
             List<Type> parameterTypes = new List<Type>();
             List<Type> parameterRealTypes = new List<Type>();
@@ -220,6 +169,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                          methodToIntercept.ReturnType,
                                          parameterTypes.ToArray());
 
+            Type[] genericParameterTypes = SetupGenericMethodArguments(methodToIntercept, method);
+
             ILGenerator il = method.GetILGenerator();
 
             // Locals
@@ -227,8 +178,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             if (methodToIntercept.ReturnType != typeof(void))
                 il.DeclareLocal(methodToIntercept.ReturnType);
-
-            il.Emit(OpCodes.Nop);
 
             // Initialize default values for out parameters
             for (int idx = 0; idx < parameters.Length; ++idx)
@@ -255,7 +204,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 if (parameters[idx].IsOut || parameters[idx].ParameterType.IsByRef)
                     il.Emit(OpCodes.Ldobj, parameterRealTypes[idx]);
 
-                if (parameterRealTypes[idx].IsValueType)
+                if (parameterRealTypes[idx].IsValueType || parameterRealTypes[idx].IsGenericParameter)
                     il.Emit(OpCodes.Box, parameterRealTypes[idx]);
 
                 il.Emit(OpCodes.Stelem_Ref);
@@ -278,7 +227,12 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             // Parameter 4 (anonymous delegate) for the call to Invoke
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldftn, anonymousDelegate);
+
+            if (genericParameterTypes.Length > 0)
+                il.Emit(OpCodes.Ldftn, anonymousDelegate.MakeGenericMethod(genericParameterTypes));
+            else
+                il.Emit(OpCodes.Ldftn, anonymousDelegate);
+
             il.Emit(OpCodes.Newobj, typeof(ILEmitProxy.InvokeDelegate).GetConstructor(new Type[] { typeof(object), typeof(IntPtr) }));
 
             // Call Invoke
@@ -329,17 +283,121 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             il.Emit(OpCodes.Ret);
         }
 
-        static Type GenerateWrapperType(Type interfaceToWrap,
-                                        ModuleBuilder module)
+        static MethodBuilder GenerateOverloadedMethodDelegate(MethodInfo methodToIntercept,
+                                                              TypeBuilder typeBuilder,
+                                                              FieldInfo fieldTarget)
         {
-            TypeBuilder typeBuilder = module.DefineType(
-                interfaceToWrap.FullName + "<Wrapper>",
-                TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.BeforeFieldInit,
-                typeof(Object),
-                new Type[] { interfaceToWrap });
+            // Define the method
+            MethodBuilder method =
+                typeBuilder.DefineMethod(methodToIntercept.Name + "{Delegate}",
+                                         MethodAttributes.Private | MethodAttributes.HideBySig,
+                                         typeof(object),
+                                         new Type[] { typeof(object[]) });
 
-            Dictionary<FieldBuilder, MethodInfo> overloadedMethods = new Dictionary<FieldBuilder, MethodInfo>();
+            SetupGenericMethodArguments(methodToIntercept, method);
 
+            ILGenerator il = method.GetILGenerator();
+
+            // Local for return value
+            il.DeclareLocal(typeof(object));
+
+            // Local for each out/ref parameter
+            ParameterInfo[] parameters = methodToIntercept.GetParameters();
+
+            foreach (ParameterInfo parameter in parameters)
+                if (parameter.IsOut || parameter.ParameterType.IsByRef)
+                    il.DeclareLocal(parameter.ParameterType.GetElementType());
+
+            // Initialize out parameters to default values
+            int localIndex = 1;
+
+            for (int idx = 0; idx < parameters.Length; ++idx)
+            {
+                if (parameters[idx].ParameterType.IsByRef && !parameters[idx].IsOut)
+                {
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldc_I4_S, idx);
+                    il.Emit(OpCodes.Ldelem_Ref);
+
+                    if (parameters[idx].ParameterType.GetElementType().IsValueType)
+                        il.Emit(OpCodes.Unbox_Any, parameters[idx].ParameterType.GetElementType());
+                    else
+                        il.Emit(OpCodes.Castclass, parameters[idx].ParameterType.GetElementType());
+
+                    il.Emit(OpCodes.Stloc_S, localIndex++);
+                }
+            }
+
+            // Load target
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, fieldTarget);
+
+            // Push call values onto stack
+            localIndex = 1;
+
+            for (int idx = 0; idx < parameters.Length; ++idx)
+            {
+                if (parameters[idx].IsOut || parameters[idx].ParameterType.IsByRef)
+                    il.Emit(OpCodes.Ldloca_S, localIndex++);
+                else
+                {
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldc_I4_S, idx);
+                    il.Emit(OpCodes.Ldelem_Ref);
+
+                    if (parameters[idx].ParameterType.IsValueType || parameters[idx].ParameterType.IsGenericParameter)
+                        il.Emit(OpCodes.Unbox_Any, parameters[idx].ParameterType);
+                    else
+                        il.Emit(OpCodes.Castclass, parameters[idx].ParameterType);
+                }
+            }
+
+            // Call intercepted method
+            il.Emit(OpCodes.Callvirt, methodToIntercept);
+
+            // Stash return value
+            if (methodToIntercept.ReturnType == typeof(void))
+            {
+                il.Emit(OpCodes.Nop);
+                il.Emit(OpCodes.Ldnull);
+            }
+            else if (methodToIntercept.ReturnType.IsValueType)
+                il.Emit(OpCodes.Box, methodToIntercept.ReturnType);
+
+            il.Emit(OpCodes.Stloc_0);
+
+            // Copy out/ref parameter values back into passed-in parameters array
+            localIndex = 1;
+
+            for (int idx = 0; idx < parameters.Length; ++idx)
+                if (parameters[idx].IsOut || parameters[idx].ParameterType.IsByRef)
+                {
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldc_I4_S, idx);
+                    il.Emit(OpCodes.Ldloc_S, localIndex++);
+
+                    if (parameters[idx].ParameterType.GetElementType().IsValueType)
+                        il.Emit(OpCodes.Box, parameters[idx].ParameterType.GetElementType());
+
+                    il.Emit(OpCodes.Stelem_Ref);
+                }
+
+            // Return
+            il.Emit(OpCodes.Ldloc_0);
+            il.Emit(OpCodes.Ret);
+
+            return method;
+        }
+
+        protected override Type GenerateWrapperType(Type interfaceToWrap,
+                                                    ModuleBuilder module,
+                                                    string moduleName)
+        {
+            // Define implementing type
+            TypeBuilder typeBuilder = module.DefineType(MakeTypeName(moduleName, interfaceToWrap), TypeAttributes.Public);
+            typeBuilder.AddInterfaceImplementation(SetupGenericClassArguments(interfaceToWrap, typeBuilder));
+
+            // Declare fields for the proxy and the target
             FieldBuilder fieldProxy = typeBuilder.DefineField("proxy",
                                                               typeof(ILEmitProxy),
                                                               FieldAttributes.Private);
@@ -347,37 +405,36 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                                                                interfaceToWrap,
                                                                FieldAttributes.Private);
 
+            // Create overrides (and delegates) for all the interface methods
+            Dictionary<FieldBuilder, MethodInfo> overloadedMethods = new Dictionary<FieldBuilder, MethodInfo>();
+
             foreach (MethodInfo method in interfaceToWrap.GetMethods())
-                if (method.IsVirtual && !method.IsFinal)
-                {
-                    FieldBuilder field = typeBuilder.DefineField("methodInfo" + overloadedMethods.Count,
-                                                                 typeof(MethodInfo),
-                                                                 FieldAttributes.Private);
+            {
+                // Cache a copy of the MethodInfo for each method
+                FieldBuilder fieldMethodInfo = typeBuilder.DefineField("methodInfo" + overloadedMethods.Count,
+                                                                       typeof(MethodInfo),
+                                                                       FieldAttributes.Private);
 
-                    MethodBuilder anonymousDelegate = GenerateAnonymousDelegate(method, typeBuilder, fieldTarget);
-                    GenerateOverloadedMethod(typeBuilder, method, anonymousDelegate, fieldProxy, fieldTarget, field);
+                GenerateOverloadedMethod(typeBuilder,
+                                         method,
+                                         GenerateOverloadedMethodDelegate(method, typeBuilder, fieldTarget),
+                                         fieldProxy,
+                                         fieldTarget,
+                                         fieldMethodInfo);
 
-                    overloadedMethods[field] = method;
-                }
+                overloadedMethods[fieldMethodInfo] = method;
+            }
 
+            // Create a single constructor which takes the proxy and target, and gets
+            // all the necessary MethodInfo objects for the class
             GenerateConstructor(typeBuilder, interfaceToWrap, fieldProxy, fieldTarget, overloadedMethods);
+
             return typeBuilder.CreateType();
         }
 
         public static Type WrapInterface(Type interfaceToWrap)
         {
-            lock (wrappers)
-            {
-                if (!wrappers.ContainsKey(interfaceToWrap))
-                {
-                    string assemblyName = Guid.NewGuid().ToString("N");
-                    AssemblyBuilder assemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(new AssemblyName(assemblyName), AssemblyBuilderAccess.RunAndSave);
-                    ModuleBuilder module = assemblyBuilder.DefineDynamicModule(assemblyName + ".dll");
-                    wrappers[interfaceToWrap] = GenerateWrapperType(interfaceToWrap, module);
-                }
-
-                return wrappers[interfaceToWrap];
-            }
+            return instance.Wrap(interfaceToWrap);
         }
     }
 }

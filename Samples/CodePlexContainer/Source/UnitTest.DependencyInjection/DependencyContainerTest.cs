@@ -153,25 +153,6 @@ namespace CodePlex.DependencyInjection
         }
 
         [TestFixture]
-        public class Generics
-        {
-            [Test]
-            public void TestMethodName()
-            {
-                DependencyContainer container = new DependencyContainer();
-                container.RegisterTypeMapping(typeof(IFoo<>), typeof(Foo<>));
-
-                IFoo<int> result = container.Get<IFoo<int>>();
-
-                Assert.IsType<Foo<int>>(result);
-            }
-
-            public interface IFoo<T> {}
-
-            public class Foo<T> : IFoo<T> {}
-        }
-
-        [TestFixture]
         public class InterceptInterface
         {
             [Test]
@@ -576,6 +557,87 @@ namespace CodePlex.DependencyInjection
         }
 
         [TestFixture]
+        public class InterceptVirtual_Generics
+        {
+            [Test]
+            public void GenericMethodOnNonGenericClass()
+            {
+                Recorder.Records.Clear();
+                DependencyContainer container = new DependencyContainer();
+
+                Foo obj = container.Get<Foo>();
+                obj.Bar(42);
+                obj.Bar("world");
+
+                Assert.Equal(6, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("Passed: 42", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+                Assert.Equal("Before Method", Recorder.Records[3]);
+                Assert.Equal("Passed: world", Recorder.Records[4]);
+                Assert.Equal("After Method", Recorder.Records[5]);
+            }
+
+            [Test]
+            public void NonGenericMethodOnGenericClass()
+            {
+                Recorder.Records.Clear();
+                DependencyContainer container = new DependencyContainer();
+
+                GenericFoo<int> obj = container.Get<GenericFoo<int>>();
+                obj.Bar(42);
+
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("Passed: 42", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+            }
+
+            [Test]
+            public void GenericMethodOnGenericClass()
+            {
+                Recorder.Records.Clear();
+                DependencyContainer container = new DependencyContainer();
+
+                GenericFoo<int> obj = container.Get<GenericFoo<int>>();
+                obj.Baz(21, 42);
+                obj.Baz(96, "world");
+
+                Assert.Equal(6, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("Passed: 21, 42", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+                Assert.Equal("Before Method", Recorder.Records[3]);
+                Assert.Equal("Passed: 96, world", Recorder.Records[4]);
+                Assert.Equal("After Method", Recorder.Records[5]);
+            }
+
+            public class Foo
+            {
+                [VirtualIntercept(typeof(RecordingHandler))]
+                public virtual void Bar<T>(T value)
+                {
+                    Recorder.Records.Add("Passed: " + value);
+                }
+            }
+
+            public class GenericFoo<T>
+            {
+                [VirtualIntercept(typeof(RecordingHandler))]
+                public virtual void Bar(T value)
+                {
+                    Recorder.Records.Add("Passed: " + value);
+                }
+
+                [VirtualIntercept(typeof(RecordingHandler))]
+                public virtual void Baz<T1>(T value, T1 value2)
+                {
+                    Recorder.Records.Add("Passed: " + value + ", " + value2);
+                }
+            }
+        }
+
+        [TestFixture]
         public class Singletons
         {
             [Test]
@@ -654,6 +716,21 @@ namespace CodePlex.DependencyInjection
 
                 Assert.IsType<MyObject>(result);
             }
+
+            [Test]
+            public void CanTypeMapFromGenericToGeneric()
+            {
+                DependencyContainer container = new DependencyContainer();
+                container.RegisterTypeMapping(typeof(IFoo<>), typeof(Foo<>));
+
+                IFoo<int> result = container.Get<IFoo<int>>();
+
+                Assert.IsType<Foo<int>>(result);
+            }
+
+            public interface IFoo<T> {}
+
+            public class Foo<T> : IFoo<T> {}
         }
     }
 }
