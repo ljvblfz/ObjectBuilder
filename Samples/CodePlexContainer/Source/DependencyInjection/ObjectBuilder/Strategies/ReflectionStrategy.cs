@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -7,26 +6,24 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public abstract class ReflectionStrategy<TMemberInfo> : BuilderStrategy
     {
         protected abstract void AddParametersToPolicy(IBuilderContext context,
-                                                      Type typeToBuild,
-                                                      string idToBuild,
-                                                      IReflectionMemberInfo<TMemberInfo> member,
+                                                      object buildKey,
+                                                      IMemberInfo<TMemberInfo> member,
                                                       IEnumerable<IParameter> parameters);
 
         public override object BuildUp(IBuilderContext context,
-                                       Type typeToBuild,
-                                       object existing,
-                                       string idToBuild)
+                                       object buildKey,
+                                       object existing)
         {
-            foreach (IReflectionMemberInfo<TMemberInfo> member in GetMembers(context, typeToBuild, existing, idToBuild))
+            foreach (IMemberInfo<TMemberInfo> member in GetMembers(context, buildKey, existing))
             {
                 if (MemberRequiresProcessing(member))
                 {
                     IEnumerable<IParameter> parameters = GenerateIParametersFromParameterInfos(member.GetParameters());
-                    AddParametersToPolicy(context, typeToBuild, idToBuild, member, parameters);
+                    AddParametersToPolicy(context, buildKey, member, parameters);
                 }
             }
 
-            return base.BuildUp(context, typeToBuild, existing, idToBuild);
+            return base.BuildUp(context, buildKey, existing);
         }
 
         static IEnumerable<IParameter> GenerateIParametersFromParameterInfos(IEnumerable<ParameterInfo> parameterInfos)
@@ -59,11 +56,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
         }
 
-        protected abstract IEnumerable<IReflectionMemberInfo<TMemberInfo>> GetMembers(IBuilderContext context,
-                                                                                      Type typeToBuild,
-                                                                                      object existing,
-                                                                                      string idToBuild);
+        protected abstract IEnumerable<IMemberInfo<TMemberInfo>> GetMembers(IBuilderContext context,
+                                                                            object buildKey,
+                                                                            object existing);
 
-        protected abstract bool MemberRequiresProcessing(IReflectionMemberInfo<TMemberInfo> member);
+        protected abstract bool MemberRequiresProcessing(IMemberInfo<TMemberInfo> member);
     }
 }

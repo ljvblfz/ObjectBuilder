@@ -7,7 +7,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     {
         readonly IPolicyList innerPolicyList;
         readonly object lockObject = new object();
-        readonly Dictionary<BuilderPolicyKey, IBuilderPolicy> policies = new Dictionary<BuilderPolicyKey, IBuilderPolicy>();
+        readonly Dictionary<PolicyKey, IBuilderPolicy> policies = new Dictionary<PolicyKey, IBuilderPolicy>();
 
         public PolicyList()
             : this(null) {}
@@ -26,26 +26,16 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
         }
 
-        public void AddPolicies(PolicyList policiesToCopy)
+        public void Clear<TPolicyInterface>(object buildKey)
         {
-            lock (lockObject)
-                if (policiesToCopy != null)
-                    foreach (KeyValuePair<BuilderPolicyKey, IBuilderPolicy> kvp in policiesToCopy.policies)
-                        policies[kvp.Key] = kvp.Value;
-        }
-
-        public void Clear<TPolicyInterface>(Type typePolicyAppliesTo,
-                                            string idPolicyAppliesTo)
-        {
-            Clear(typeof(TPolicyInterface), typePolicyAppliesTo, idPolicyAppliesTo);
+            Clear(typeof(TPolicyInterface), buildKey);
         }
 
         public void Clear(Type policyInterface,
-                          Type typePolicyAppliesTo,
-                          string idPolicyAppliesTo)
+                          object buildKey)
         {
             lock (lockObject)
-                policies.Remove(new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo));
+                policies.Remove(new PolicyKey(policyInterface, buildKey));
         }
 
         public void ClearAll()
@@ -56,144 +46,207 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         public void ClearDefault<TPolicyInterface>()
         {
-            ClearDefault(typeof(TPolicyInterface));
+            Clear(typeof(TPolicyInterface), null);
         }
 
         public void ClearDefault(Type policyInterface)
         {
-            Clear(policyInterface, null, null);
+            Clear(policyInterface, null);
         }
 
-        public TPolicyInterface Get<TPolicyInterface>(Type typePolicyAppliesTo,
-                                                      string idPolicyAppliesTo)
+        public TPolicyInterface Get<TPolicyInterface>(object buildKey)
             where TPolicyInterface : IBuilderPolicy
         {
-            return (TPolicyInterface)Get(typeof(TPolicyInterface), typePolicyAppliesTo, idPolicyAppliesTo);
+            return (TPolicyInterface)Get(typeof(TPolicyInterface), buildKey, false);
         }
 
         public IBuilderPolicy Get(Type policyInterface,
-                                  Type typePolicyAppliesTo,
-                                  string idPolicyAppliesTo)
+                                  object buildKey)
         {
-            return Get(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo, false);
+            return Get(policyInterface, buildKey, false);
         }
 
-        IBuilderPolicy Get(Type policyInterface,
-                           Type typePolicyAppliesTo,
-                           string idPolicyAppliesTo,
-                           bool localOnly)
+        public TPolicyInterface Get<TPolicyInterface>(object buildKey,
+                                                      bool localOnly)
+            where TPolicyInterface : IBuilderPolicy
         {
-            BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo ?? "");
-            BuilderPolicyKey keyForDefaultType = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, null);
-            BuilderPolicyKey keyForDefaultAllTypes = new BuilderPolicyKey(policyInterface, null, null);
-            IPolicyList thisPolicyList = this;
+            return (TPolicyInterface)Get(typeof(TPolicyInterface), buildKey, localOnly);
+        }
 
-            if (!typePolicyAppliesTo.IsGenericType)
+        public IBuilderPolicy Get(Type policyInterface,
+                                  object buildKey,
+                                  bool localOnly)
+        {
+            Type buildType;
+
+            if (!BuilderStrategy.TryGetTypeFromBuildKey(buildKey, out buildType) || !buildType.IsGenericType)
                 return
-                    thisPolicyList.GetForKey(key, localOnly) ??
-                    thisPolicyList.GetForKey(keyForDefaultType, localOnly) ??
-                    thisPolicyList.GetForKey(keyForDefaultAllTypes, localOnly);
-
-            BuilderPolicyKey genericKey = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo.GetGenericTypeDefinition(), idPolicyAppliesTo ?? "");
-            BuilderPolicyKey genericKeyForDefaultType = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo.GetGenericTypeDefinition(), null);
+                    GetNoDefault(policyInterface, buildKey, localOnly) ??
+                    GetNoDefault(policyInterface, null, localOnly);
 
             return
-                thisPolicyList.GetForKey(key, localOnly) ??
-                thisPolicyList.GetForKey(genericKey, localOnly) ??
-                thisPolicyList.GetForKey(keyForDefaultType, localOnly) ??
-                thisPolicyList.GetForKey(genericKeyForDefaultType, localOnly) ??
-                thisPolicyList.GetForKey(keyForDefaultAllTypes, localOnly);
+                GetNoDefault(policyInterface, buildKey, localOnly) ??
+                GetNoDefault(policyInterface, buildType.GetGenericTypeDefinition(), localOnly) ??
+                GetNoDefault(policyInterface, null, localOnly);
         }
 
-        IBuilderPolicy IPolicyList.GetForKey(BuilderPolicyKey key,
-                                             bool localOnly)
+        public TPolicyInterface GetNoDefault<TPolicyInterface>(object buildKey,
+                                                               bool localOnly)
+            where TPolicyInterface : IBuilderPolicy
+        {
+            return (TPolicyInterface)GetNoDefault(typeof(TPolicyInterface), buildKey, localOnly);
+        }
+
+        public IBuilderPolicy GetNoDefault(Type policyInterface,
+                                           object buildKey,
+                                           bool localOnly)
         {
             lock (lockObject)
             {
                 IBuilderPolicy policy;
-                if (policies.TryGetValue(key, out policy))
+                if (policies.TryGetValue(new PolicyKey(policyInterface, buildKey), out policy))
                     return policy;
             }
 
             if (localOnly)
                 return null;
-            else
-                return innerPolicyList.GetForKey(key, localOnly);
-        }
 
-        public TPolicy GetLocal<TPolicy>(Type typePolicyAppliesTo,
-                                         string idPolicyAppliesTo)
-            where TPolicy : IBuilderPolicy
-        {
-            return (TPolicy)GetLocal(typeof(TPolicy), typePolicyAppliesTo, idPolicyAppliesTo);
-        }
-
-        public IBuilderPolicy GetLocal(Type policyInterface,
-                                       Type typePolicyAppliesTo,
-                                       string idPolicyAppliesTo)
-        {
-            return Get(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo, true);
+            return innerPolicyList.GetNoDefault(policyInterface, buildKey, localOnly);
         }
 
         public void Set<TPolicyInterface>(TPolicyInterface policy,
-                                          Type typePolicyAppliesTo,
-                                          string idPolicyAppliesTo)
+                                          object buildKey)
             where TPolicyInterface : IBuilderPolicy
         {
-            Set(typeof(TPolicyInterface), policy, typePolicyAppliesTo, idPolicyAppliesTo);
+            Set(typeof(TPolicyInterface), policy, buildKey);
         }
 
         public void Set(Type policyInterface,
                         IBuilderPolicy policy,
-                        Type typePolicyAppliesTo,
-                        string idPolicyAppliesTo)
+                        object buildKey)
         {
-            BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, idPolicyAppliesTo ?? "");
-
             lock (lockObject)
-                policies[key] = policy;
+                policies[new PolicyKey(policyInterface, buildKey)] = policy;
         }
 
         public void SetDefault<TPolicyInterface>(TPolicyInterface policy)
             where TPolicyInterface : IBuilderPolicy
         {
-            SetDefault(typeof(TPolicyInterface), policy);
+            Set(typeof(TPolicyInterface), policy, null);
         }
 
         public void SetDefault(Type policyInterface,
                                IBuilderPolicy policy)
         {
-            BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, null, null);
-
-            lock (lockObject)
-                policies[key] = policy;
+            Set(policyInterface, policy, null);
         }
-
-        public void SetDefaultForType<TPolicyInterface>(TPolicyInterface policy,
-                                                        Type typePolicyAppliesTo)
-            where TPolicyInterface : IBuilderPolicy
-        {
-            SetDefaultForType(typeof(TPolicyInterface), policy, typePolicyAppliesTo);
-        }
-
-        public void SetDefaultForType(Type policyInterface,
-                                      IBuilderPolicy policy,
-                                      Type typePolicyAppliesTo)
-        {
-            BuilderPolicyKey key = new BuilderPolicyKey(policyInterface, typePolicyAppliesTo, null);
-
-            lock (lockObject)
-                policies[key] = policy;
-        }
-
-        // Inner types
 
         class NullPolicyList : IPolicyList
         {
-            public IBuilderPolicy GetForKey(BuilderPolicyKey key,
-                                            bool localOnly)
+            public void Clear<TPolicyInterface>(object buildKey)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Clear(Type policyInterface,
+                              object buildKey)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void ClearAll()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void ClearDefault<TPolicyInterface>()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void ClearDefault(Type policyInterface)
+            {
+                throw new NotImplementedException();
+            }
+
+            public TPolicyInterface Get<TPolicyInterface>(object buildKey) where TPolicyInterface : IBuilderPolicy
+            {
+                return default(TPolicyInterface);
+            }
+
+            public IBuilderPolicy Get(Type policyInterface,
+                                      object buildKey)
             {
                 return null;
+            }
+
+            public TPolicyInterface Get<TPolicyInterface>(object buildKey,
+                                                          bool localOnly)
+                where TPolicyInterface : IBuilderPolicy
+            {
+                return default(TPolicyInterface);
+            }
+
+            public IBuilderPolicy Get(Type policyInterface,
+                                      object buildKey,
+                                      bool localOnly)
+            {
+                return null;
+            }
+
+            public TPolicyInterface GetNoDefault<TPolicyInterface>(object buildKey,
+                                                                   bool localOnly)
+                where TPolicyInterface : IBuilderPolicy
+            {
+                return default(TPolicyInterface);
+            }
+
+            public IBuilderPolicy GetNoDefault(Type policyInterface,
+                                               object buildKey,
+                                               bool localOnly)
+            {
+                return null;
+            }
+
+            public void Set<TPolicyInterface>(TPolicyInterface policy,
+                                              object buildKey)
+                where TPolicyInterface : IBuilderPolicy
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Set(Type policyInterface,
+                            IBuilderPolicy policy,
+                            object buildKey)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetDefault<TPolicyInterface>(TPolicyInterface policy)
+                where TPolicyInterface : IBuilderPolicy
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetDefault(Type policyInterface,
+                                   IBuilderPolicy policy)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        struct PolicyKey
+        {
+#pragma warning disable 219
+            public readonly object BuildKey;
+            public readonly Type PolicyType;
+#pragma warning restore 219
+
+            public PolicyKey(Type policyType,
+                             object buildKey)
+            {
+                PolicyType = policyType;
+                BuildKey = buildKey;
             }
         }
     }

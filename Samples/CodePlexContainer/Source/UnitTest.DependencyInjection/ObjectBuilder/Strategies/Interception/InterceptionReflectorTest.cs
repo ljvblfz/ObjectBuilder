@@ -15,11 +15,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             {
                 PolicyList policies = new PolicyList();
 
-                InterceptionReflector.Reflect<IFoo, FooBar>(null, policies, new StubObjectFactory());
+                InterceptionReflector.Reflect<IFoo, FooBar>(policies, new StubObjectFactory());
 
-                Assert.Equal(1, policies.Get<VirtualInterceptionPolicy>(typeof(FooBar), null).Count);
-                Assert.Equal(1, policies.Get<InterfaceInterceptionPolicy>(typeof(FooBar), null).Count);
-                Assert.Equal(1, policies.Get<RemotingInterceptionPolicy>(typeof(FooBar), null).Count);
+                Assert.Equal(1, policies.Get<VirtualInterceptionPolicy>(typeof(FooBar)).Count);
+                Assert.Equal(1, policies.Get<InterfaceInterceptionPolicy>(typeof(FooBar)).Count);
+                Assert.Equal(1, policies.Get<RemotingInterceptionPolicy>(typeof(FooBar)).Count);
             }
 
             public interface IFoo
@@ -44,7 +44,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             {
                 PolicyList policies = new PolicyList();
 
-                InterceptionReflector.Reflect<object>(null, policies, new StubObjectFactory());
+                InterceptionReflector.Reflect<object>(policies, new StubObjectFactory());
 
                 Assert.Equal(0, policies.Count);
             }
@@ -61,7 +61,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Throws<InvalidOperationException>(
                     delegate
                     {
-                        InterceptionReflector.Reflect<INonPublicInterface, NonPublicInterface>(null, policies, new StubObjectFactory());
+                        InterceptionReflector.Reflect<INonPublicInterface, NonPublicInterface>(policies, new StubObjectFactory());
                     });
             }
 
@@ -70,7 +70,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             {
                 PolicyList policies = new PolicyList();
 
-                InterceptionReflector.Reflect<OneMethod>(null, policies, new StubObjectFactory());
+                InterceptionReflector.Reflect<OneMethod>(policies, new StubObjectFactory());
 
                 Assert.Equal(0, policies.Count);
             }
@@ -81,8 +81,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(IInterface1).GetMethod("InterceptedMethod1");
 
-                InterceptionReflector.Reflect<IInterface1, TwoInterfaceClass>(null, policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(TwoInterfaceClass), null);
+                InterceptionReflector.Reflect<IInterface1, TwoInterfaceClass>(policies, new StubObjectFactory());
+                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(TwoInterfaceClass));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -95,8 +95,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<IOneMethod, OneMethod>("foo", policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(OneMethod), "foo");
+                InterceptionReflector.Reflect<IOneMethod, OneMethod>(policies, new StubObjectFactory());
+                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(OneMethod));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -110,8 +110,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 MethodBase method1 = typeof(ITwoMethods).GetMethod("InterceptedMethod1");
                 MethodBase method2 = typeof(ITwoMethods).GetMethod("InterceptedMethod2");
 
-                InterceptionReflector.Reflect<ITwoMethods, TwoMethods>(null, policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(TwoMethods), null);
+                InterceptionReflector.Reflect<ITwoMethods, TwoMethods>(policies, new StubObjectFactory());
+                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(TwoMethods));
 
                 Assert.Equal(2, policy.Count);
                 Assert.Equal(1, policy[method1].Count);
@@ -126,8 +126,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<IOneMethod, OneMethodTwoAttributes>(null, policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(OneMethodTwoAttributes), null);
+                InterceptionReflector.Reflect<IOneMethod, OneMethodTwoAttributes>(policies, new StubObjectFactory());
+                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(OneMethodTwoAttributes));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -141,8 +141,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<IOneMethod, DerivedOneMethod>(null, policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(DerivedOneMethod), null);
+                InterceptionReflector.Reflect<IOneMethod, DerivedOneMethod>(policies, new StubObjectFactory());
+                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(DerivedOneMethod));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -155,8 +155,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<IOneMethod, DerivedWithAddedIntercepts>(null, policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(DerivedWithAddedIntercepts), null);
+                InterceptionReflector.Reflect<IOneMethod, DerivedWithAddedIntercepts>(policies, new StubObjectFactory());
+                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(DerivedWithAddedIntercepts));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -170,8 +170,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(IGeneric<>).GetMethod("DoSomething");
 
-                InterceptionReflector.Reflect<IGeneric<int>, Generic<int>>(null, policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(Generic<>), null);
+                InterceptionReflector.Reflect<IGeneric<int>, Generic<int>>(policies, new StubObjectFactory());
+                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(Generic<>));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -276,7 +276,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Throws<InvalidOperationException>(
                     delegate
                     {
-                        InterceptionReflector.Reflect<NonMBRO>(null, policies, new StubObjectFactory());
+                        InterceptionReflector.Reflect<NonMBRO>(policies, new StubObjectFactory());
                     });
             }
 
@@ -286,8 +286,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(OneMethod).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<OneMethod>("foo", policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(OneMethod), "foo");
+                InterceptionReflector.Reflect<OneMethod>(policies, new StubObjectFactory());
+                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(OneMethod));
 
                 Assert.NotNull(policy);
                 Assert.Equal(1, policy.Count);
@@ -302,8 +302,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 MethodBase method1 = typeof(TwoMethods).GetMethod("InterceptedMethod1");
                 MethodBase method2 = typeof(TwoMethods).GetMethod("InterceptedMethod2");
 
-                InterceptionReflector.Reflect<TwoMethods>(null, policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(TwoMethods), null);
+                InterceptionReflector.Reflect<TwoMethods>(policies, new StubObjectFactory());
+                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(TwoMethods));
 
                 Assert.Equal(2, policy.Count);
                 Assert.Equal(1, policy[method1].Count);
@@ -318,8 +318,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(OneMethodTwoAttributes).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<OneMethodTwoAttributes>(null, policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(OneMethodTwoAttributes), null);
+                InterceptionReflector.Reflect<OneMethodTwoAttributes>(policies, new StubObjectFactory());
+                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(OneMethodTwoAttributes));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -333,8 +333,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(DerivedOneMethod).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<DerivedOneMethod>(null, policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(DerivedOneMethod), null);
+                InterceptionReflector.Reflect<DerivedOneMethod>(policies, new StubObjectFactory());
+                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(DerivedOneMethod));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -347,8 +347,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(DerivedWithAddedIntercepts).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<DerivedWithAddedIntercepts>(null, policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(DerivedWithAddedIntercepts), null);
+                InterceptionReflector.Reflect<DerivedWithAddedIntercepts>(policies, new StubObjectFactory());
+                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(DerivedWithAddedIntercepts));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -408,7 +408,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Throws<InvalidOperationException>(
                     delegate
                     {
-                        InterceptionReflector.Reflect<InternalClass>(null, policies, new StubObjectFactory());
+                        InterceptionReflector.Reflect<InternalClass>(policies, new StubObjectFactory());
                     });
             }
 
@@ -420,7 +420,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Throws<InvalidOperationException>(
                     delegate
                     {
-                        InterceptionReflector.Reflect<SealedClass>(null, policies, new StubObjectFactory());
+                        InterceptionReflector.Reflect<SealedClass>(policies, new StubObjectFactory());
                     });
             }
 
@@ -432,7 +432,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Throws<InvalidOperationException>(
                     delegate
                     {
-                        InterceptionReflector.Reflect<NonVirtualMethod>(null, policies, new StubObjectFactory());
+                        InterceptionReflector.Reflect<NonVirtualMethod>(policies, new StubObjectFactory());
                     });
             }
 
@@ -444,7 +444,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Assert.Throws<InvalidOperationException>(
                     delegate
                     {
-                        InterceptionReflector.Reflect<VirtualSealed>(null, policies, new StubObjectFactory());
+                        InterceptionReflector.Reflect<VirtualSealed>(policies, new StubObjectFactory());
                     });
             }
 
@@ -454,8 +454,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(OneMethod).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<OneMethod>("foo", policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(OneMethod), "foo");
+                InterceptionReflector.Reflect<OneMethod>(policies, new StubObjectFactory());
+                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(OneMethod));
 
                 Assert.NotNull(policy);
                 Assert.Equal(1, policy.Count);
@@ -470,8 +470,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 MethodBase method1 = typeof(TwoMethods).GetMethod("InterceptedMethod1");
                 MethodBase method2 = typeof(TwoMethods).GetMethod("InterceptedMethod2");
 
-                InterceptionReflector.Reflect<TwoMethods>(null, policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(TwoMethods), null);
+                InterceptionReflector.Reflect<TwoMethods>(policies, new StubObjectFactory());
+                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(TwoMethods));
 
                 Assert.Equal(2, policy.Count);
                 Assert.Equal(1, policy[method1].Count);
@@ -486,8 +486,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(OneMethodTwoAttributes).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<OneMethodTwoAttributes>(null, policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(OneMethodTwoAttributes), null);
+                InterceptionReflector.Reflect<OneMethodTwoAttributes>(policies, new StubObjectFactory());
+                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(OneMethodTwoAttributes));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -501,8 +501,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(DerivedOneMethod).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<DerivedOneMethod>(null, policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(DerivedOneMethod), null);
+                InterceptionReflector.Reflect<DerivedOneMethod>(policies, new StubObjectFactory());
+                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(DerivedOneMethod));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -515,8 +515,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(DerivedWithAddedIntercepts).GetMethod("InterceptedMethod");
 
-                InterceptionReflector.Reflect<DerivedWithAddedIntercepts>(null, policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(DerivedWithAddedIntercepts), null);
+                InterceptionReflector.Reflect<DerivedWithAddedIntercepts>(policies, new StubObjectFactory());
+                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(DerivedWithAddedIntercepts));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -530,8 +530,8 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 PolicyList policies = new PolicyList();
                 MethodBase method = typeof(Generic<>).GetMethod("DoSomething");
 
-                InterceptionReflector.Reflect<Generic<int>>(null, policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(Generic<>), null);
+                InterceptionReflector.Reflect<Generic<int>>(policies, new StubObjectFactory());
+                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(Generic<>));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);

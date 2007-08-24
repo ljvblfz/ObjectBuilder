@@ -1,51 +1,32 @@
 using System;
-using System.Globalization;
-using CodePlex.DependencyInjection.Properties;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class DependencyResolver
+    public static class DependencyResolver
     {
-        readonly IBuilderContext context;
-
-        public DependencyResolver(IBuilderContext context)
+        public static object Resolve(IBuilderContext context,
+                                     object buildKey,
+                                     NotPresentBehavior behavior)
         {
-            if (context == null)
-                throw new ArgumentNullException("context");
+            Guard.ArgumentNotNull(context, "context");
+            Guard.ArgumentNotNull(buildKey, "buildKey");
 
-            this.context = context;
-        }
+            if (context.Locator.Contains(buildKey))
+                return context.Locator.Get(buildKey);
 
-        public object Resolve(Type typeToResolve,
-                              Type typeToCreate,
-                              string id,
-                              NotPresentBehavior notPresent)
-        {
-            if (typeToResolve == null)
-                throw new ArgumentNullException("typeToResolve");
-            if (!Enum.IsDefined(typeof(NotPresentBehavior), notPresent))
-                throw new ArgumentException(Resources.InvalidEnumerationValue, "notPresent");
-
-            if (typeToCreate == null)
-                typeToCreate = typeToResolve;
-
-            DependencyResolutionLocatorKey key = new DependencyResolutionLocatorKey(typeToResolve, id);
-
-            if (context.Locator.Contains(key))
-                return context.Locator.Get(key);
-
-            switch (notPresent)
+            switch (behavior)
             {
-                case NotPresentBehavior.CreateNew:
-                    return context.HeadOfChain.BuildUp(context, typeToCreate, null, key.ID);
+                case NotPresentBehavior.Build:
+                    return context.HeadOfChain.BuildUp(context, buildKey, null);
 
-                case NotPresentBehavior.ReturnNull:
+                case NotPresentBehavior.Null:
                     return null;
 
+                case NotPresentBehavior.Throw:
+                    throw new DependencyMissingException("Could not locate dependency " + buildKey);
+
                 default:
-                    throw new DependencyMissingException(
-                        string.Format(CultureInfo.CurrentCulture,
-                                      Resources.DependencyMissing, typeToResolve.ToString()));
+                    throw new InvalidOperationException("Unknown NotPresentBehavior " + behavior);
             }
         }
     }

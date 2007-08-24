@@ -1,17 +1,18 @@
-using System;
 using System.Reflection;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface ICreationPolicy : IBuilderPolicy
     {
-        object[] GetParameters(IBuilderContext context,
-                               Type type,
-                               string id,
-                               ConstructorInfo constructor);
+        bool SupportsReflection { get; }
 
-        ConstructorInfo SelectConstructor(IBuilderContext context,
-                                          Type type,
-                                          string id);
+        object Create(IBuilderContext context,
+                      object buildKey);
+
+        ConstructorInfo GetConstructor(IBuilderContext context,
+                                       object buildKey);
+
+        object[] GetParameters(IBuilderContext context,
+                               ConstructorInfo constructor);
     }
 }

@@ -1,13 +1,10 @@
-using System;
-
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IBuilderStrategy
     {
         object BuildUp(IBuilderContext context,
-                       Type typeToBuild,
-                       object existing,
-                       string idToBuild);
+                       object buildKey,
+                       object existing);
 
         object TearDown(IBuilderContext context,
                         object item);

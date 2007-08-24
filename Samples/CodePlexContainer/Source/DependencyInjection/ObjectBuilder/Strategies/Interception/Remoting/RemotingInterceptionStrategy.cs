@@ -5,16 +5,24 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class RemotingInterceptionStrategy : BuilderStrategy
     {
         public override object BuildUp(IBuilderContext context,
-                                       Type typeToBuild,
-                                       object existing,
-                                       string idToBuild)
+                                       object buildKey,
+                                       object existing)
         {
-            RemotingInterceptionPolicy policy = context.Policies.Get<RemotingInterceptionPolicy>(typeToBuild, idToBuild);
+            Type typeToBuild;
 
-            if (existing != null && policy != null)
-                existing = RemotingInterceptor.Wrap(existing, context.OriginalType, policy);
+            if (TryGetTypeFromBuildKey(buildKey, out typeToBuild))
+            {
+                Type originalType;
+                if (!TryGetTypeFromBuildKey(context.OriginalBuildKey, out originalType))
+                    originalType = typeToBuild;
 
-            return base.BuildUp(context, context.OriginalType, existing, context.OriginalID);
+                RemotingInterceptionPolicy policy = context.Policies.Get<RemotingInterceptionPolicy>(buildKey);
+
+                if (existing != null && policy != null)
+                    existing = RemotingInterceptor.Wrap(existing, originalType, policy);
+            }
+
+            return base.BuildUp(context, buildKey, existing);
         }
     }
 }

@@ -14,10 +14,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             {
                 Builder builder = new Builder();
 
-                Assert.Throws<ArgumentNullException>(delegate
-                                                     {
-                                                         builder.BuildUp<object>(null, null, null, null, (string)null, null);
-                                                     });
+                Assert.Throws<ArgumentNullException>(
+                    delegate
+                    {
+                        builder.BuildUp<object>(null, null, null, null, null, null);
+                    });
             }
 
             [Test]
@@ -26,10 +27,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Builder builder = new Builder();
                 StrategyChain strategies = new StrategyChain();
 
-                Assert.Throws<ArgumentException>(delegate
-                                                 {
-                                                     builder.BuildUp<object>(null, null, null, strategies, null, null);
-                                                 });
+                Assert.Throws<ArgumentNullException>(
+                    delegate
+                    {
+                        builder.BuildUp<object>(null, null, null, strategies, null, null);
+                    });
             }
 
             [Test]
@@ -61,7 +63,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 builder.BuildUp<object>(null, null, policies, strategies, null, null);
 
                 Assert.Same(setStrategy.Policy, getStrategy.Policy);
-                Assert.Null(policies.Get<FakePolicy>(typeof(object), null));
+                Assert.Null(policies.Get<FakePolicy>(typeof(object)));
             }
         }
 
@@ -74,32 +76,30 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             public FakePolicy Policy = null;
 
             public override object BuildUp(IBuilderContext context,
-                                           Type typeToBuild,
-                                           object existing,
-                                           string idToBuild)
+                                           object buildKey,
+                                           object existing)
             {
-                Policy = context.Policies.Get<FakePolicy>(typeof(object), null);
-                return base.BuildUp(context, typeToBuild, existing, idToBuild);
+                Policy = context.Policies.Get<FakePolicy>(typeof(object));
+                return base.BuildUp(context, buildKey, existing);
             }
         }
 
         class PolicySettingStrategy : BuilderStrategy
         {
-            public FakePolicy Policy = new FakePolicy();
+            public readonly FakePolicy Policy = new FakePolicy();
 
             public override object BuildUp(IBuilderContext context,
-                                           Type typeToBuild,
-                                           object existing,
-                                           string idToBuild)
+                                           object buildKey,
+                                           object existing)
             {
-                context.Policies.Set(Policy, typeof(object), null);
-                return base.BuildUp(context, typeToBuild, existing, idToBuild);
+                context.Policies.Set(Policy, typeof(object));
+                return base.BuildUp(context, buildKey, existing);
             }
         }
 
         class StringConcatStrategy : BuilderStrategy
         {
-            public string StringValue;
+            public readonly string StringValue;
 
             public StringConcatStrategy(string value)
             {
@@ -119,11 +119,10 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
 
             public override object BuildUp(IBuilderContext context,
-                                           Type typeToBuild,
-                                           object existing,
-                                           string idToBuild)
+                                           object buildKey,
+                                           object existing)
             {
-                return base.BuildUp(context, typeToBuild, AppendString(existing), idToBuild);
+                return base.BuildUp(context, buildKey, AppendString(existing));
             }
 
             public override object TearDown(IBuilderContext context,
@@ -142,10 +141,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Builder builder = new Builder();
                 StrategyChain strategies = new StrategyChain();
 
-                Assert.Throws<ArgumentNullException>(delegate
-                                                     {
-                                                         builder.TearDown<object>(null, null, null, strategies, null);
-                                                     });
+                Assert.Throws<ArgumentNullException>(
+                    delegate
+                    {
+                        builder.TearDown<object>(null, null, null, strategies, null);
+                    });
             }
 
             [Test]
@@ -153,10 +153,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             {
                 Builder builder = new Builder();
 
-                Assert.Throws<ArgumentNullException>(delegate
-                                                     {
-                                                         builder.TearDown(null, null, null, null, new object());
-                                                     });
+                Assert.Throws<ArgumentNullException>(
+                    delegate
+                    {
+                        builder.TearDown(null, null, null, null, new object());
+                    });
             }
 
             [Test]
@@ -165,10 +166,11 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 Builder builder = new Builder();
                 StrategyChain strategies = new StrategyChain();
 
-                Assert.Throws<ArgumentException>(delegate
-                                                 {
-                                                     builder.TearDown(null, null, null, strategies, new object());
-                                                 });
+                Assert.Throws<ArgumentNullException>(
+                    delegate
+                    {
+                        builder.TearDown(null, null, null, strategies, new object());
+                    });
             }
 
             [Test]

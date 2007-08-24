@@ -7,27 +7,29 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class VirtualInterceptionStrategy : BuilderStrategy
     {
         public override object BuildUp(IBuilderContext context,
-                                       Type typeToBuild,
-                                       object existing,
-                                       string idToBuild)
+                                       object buildKey,
+                                       object existing)
         {
-            ICreationPolicy creationPolicy = context.Policies.Get<ICreationPolicy>(typeToBuild, idToBuild);
-            VirtualInterceptionPolicy interceptionPolicy = context.Policies.Get<VirtualInterceptionPolicy>(typeToBuild, idToBuild);
+            ICreationPolicy creationPolicy = context.Policies.Get<ICreationPolicy>(buildKey);
+            VirtualInterceptionPolicy interceptionPolicy = context.Policies.Get<VirtualInterceptionPolicy>(buildKey);
+            Type typeToBuild;
 
-            if (creationPolicy != null && interceptionPolicy != null)
+            if (creationPolicy != null &&
+                creationPolicy.SupportsReflection &&
+                interceptionPolicy != null &&
+                TryGetTypeFromBuildKey(buildKey, out typeToBuild))
             {
-                ConstructorInfo ctor = creationPolicy.SelectConstructor(context, typeToBuild, idToBuild);
-                object[] ctorParams = creationPolicy.GetParameters(context, typeToBuild, idToBuild, ctor);
+                ConstructorInfo ctor = creationPolicy.GetConstructor(context, buildKey);
+                object[] ctorParams = creationPolicy.GetParameters(context, ctor);
 
-                typeToBuild = InterceptClass(context, typeToBuild, idToBuild, interceptionPolicy, ctorParams);
+                buildKey = InterceptClass(context, typeToBuild, interceptionPolicy, ctorParams);
             }
 
-            return base.BuildUp(context, typeToBuild, existing, context.OriginalID);
+            return base.BuildUp(context, buildKey, existing);
         }
 
         static Type InterceptClass(IBuilderContext context,
                                    Type typeToBuild,
-                                   string idToBuild,
                                    IEnumerable<KeyValuePair<MethodBase, List<IInterceptionHandler>>> handlers,
                                    object[] originalParameters)
         {
@@ -51,9 +53,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             }
 
             ConstructorInfo newConstructor = typeToBuild.GetConstructor(newParameterTypes.ToArray());
-            ConstructorPolicy newPolicy = new ConstructorPolicy(newConstructor, newIParameters.ToArray());
+            ConstructorCreationPolicy newPolicy = new ConstructorCreationPolicy(newConstructor, newIParameters.ToArray());
 
-            context.Policies.Set<ICreationPolicy>(newPolicy, typeToBuild, idToBuild);
+            context.Policies.Set<ICreationPolicy>(newPolicy, typeToBuild);
 
             // Return the wrapped type for building
             return typeToBuild;

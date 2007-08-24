@@ -7,57 +7,44 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class ConstructorReflectionStrategy : ReflectionStrategy<ConstructorInfo>
     {
         protected override void AddParametersToPolicy(IBuilderContext context,
-                                                      Type typeToBuild,
-                                                      string idToBuild,
-                                                      IReflectionMemberInfo<ConstructorInfo> member,
+                                                      object buildKey,
+                                                      IMemberInfo<ConstructorInfo> member,
                                                       IEnumerable<IParameter> parameters)
         {
-            ConstructorPolicy policy = new ConstructorPolicy();
-
-            foreach (IParameter parameter in parameters)
-                policy.AddParameter(parameter);
-
-            context.Policies.Set<ICreationPolicy>(policy, typeToBuild, idToBuild);
+            ConstructorCreationPolicy policy = new ConstructorCreationPolicy(member.MemberInfo, parameters);
+            context.Policies.Set<ICreationPolicy>(policy, buildKey);
         }
 
-        protected override IEnumerable<IReflectionMemberInfo<ConstructorInfo>> GetMembers(IBuilderContext context,
-                                                                                          Type typeToBuild,
-                                                                                          object existing,
-                                                                                          string idToBuild)
+        protected override IEnumerable<IMemberInfo<ConstructorInfo>> GetMembers(IBuilderContext context,
+                                                                                object buildKey,
+                                                                                object existing)
         {
-            List<IReflectionMemberInfo<ConstructorInfo>> result = new List<IReflectionMemberInfo<ConstructorInfo>>();
-            ICreationPolicy existingPolicy = context.Policies.Get<ICreationPolicy>(typeToBuild, idToBuild);
+            ICreationPolicy existingPolicy = context.Policies.GetNoDefault<ICreationPolicy>(buildKey, false);
 
-            if (existing == null && (existingPolicy == null || existingPolicy is DefaultCreationPolicy))
+            if (existing == null && existingPolicy == null)
             {
+                Type typeToBuild = GetTypeFromBuildKey(buildKey);
                 ConstructorInfo injectionCtor = null;
                 ConstructorInfo[] ctors = typeToBuild.GetConstructors();
 
                 if (ctors.Length == 1)
                     injectionCtor = ctors[0];
                 else
-                {
                     foreach (ConstructorInfo ctor in ctors)
-                    {
                         if (Attribute.IsDefined(ctor, typeof(InjectionConstructorAttribute)))
                         {
-                            // Multiple decorated constructors aren't valid
                             if (injectionCtor != null)
-                                throw new InvalidAttributeException();
+                                throw new InvalidAttributeException(typeToBuild, ".ctor");
 
                             injectionCtor = ctor;
                         }
-                    }
-                }
 
                 if (injectionCtor != null)
-                    result.Add(new ReflectionMemberInfo<ConstructorInfo>(injectionCtor));
+                    yield return new MethodMemberInfo<ConstructorInfo>(injectionCtor);
             }
-
-            return result;
         }
 
-        protected override bool MemberRequiresProcessing(IReflectionMemberInfo<ConstructorInfo> member)
+        protected override bool MemberRequiresProcessing(IMemberInfo<ConstructorInfo> member)
         {
             return true;
         }

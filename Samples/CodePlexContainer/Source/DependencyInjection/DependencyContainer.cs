@@ -39,8 +39,7 @@ namespace CodePlex.DependencyInjection
 
             if (innerStrategies == null)
             {
-                strategies.AddNew<LifetimeStrategy>(BuilderStage.PreCreation);
-                strategies.AddNew<TypeMappingStrategy>(BuilderStage.PreCreation);
+                strategies.AddNew<BuildKeyMappingStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<SingletonStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<ConstructorReflectionStrategy>(BuilderStage.PreCreation);
                 strategies.AddNew<MethodReflectionStrategy>(BuilderStage.PreCreation);
@@ -53,7 +52,7 @@ namespace CodePlex.DependencyInjection
                 strategies.AddNew<CreationStrategy>(BuilderStage.Creation);
 
                 strategies.AddNew<PropertySetterStrategy>(BuilderStage.Initialization);
-                strategies.AddNew<MethodExecutionStrategy>(BuilderStage.Initialization);
+                strategies.AddNew<MethodCallStrategy>(BuilderStage.Initialization);
                 strategies.AddNew<EventBrokerStrategy>(BuilderStage.Initialization);
 
                 strategies.AddNew<BuilderAwareStrategy>(BuilderStage.PostInitialization);
@@ -76,7 +75,7 @@ namespace CodePlex.DependencyInjection
 
         public void CacheInstancesOf(Type typeToCache)
         {
-            policies.Set<ISingletonPolicy>(new SingletonPolicy(true), typeToCache, null);
+            policies.Set<ISingletonPolicy>(new SingletonPolicy(true), typeToCache);
         }
 
         public void Dispose()
@@ -95,17 +94,17 @@ namespace CodePlex.DependencyInjection
 
         public object Get(Type typeToBuild)
         {
-            return builder.BuildUp(locator, lifetime, policies, strategies.MakeStrategyChain(), typeToBuild, null, null);
+            return builder.BuildUp(locator, lifetime, policies, strategies.MakeStrategyChain(), typeToBuild, null);
         }
 
         EventBrokerPolicy GetEventBrokerPolicy(Type type)
         {
-            EventBrokerPolicy policy = (EventBrokerPolicy)policies.Get<IEventBrokerPolicy>(type, null);
+            EventBrokerPolicy policy = (EventBrokerPolicy)policies.Get<IEventBrokerPolicy>(type);
 
             if (policy == null)
             {
                 policy = new EventBrokerPolicy();
-                policies.Set<IEventBrokerPolicy>(policy, type, null);
+                policies.Set<IEventBrokerPolicy>(policy, type);
             }
 
             return policy;
@@ -115,7 +114,7 @@ namespace CodePlex.DependencyInjection
         {
             Guard.ArgumentNotNull(@object, "object");
 
-            return builder.BuildUp(locator, lifetime, policies, strategies.MakeStrategyChain(), @object.GetType(), null, @object);
+            return builder.BuildUp(locator, lifetime, policies, strategies.MakeStrategyChain(), @object.GetType(), @object);
         }
 
         void Intercept<T>(Type typeToIntercept,
@@ -123,12 +122,12 @@ namespace CodePlex.DependencyInjection
                           IInterceptionHandler[] handlers)
             where T : InterceptionPolicy, new()
         {
-            T policy = policies.GetLocal<T>(typeToIntercept, null);
+            T policy = policies.Get<T>(typeToIntercept, true);
 
             if (policy == null)
             {
                 policy = new T();
-                policies.Set(policy, typeToIntercept, null);
+                policies.Set(policy, typeToIntercept);
             }
 
             policy.Add(method, handlers);
@@ -212,7 +211,7 @@ namespace CodePlex.DependencyInjection
             if (!typeToRegisterAs.IsInstanceOfType(instance))
                 throw new ArgumentException("Object is not type compatible with registration type", "instance");
 
-            locator.Add(new DependencyResolutionLocatorKey(typeToRegisterAs, null), instance);
+            locator.Add(typeToRegisterAs, instance);
             lifetime.Add(instance);
         }
 
@@ -224,7 +223,7 @@ namespace CodePlex.DependencyInjection
         public void RegisterTypeMapping(Type typeRequested,
                                         Type typeToBuild)
         {
-            policies.Set<ITypeMappingPolicy>(new TypeMappingPolicy(typeToBuild, null), typeRequested, null);
+            policies.Set<IBuildKeyMappingPolicy>(new BuildKeyMappingPolicy(typeToBuild), typeRequested);
         }
 
         public void TearDown(object existingObject)

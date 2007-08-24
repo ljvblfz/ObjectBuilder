@@ -1,22 +1,19 @@
+using System;
 using System.Runtime.Serialization;
 
 namespace CodePlex.NUnitExtensions
 {
     public class AssertActualExpectedException : AssertException
     {
-        // Fields
-
-        string actual;
-        string expected;
-
-        // Lifetime
+        readonly string actual;
+        readonly string expected;
 
         protected AssertActualExpectedException(SerializationInfo info,
                                                 StreamingContext context)
             : base(info, context)
         {
-            expected = info.GetString("Expected");
             actual = info.GetString("Actual");
+            expected = info.GetString("Expected");
         }
 
         public AssertActualExpectedException(object actual,
@@ -24,11 +21,9 @@ namespace CodePlex.NUnitExtensions
                                              string userMessage)
             : base(userMessage)
         {
-            this.expected = expected == null ? null : expected.ToString();
             this.actual = actual == null ? null : actual.ToString();
+            this.expected = expected == null ? null : expected.ToString();
         }
-
-        // Properties
 
         public string Actual
         {
@@ -46,12 +41,15 @@ namespace CodePlex.NUnitExtensions
             {
                 return string.Format("{0}\r\nExpected: {1}\r\nActual:   {2}",
                                      base.Message,
-                                     Expected ?? "(null)",
-                                     Actual ?? "(null)");
+                                     FormatMultiLine(Expected ?? "(null)"),
+                                     FormatMultiLine(Actual ?? "(null)"));
             }
         }
 
-        // Methods
+        static string FormatMultiLine(string value)
+        {
+            return value.Replace(Environment.NewLine, Environment.NewLine + "          ");
+        }
 
         public override void GetObjectData(SerializationInfo info,
                                            StreamingContext context)

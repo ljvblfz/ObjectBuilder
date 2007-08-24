@@ -1,20 +1,17 @@
-using System;
-
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class BuilderAwareStrategy : BuilderStrategy
     {
         public override object BuildUp(IBuilderContext context,
-                                       Type t,
-                                       object existing,
-                                       string id)
+                                       object buildKey,
+                                       object existing)
         {
             IBuilderAware awareObject = existing as IBuilderAware;
 
             if (awareObject != null)
-                awareObject.OnBuiltUp(id);
+                awareObject.OnBuiltUp(buildKey);
 
-            return base.BuildUp(context, t, existing, id);
+            return base.BuildUp(context, buildKey, existing);
         }
 
         public override object TearDown(IBuilderContext context,

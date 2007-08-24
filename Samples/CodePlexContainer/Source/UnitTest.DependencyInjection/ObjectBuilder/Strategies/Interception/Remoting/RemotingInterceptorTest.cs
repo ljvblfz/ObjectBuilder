@@ -132,8 +132,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             wrapped.InterceptedMethod(); // Does not throw because it was short circuited
         }
 
-        // Helpers
-
         internal class SpyMBROClass : MarshalByRefObject
         {
             public void InterceptedMethod()

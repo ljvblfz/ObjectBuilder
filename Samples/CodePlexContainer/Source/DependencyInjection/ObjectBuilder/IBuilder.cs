@@ -1,5 +1,3 @@
-using System;
-
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IBuilder
@@ -8,15 +6,14 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                        ILifetimeContainer lifetime,
                        PolicyList policies,
                        IStrategyChain strategies,
-                       Type typeToBuild,
-                       string idToBuild,
+                       object buildKey,
                        object existing);
 
         TTypeToBuild BuildUp<TTypeToBuild>(IReadWriteLocator locator,
                                            ILifetimeContainer lifetime,
                                            PolicyList policies,
                                            IStrategyChain strategies,
-                                           string idToBuild,
+                                           object buildKey,
                                            object existing);
 
         TItem TearDown<TItem>(IReadWriteLocator locator,

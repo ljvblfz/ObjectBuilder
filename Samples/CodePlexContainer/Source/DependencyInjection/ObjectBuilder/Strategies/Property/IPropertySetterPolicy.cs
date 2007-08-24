@@ -4,6 +4,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public interface IPropertySetterPolicy : IBuilderPolicy
     {
-        Dictionary<string, IPropertySetterInfo> Properties { get; }
+        List<IPropertySetterInfo> Properties { get; }
     }
 }

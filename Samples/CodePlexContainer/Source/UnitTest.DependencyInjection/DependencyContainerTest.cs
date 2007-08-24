@@ -249,54 +249,25 @@ namespace CodePlex.DependencyInjection
         [TestFixture]
         public class InterceptInterface_GenericMethods
         {
-            //[Test]
-            //public void GenericMethodOnNonGenericInterface()
-            //{
-            //    Recorder.Records.Clear();
-            //    DependencyContainer container = new DependencyContainer();
-            //    container.RegisterTypeMapping<IFoo, Foo>();
+            [Test]
+            public void GenericMethodOnNonGenericInterface()
+            {
+                Recorder.Records.Clear();
+                DependencyContainer container = new DependencyContainer();
+                container.RegisterTypeMapping<IFoo, Foo>();
 
-            //    IFoo obj = container.Get<IFoo>();
-            //    obj.Bar(42);
-            //    obj.Bar("world");
+                IFoo obj = container.Get<IFoo>();
+                obj.Bar(42);
+                obj.Bar("world");
 
-            //    Assert.Equal(6, Recorder.Records.Count);
-            //    Assert.Equal("Before Method", Recorder.Records[0]);
-            //    Assert.Equal("Passed: 42", Recorder.Records[1]);
-            //    Assert.Equal("After Method", Recorder.Records[2]);
-            //    Assert.Equal("Before Method", Recorder.Records[3]);
-            //    Assert.Equal("Passed: world", Recorder.Records[4]);
-            //    Assert.Equal("After Method", Recorder.Records[5]);
-            //}
-
-            //public class DerivedFoo : IFoo {
-            //    readonly ILEmitProxy proxy;
-            //    readonly IFoo target;
-            //    readonly MethodInfo method0;
-            //    readonly Type[] method0GenericArgs;
-
-            //    public DerivedFoo(ILEmitProxy proxy, IFoo target)
-            //    {
-            //        this.proxy = proxy;
-            //        this.target = target;
-
-            //        MethodInfo tempMethod = typeof(IFoo).GetMethod("Bar");
-            //        method0 = tempMethod.GetGenericMethodDefinition();
-            //        method0GenericArgs = tempMethod.GetGenericArguments();
-            //    }
-
-            //    public void Bar<T>(T value)
-            //    {
-            //        MethodInfo realMethod = method0.MakeGenericMethod(method0GenericArgs);
-            //        proxy.Invoke(target, realMethod, new object[] { value }, Bar__Delegate);
-            //    }
-
-            //    public object Bar__Delegate(object[] arguments)
-            //    {
-            //        // What to write here???
-            //        return null;
-            //    }
-            //}
+                Assert.Equal(6, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("Passed: 42", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+                Assert.Equal("Before Method", Recorder.Records[3]);
+                Assert.Equal("Passed: world", Recorder.Records[4]);
+                Assert.Equal("After Method", Recorder.Records[5]);
+            }
 
             public interface IFoo
             {
@@ -308,28 +279,7 @@ namespace CodePlex.DependencyInjection
                 [InterfaceIntercept(typeof(RecordingHandler))]
                 public void Bar<T>(T value)
                 {
-                    Recorder.Records.Add("Passed " + value);
-                }
-            }
-
-            public interface IGenericFoo<T>
-            {
-                void Bar(T value);
-            }
-
-            public class GenericFoo<T> : IGenericFoo<T>
-            {
-                public void Bar(T value)
-                {
-                    Recorder.Records.Add("Passed " + value);
-                }
-            }
-
-            public class ConcreteFoo : IGenericFoo<int>
-            {
-                public void Bar(int value)
-                {
-                    Recorder.Records.Add("Passed " + value);
+                    Recorder.Records.Add("Passed: " + value);
                 }
             }
         }
@@ -415,7 +365,7 @@ namespace CodePlex.DependencyInjection
             }
 
             [Test]
-            public void InterceptInterfaceViaAttributes()
+            public void InterfacesNotSupported()
             {
                 DependencyContainer container = new DependencyContainer();
                 container.RegisterTypeMapping<ISpy, SpyInterfaceImplWithAttribute>();
@@ -457,7 +407,7 @@ namespace CodePlex.DependencyInjection
                     Recorder.Records.Add("In Method");
                 }
 
-                public void OnBuiltUp(string id)
+                public void OnBuiltUp(object buildKey)
                 {
                     Recorder.Records.Add("OnBuiltUp");
                 }
@@ -630,7 +580,8 @@ namespace CodePlex.DependencyInjection
                 }
 
                 [VirtualIntercept(typeof(RecordingHandler))]
-                public virtual void Baz<T1>(T value, T1 value2)
+                public virtual void Baz<T1>(T value,
+                                            T1 value2)
                 {
                     Recorder.Records.Add("Passed: " + value + ", " + value2);
                 }

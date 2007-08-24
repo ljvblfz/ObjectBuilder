@@ -4,9 +4,9 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class PropertySetterPolicy : IPropertySetterPolicy
     {
-        readonly Dictionary<string, IPropertySetterInfo> properties = new Dictionary<string, IPropertySetterInfo>();
+        readonly List<IPropertySetterInfo> properties = new List<IPropertySetterInfo>();
 
-        public Dictionary<string, IPropertySetterInfo> Properties
+        public List<IPropertySetterInfo> Properties
         {
             get { return properties; }
         }

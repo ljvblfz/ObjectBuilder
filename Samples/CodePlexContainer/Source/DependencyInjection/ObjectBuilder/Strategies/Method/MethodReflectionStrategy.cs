@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -7,32 +6,30 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class MethodReflectionStrategy : ReflectionStrategy<MethodInfo>
     {
         protected override void AddParametersToPolicy(IBuilderContext context,
-                                                      Type typeToBuild,
-                                                      string idToBuild,
-                                                      IReflectionMemberInfo<MethodInfo> member,
+                                                      object buildKey,
+                                                      IMemberInfo<MethodInfo> member,
                                                       IEnumerable<IParameter> parameters)
         {
-            MethodPolicy result = context.Policies.Get<IMethodPolicy>(typeToBuild, idToBuild) as MethodPolicy;
+            IMethodCallPolicy result = context.Policies.Get<IMethodCallPolicy>(buildKey);
 
             if (result == null)
             {
-                result = new MethodPolicy();
-                context.Policies.Set<IMethodPolicy>(result, typeToBuild, idToBuild);
+                result = new MethodCallPolicy();
+                context.Policies.Set(result, buildKey);
             }
 
-            result.Methods.Add(member.Name, new MethodCallInfo(member.MemberInfo, parameters));
+            result.Methods.Add(new ReflectionMethodCallInfo(member.MemberInfo, parameters));
         }
 
-        protected override IEnumerable<IReflectionMemberInfo<MethodInfo>> GetMembers(IBuilderContext context,
-                                                                                     Type typeToBuild,
-                                                                                     object existing,
-                                                                                     string idToBuild)
+        protected override IEnumerable<IMemberInfo<MethodInfo>> GetMembers(IBuilderContext context,
+                                                                           object buildKey,
+                                                                           object existing)
         {
-            foreach (MethodInfo method in typeToBuild.GetMethods())
-                yield return new ReflectionMemberInfo<MethodInfo>(method);
+            foreach (MethodInfo method in GetTypeFromBuildKey(buildKey).GetMethods())
+                yield return new MethodMemberInfo<MethodInfo>(method);
         }
 
-        protected override bool MemberRequiresProcessing(IReflectionMemberInfo<MethodInfo> member)
+        protected override bool MemberRequiresProcessing(IMemberInfo<MethodInfo> member)
         {
             return (member.GetCustomAttributes(typeof(InjectionMethodAttribute), true).Length > 0);
         }

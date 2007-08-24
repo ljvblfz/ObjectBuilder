@@ -6,25 +6,22 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public static class InterceptionReflector
     {
-        public static void Reflect<TBeingBuilt>(string idBeingBuilt,
-                                                PolicyList policies,
+        public static void Reflect<TBeingBuilt>(PolicyList policies,
                                                 IObjectFactory factory)
         {
-            Reflect(typeof(TBeingBuilt), typeof(TBeingBuilt), idBeingBuilt, policies, factory);
+            Reflect(typeof(TBeingBuilt), typeof(TBeingBuilt), policies, factory);
         }
 
-        public static void Reflect<TRequested, TBeingBuilt>(string idBeingBuilt,
-                                                            PolicyList policies,
+        public static void Reflect<TRequested, TBeingBuilt>(PolicyList policies,
                                                             IObjectFactory factory)
             where TBeingBuilt : TRequested
         {
-            Reflect(typeof(TRequested), typeof(TBeingBuilt), idBeingBuilt, policies, factory);
+            Reflect(typeof(TRequested), typeof(TBeingBuilt), policies, factory);
         }
 
         public static void Reflect(Type typeRequested,
                                    Type typeBeingBuilt,
-                                   string idBeingBuilt,
-                                   PolicyList policyList,
+                                   IPolicyList policyList,
                                    IObjectFactory factory)
         {
             if (typeRequested.IsGenericType && typeBeingBuilt.IsGenericType)
@@ -39,7 +36,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                 ReflectOnMethod(typeRequested, typeBeingBuilt, typePolicies, method, factory);
 
             foreach (InterceptionPolicy policy in typePolicies.Values)
-                policyList.Set(policy.GetType(), policy, typeBeingBuilt, idBeingBuilt);
+                policyList.Set(policy.GetType(), policy, typeBeingBuilt);
         }
 
         static void ReflectOnMethod(Type typeRequested,

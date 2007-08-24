@@ -1,33 +1,29 @@
-using System;
-
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class SingletonStrategy : BuilderStrategy
     {
         public override object BuildUp(IBuilderContext context,
-                                       Type typeToBuild,
-                                       object existing,
-                                       string idToBuild)
+                                       object buildKey,
+                                       object existing)
         {
-            DependencyResolutionLocatorKey key = new DependencyResolutionLocatorKey(typeToBuild, idToBuild);
+            if (context.Locator == null || context.Lifetime == null)
+                return base.BuildUp(context, buildKey, existing);
 
-            if (context.Locator != null && context.Locator.Contains(key))
-                return context.Locator.Get(key);
+            lock (context.Locator)
+                if (context.Locator.Contains(buildKey))
+                    return context.Locator.Get(buildKey);
 
-            existing = base.BuildUp(context, typeToBuild, existing, idToBuild);
+            existing = base.BuildUp(context, buildKey, existing);
 
-            if (context.Locator != null && context.Lifetime != null)
+            ISingletonPolicy singletonPolicy = context.Policies.Get<ISingletonPolicy>(buildKey);
+
+            if (singletonPolicy != null && singletonPolicy.IsSingleton)
             {
-                ISingletonPolicy singletonPolicy = context.Policies.Get<ISingletonPolicy>(typeToBuild, idToBuild);
+                lock (context.Locator)
+                    context.Locator.Add(buildKey, existing);
 
-                if (singletonPolicy != null && singletonPolicy.IsSingleton)
-                {
-                    lock (context.Locator)
-                        context.Locator.Add(key, existing);
-
-                    lock (context.Lifetime)
-                        context.Lifetime.Add(existing);
-                }
+                lock (context.Lifetime)
+                    context.Lifetime.Add(existing);
             }
 
             return existing;

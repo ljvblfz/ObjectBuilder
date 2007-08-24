@@ -5,27 +5,29 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public abstract class BuilderStrategy : IBuilderStrategy
     {
-        public TItem BuildUp<TItem>(IBuilderContext context,
-                                    TItem existing,
-                                    string idToBuild)
-        {
-            return (TItem)BuildUp(context, typeof(TItem), existing, idToBuild);
-        }
-
         public virtual object BuildUp(IBuilderContext context,
-                                      Type typeToBuild,
-                                      object existing,
-                                      string idToBuild)
+                                      object buildKey,
+                                      object existing)
         {
             IBuilderStrategy next = context.GetNextInChain(this);
 
             if (next != null)
-                return next.BuildUp(context, typeToBuild, existing, idToBuild);
-            else
-                return existing;
+                return next.BuildUp(context, buildKey, existing);
+
+            return existing;
         }
 
-        protected static string ParametersToTypeList(params object[] parameters)
+        public static Type GetTypeFromBuildKey(object buildKey)
+        {
+            Type result;
+
+            if (!TryGetTypeFromBuildKey(buildKey, out result))
+                throw new ArgumentException("Cannot extract type from build key " + buildKey, "buildKey");
+
+            return result;
+        }
+
+        public static string ParametersToTypeList(params object[] parameters)
         {
             List<string> types = new List<string>();
 
@@ -42,8 +44,23 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
             if (next != null)
                 return next.TearDown(context, item);
-            else
-                return item;
+
+            return item;
+        }
+
+        public static bool TryGetTypeFromBuildKey(object buildKey,
+                                                  out Type type)
+        {
+            type = buildKey as Type;
+
+            if (type == null)
+            {
+                ITypeBasedBuildKey typeBasedBuildKey = buildKey as ITypeBasedBuildKey;
+                if (typeBasedBuildKey != null)
+                    type = typeBasedBuildKey.Type;
+            }
+
+            return type != null;
         }
     }
 }

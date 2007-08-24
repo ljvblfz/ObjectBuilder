@@ -1,6 +1,7 @@
 using System.Reflection;
+using CodePlex.DependencyInjection.ObjectBuilder;
 
-namespace CodePlex.DependencyInjection.ObjectBuilder
+namespace CodePlex.DependencyInjection
 {
     public class StubMethodInvocation : IMethodInvocation
     {

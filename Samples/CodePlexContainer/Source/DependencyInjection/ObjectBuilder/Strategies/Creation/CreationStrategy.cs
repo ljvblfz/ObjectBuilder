@@ -1,69 +1,25 @@
 using System;
-using System.Globalization;
-using System.Reflection;
-using CodePlex.DependencyInjection.Properties;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
     public class CreationStrategy : BuilderStrategy
     {
         public override object BuildUp(IBuilderContext context,
-                                       Type typeToBuild,
-                                       object existing,
-                                       string idToBuild)
+                                       object buildKey,
+                                       object existing)
         {
-            return base.BuildUp(context,
-                                typeToBuild,
-                                existing ?? BuildUpNewObject(context, typeToBuild, idToBuild),
-                                idToBuild);
+            return base.BuildUp(context, buildKey, existing ?? BuildUpNewObject(context, buildKey));
         }
 
         static object BuildUpNewObject(IBuilderContext context,
-                                       Type typeToBuild,
-                                       string idToBuild)
+                                       object buildKey)
         {
-            ICreationPolicy policy = context.Policies.Get<ICreationPolicy>(typeToBuild,
-                                                                           idToBuild);
+            ICreationPolicy policy = context.Policies.Get<ICreationPolicy>(buildKey);
 
             if (policy == null)
-            {
-                if (idToBuild == null)
-                    throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-                                                              Resources.MissingPolicyUnnamed,
-                                                              typeToBuild));
-                else
-                    throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-                                                              Resources.MissingPolicyNamed,
-                                                              typeToBuild,
-                                                              idToBuild));
-            }
+                throw new InvalidOperationException("Could not find creation policy for build key " + buildKey);
 
-            try
-            {
-                ConstructorInfo constructor = policy.SelectConstructor(context, typeToBuild, idToBuild);
-
-                if (constructor == null)
-                {
-                    if (typeToBuild.IsValueType)
-                        return Activator.CreateInstance(typeToBuild);
-
-                    string message = "Could not find constructor to build " + typeToBuild.FullName;
-                    if (idToBuild != null)
-                        message += " (id " + idToBuild + ")";
-
-                    throw new ArgumentException(message);
-                }
-
-                return constructor.Invoke(policy.GetParameters(context, typeToBuild, idToBuild, constructor));
-            }
-            catch (MemberAccessException ex)
-            {
-                throw new ArgumentException(
-                    String.Format(CultureInfo.CurrentCulture,
-                                  Resources.CannotCreateInstanceOfType,
-                                  typeToBuild),
-                    ex);
-            }
+            return policy.Create(context, buildKey);
         }
     }
 }

@@ -5,16 +5,25 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class InterceptionReflectionStrategy : BuilderStrategy
     {
         public override object BuildUp(IBuilderContext context,
-                                       Type typeToBuild,
-                                       object existing,
-                                       string idToBuild)
+                                       object buildKey,
+                                       object existing)
         {
-            IObjectFactory factory = (IObjectFactory)context.Locator.Get(new DependencyResolutionLocatorKey(typeof(IObjectFactory), null));
+            Type typeToBuild;
 
-            if (factory != null)
-                InterceptionReflector.Reflect(context.OriginalType, typeToBuild, idToBuild, context.Policies, factory);
+            if (TryGetTypeFromBuildKey(buildKey, out typeToBuild))
+            {
+                Type originalType;
 
-            return base.BuildUp(context, typeToBuild, existing, idToBuild);
+                if (!TryGetTypeFromBuildKey(context.OriginalBuildKey, out originalType))
+                    originalType = typeToBuild;
+
+                IObjectFactory factory = context.Locator.Get<IObjectFactory>();
+
+                if (factory != null)
+                    InterceptionReflector.Reflect(originalType, typeToBuild, context.Policies, factory);
+            }
+
+            return base.BuildUp(context, buildKey, existing);
         }
     }
 }

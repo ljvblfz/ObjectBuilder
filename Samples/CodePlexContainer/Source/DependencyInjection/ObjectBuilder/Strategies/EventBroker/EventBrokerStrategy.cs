@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -7,14 +6,13 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class EventBrokerStrategy : BuilderStrategy
     {
         public override object BuildUp(IBuilderContext context,
-                                       Type typeToBuild,
-                                       object existing,
-                                       string idToBuild)
+                                       object buildKey,
+                                       object existing)
         {
-            IEventBrokerPolicy policy = context.Policies.Get<IEventBrokerPolicy>(existing.GetType(), idToBuild);
+            IEventBrokerPolicy policy = context.Policies.Get<IEventBrokerPolicy>(buildKey);
             EventBrokerService service = context.Locator.Get<EventBrokerService>();
 
-            if (policy != null && service != null && context.Locator != null && context.Lifetime != null)
+            if (policy != null && service != null)
             {
                 foreach (KeyValuePair<string, MethodInfo> kvp in policy.Sinks)
                     service.RegisterSink(existing, kvp.Value, kvp.Key);
@@ -23,7 +21,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
                     service.RegisterSource(existing, kvp.Value, kvp.Key);
             }
 
-            return base.BuildUp(context, typeToBuild, existing, idToBuild);
+            return base.BuildUp(context, buildKey, existing);
         }
     }
 }

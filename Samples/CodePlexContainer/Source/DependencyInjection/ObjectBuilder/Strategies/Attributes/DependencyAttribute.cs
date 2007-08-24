@@ -5,20 +5,20 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public sealed class DependencyAttribute : ParameterAttribute
     {
-        Type createType;
-        string name;
-        NotPresentBehavior notPresentBehavior = NotPresentBehavior.CreateNew;
+        readonly object buildKey;
+        NotPresentBehavior notPresentBehavior = NotPresentBehavior.Build;
 
-        public Type CreateType
+        public DependencyAttribute()
+            : this(null) {}
+
+        public DependencyAttribute(object buildKey)
         {
-            get { return createType; }
-            set { createType = value; }
+            this.buildKey = buildKey;
         }
 
-        public string Name
+        public object BuildKey
         {
-            get { return name; }
-            set { name = value; }
+            get { return buildKey; }
         }
 
         public NotPresentBehavior NotPresentBehavior
@@ -29,7 +29,7 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
 
         public override IParameter CreateParameter(Type annotatedMemberType)
         {
-            return new DependencyParameter(annotatedMemberType, name, createType, notPresentBehavior);
+            return new DependencyParameter(BuildKey ?? annotatedMemberType, notPresentBehavior);
         }
     }
 }

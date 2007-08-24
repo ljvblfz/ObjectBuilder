@@ -75,10 +75,12 @@ namespace CodePlex.NUnitExtensions
 
         public static void Empty(IEnumerable collection)
         {
-            if (collection == null) throw new ArgumentNullException("cannot be null");
+            if (collection == null) throw new ArgumentNullException("collection", "cannot be null");
 
+#pragma warning disable 168
             foreach (object @object in collection)
                 throw new EmptyException();
+#pragma warning restore 168
         }
 
         public static void Equal<T>(T expected,
@@ -188,9 +190,12 @@ namespace CodePlex.NUnitExtensions
             throw new IsTypeException(expectedType, @object, userMessage);
         }
 
-        public static void NotEmpty<T>(ICollection<T> collection)
+        public static void NotEmpty(IEnumerable collection)
         {
-            if (collection.Count > 0) return;
+            if (collection == null) throw new ArgumentNullException("collection", "cannot be null");
+
+            foreach (object @object in collection)
+                return;
 
             throw new NotEmptyException();
         }
@@ -334,14 +339,14 @@ namespace CodePlex.NUnitExtensions
             public int Compare(T x,
                                T y)
             {
-                if (x == null)
+                if (Equals(x, default(T)))
                 {
-                    if (y == null)
+                    if (Equals(y, default(T)))
                         return 0;
                     return -1;
                 }
 
-                if (y == null)
+                if (Equals(y, default(T)))
                     return -1;
 
                 if (x.GetType() != y.GetType())

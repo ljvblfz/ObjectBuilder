@@ -2,26 +2,40 @@ using System;
 
 namespace CodePlex.DependencyInjection.ObjectBuilder
 {
-    public class DependencyParameter : KnownTypeParameter
+    public class DependencyParameter : IParameter
     {
-        readonly Type createType;
-        readonly string name;
+        readonly object buildKey;
         readonly NotPresentBehavior notPresentBehavior;
+        object value = null;
 
-        public DependencyParameter(Type parameterType,
-                                   string name,
-                                   Type createType,
+        public DependencyParameter(object buildKey,
                                    NotPresentBehavior notPresentBehavior)
-            : base(parameterType)
         {
-            this.name = name;
-            this.createType = createType;
+            this.buildKey = buildKey;
             this.notPresentBehavior = notPresentBehavior;
         }
 
-        public override object GetValue(IBuilderContext context)
+        public object BuildKey
         {
-            return new DependencyResolver(context).Resolve(type, createType, name, notPresentBehavior);
+            get { return buildKey; }
+        }
+
+        public NotPresentBehavior NotPresentBehavior
+        {
+            get { return notPresentBehavior; }
+        }
+
+        public Type GetParameterType(IBuilderContext context)
+        {
+            return GetValue(context).GetType();
+        }
+
+        public object GetValue(IBuilderContext context)
+        {
+            if (value == null)
+                value = DependencyResolver.Resolve(context, BuildKey, NotPresentBehavior);
+
+            return value;
         }
     }
 }

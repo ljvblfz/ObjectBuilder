@@ -20,8 +20,6 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
             Assert.Equal<object>(42, invocation.Inputs["one"]);
         }
 
-        // Helpers
-
         internal class InvocationTarget : MarshalByRefObject
         {
             public string FirstTarget(int one,

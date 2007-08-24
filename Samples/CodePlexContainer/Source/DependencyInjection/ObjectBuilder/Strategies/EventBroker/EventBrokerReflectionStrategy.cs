@@ -6,19 +6,23 @@ namespace CodePlex.DependencyInjection.ObjectBuilder
     public class EventBrokerReflectionStrategy : BuilderStrategy
     {
         public override object BuildUp(IBuilderContext context,
-                                       Type typeToBuild,
-                                       object existing,
-                                       string idToBuild)
+                                       object buildKey,
+                                       object existing)
         {
-            EventBrokerPolicy policy = new EventBrokerPolicy();
+            Type typeToBuild;
 
-            RegisterSinks(policy, typeToBuild);
-            RegisterSources(policy, typeToBuild);
+            if (TryGetTypeFromBuildKey(buildKey, out typeToBuild))
+            {
+                EventBrokerPolicy policy = new EventBrokerPolicy();
 
-            if (!policy.IsEmpty)
-                context.Policies.Set<IEventBrokerPolicy>(policy, typeToBuild, idToBuild);
+                RegisterSinks(policy, typeToBuild);
+                RegisterSources(policy, typeToBuild);
 
-            return base.BuildUp(context, typeToBuild, existing, idToBuild);
+                if (!policy.IsEmpty)
+                    context.Policies.Set<IEventBrokerPolicy>(policy, buildKey);
+            }
+
+            return base.BuildUp(context, buildKey, existing);
         }
 
         static void RegisterSinks(EventBrokerPolicy policy,

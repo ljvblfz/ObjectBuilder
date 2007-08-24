@@ -1,6 +1,7 @@
 using System;
+using CodePlex.DependencyInjection.ObjectBuilder;
 
-namespace CodePlex.DependencyInjection.ObjectBuilder
+namespace CodePlex.DependencyInjection
 {
     public class StubMethodReturn : IMethodReturn
     {
