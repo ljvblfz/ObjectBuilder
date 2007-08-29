@@ -1,0 +1,39 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Settings -->
+
+  <PropertyGroup>
+    <ZipStoragePath>D:\Builds\Zips\DependencyInjection</ZipStoragePath>
+  </PropertyGroup>
+
+  <!-- CruiseControl targets -->
+
+  <Target Name="Cruise" DependsOnTargets="SetVersionNumber;Build;UnitTest;CreateZip"/>
+
+  <!-- Meta-targets -->
+
+  <Target Name="Test" DependsOnTargets="Build;UnitTest"/>
+
+  <!-- Individiual targets -->
+  
+  <Target Name="Clean">
+    <MSBuild Projects="CodePlexContainer.sln" Targets="Clean" Properties="Configuration=Release"/>
+  </Target>
+
+  <Target Name="Build">
+    <MSBuild Projects="CodePlexContainer.sln" Targets="Build" Properties="Configuration=Release"/>
+  </Target>
+
+  <Target Name="UnitTest">
+    <Exec Command="$(CodePlex3rdParty)\nunit-console.exe /nologo /noshadow /xml=Tests.CodePlex.DependencyInjection.results.xml Tests.CodePlex.DependencyInjection\bin\Release\Tests.CodePlex.DependencyInjection.dll"/>
+  </Target>
+
+  <Target Name="SetVersionNumber">
+    <Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(ccnetlabel) CodePlex.DependencyInjection\Properties\AssemblyInfo.cs" WorkingDirectory="."/>
+  </Target>
+
+  <Target Name="CreateZip">
+    <Exec Command="$(CodePlex3rdParty)\zip.exe -r -9 $(ZipStoragePath)\CodePlexContainer-build-$(ccnetlabel).zip *.*" WorkingDirectory="CodePlex.DependencyInjection\bin\Release"/>
+  </Target>
+
+</Project>

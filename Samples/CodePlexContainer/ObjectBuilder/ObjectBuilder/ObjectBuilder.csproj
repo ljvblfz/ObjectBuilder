@@ -1,0 +1,81 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E1E3B550-5E55-451C-9C5B-AB05DD61EF49}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ObjectBuilder</RootNamespace>
+    <AssemblyName>ObjectBuilder</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>GlobalAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Builder.cs" />
+    <Compile Include="BuilderContext.cs" />
+    <Compile Include="Strategies\BuilderAware\BuilderAwareStrategy.cs" />
+    <Compile Include="Strategies\BuilderAware\IBuilderAware.cs" />
+    <Compile Include="Strategies\BuilderStage.cs" />
+    <Compile Include="Strategies\BuilderStrategy.cs" />
+    <Compile Include="IBuilder.cs" />
+    <Compile Include="IBuilderContext.cs" />
+    <Compile Include="Policies\IBuilderPolicy.cs" />
+    <Compile Include="Strategies\BuildKeyMapping\BuildKeyMappingPolicy.cs" />
+    <Compile Include="Strategies\BuildKeyMapping\BuildKeyMappingStrategy.cs" />
+    <Compile Include="Strategies\BuildKeyMapping\IBuildKeyMappingPolicy.cs" />
+    <Compile Include="Strategies\IBuilderStrategy.cs" />
+    <Compile Include="Policies\IPolicyList.cs" />
+    <Compile Include="Strategies\IStrategyChain.cs" />
+    <Compile Include="ITypeBasedBuildKey.cs" />
+    <Compile Include="Lifetime\ILifetimeContainer.cs" />
+    <Compile Include="Lifetime\LifetimeContainer.cs" />
+    <Compile Include="Location\IReadableLocator.cs" />
+    <Compile Include="Location\IReadWriteLocator.cs" />
+    <Compile Include="Location\Locator.cs" />
+    <Compile Include="Location\ReadableLocator.cs" />
+    <Compile Include="Location\ReadOnlyLocator.cs" />
+    <Compile Include="Location\ReadWriteLocator.cs" />
+    <Compile Include="Policies\PolicyList.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Strategies\Singleton\ISingletonPolicy.cs" />
+    <Compile Include="Strategies\Singleton\SingletonPolicy.cs" />
+    <Compile Include="Strategies\Singleton\SingletonStrategy.cs" />
+    <Compile Include="Strategies\StagedStrategyChain.cs" />
+    <Compile Include="Strategies\StrategyChain.cs" />
+    <Compile Include="Guard.cs" />
+    <Compile Include="Location\WeakRefDictionary.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

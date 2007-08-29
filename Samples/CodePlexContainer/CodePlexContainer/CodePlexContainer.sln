@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodePlex.DependencyInjection", "CodePlex.DependencyInjection\CodePlex.DependencyInjection.csproj", "{4E52C0D8-B2D1-4400-9288-2FA5EDE8817C}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.CodePlex.DependencyInjection", "Tests.CodePlex.DependencyInjection\Tests.CodePlex.DependencyInjection.csproj", "{EB70BD4C-EA84-47D2-A273-1B248874DC06}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4E52C0D8-B2D1-4400-9288-2FA5EDE8817C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E52C0D8-B2D1-4400-9288-2FA5EDE8817C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E52C0D8-B2D1-4400-9288-2FA5EDE8817C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E52C0D8-B2D1-4400-9288-2FA5EDE8817C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB70BD4C-EA84-47D2-A273-1B248874DC06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB70BD4C-EA84-47D2-A273-1B248874DC06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB70BD4C-EA84-47D2-A273-1B248874DC06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB70BD4C-EA84-47D2-A273-1B248874DC06}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

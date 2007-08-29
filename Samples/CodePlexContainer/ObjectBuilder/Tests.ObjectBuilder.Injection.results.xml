@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="C:\Dev\DependencyInjection\ObjectBuilder\Tests.ObjectBuilder.Injection\bin\Release\Tests.ObjectBuilder.Injection.dll" total="48" failures="0" not-run="0" date="2007-08-29" time="10:09:14">
+  <environment nunit-version="2.2.10.0" clr-version="2.0.50727.1378" os-version="Microsoft Windows NT 5.1.2600 Service Pack 2" platform="Win32NT" cwd="C:\Dev\DependencyInjection\ObjectBuilder" machine-name="BRADWILS-VMXP" user="bradwils" user-domain="REDMOND" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite name="C:\Dev\DependencyInjection\ObjectBuilder\Tests.ObjectBuilder.Injection\bin\Release\Tests.ObjectBuilder.Injection.dll" success="True" time="0.187" asserts="0">
+    <results>
+      <test-suite name="C:\Dev\DependencyInjection\ObjectBuilder\Tests.ObjectBuilder.Injection\bin\Release\Tests.ObjectBuilder.Injection.dll" success="True" time="0.187" asserts="0">
+        <results>
+          <test-suite name="ObjectBuilder" success="True" time="0.172" asserts="0">
+            <results>
+              <test-suite name="ActivatorCreationPolicyTest" success="True" time="0.031" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.ActivatorCreationPolicyTest.CreatesObjectAndPassesValue" executed="True" success="True" time="0.016" asserts="0" />
+                  <test-case name="ObjectBuilder.ActivatorCreationPolicyTest.NoMatchingConstructor" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ActivatorCreationPolicyTest.NullContext" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="ConstructorCreationPolicyTest" success="True" time="0.016" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.ConstructorCreationPolicyTest.CreatesObjectAndPassesValue" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ConstructorCreationPolicyTest.NonMatchingParameterCount" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ConstructorCreationPolicyTest.NonMatchingParameterTypes" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ConstructorCreationPolicyTest.NullConstructor" executed="True" success="True" time="0.016" asserts="0" />
+                  <test-case name="ObjectBuilder.ConstructorCreationPolicyTest.NullContext" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="ConstructorReflectionStrategyTest" success="True" time="0.016" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.ConstructorReflectionStrategyTest.MultipleDecoratedConstructors" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ConstructorReflectionStrategyTest.NoDecoratedConstructors" executed="True" success="True" time="0.016" asserts="0" />
+                  <test-case name="ObjectBuilder.ConstructorReflectionStrategyTest.OneDecoratedConstructor" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ConstructorReflectionStrategyTest.ZeroConstructorsOnReferenceType" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ConstructorReflectionStrategyTest.ZeroConstructorsOnValueType" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="CreationStrategyTest" success="True" time="0.016" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.CreationStrategyTest.DoesNotUsePolicyWhenPassedExistingObject" executed="True" success="True" time="0.016" asserts="0" />
+                  <test-case name="ObjectBuilder.CreationStrategyTest.NoCreationPolicy" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.CreationStrategyTest.UsesPolicyToCreateObject" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="DefaultCreationPolicyTest" success="True" time="0.000" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.DefaultCreationPolicyTest.ConstructorWithValueType" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DefaultCreationPolicyTest.DependencyChainIsFollowed" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DefaultCreationPolicyTest.MultiParameterConstructor" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DefaultCreationPolicyTest.ParameterizedConstructor" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DefaultCreationPolicyTest.ParameterlessConstructor" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DefaultCreationPolicyTest.ValueTypeCanBeConstructed" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DefaultCreationPolicyTest.ValueTypeWithConstructor" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="DependencyAttributeTest" success="True" time="0.000" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.DependencyAttributeTest.DefaultBuildKeyIsAnnotatedMemberType" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DependencyAttributeTest.DefaultNotPresentBehaviorIsBuild" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DependencyAttributeTest.ReturnsDependencyParameter" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="DependencyResolverTest" success="True" time="0.031" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.DependencyResolverTest.CanBuildObjectWhenNotPresent" executed="True" success="True" time="0.016" asserts="0" />
+                  <test-case name="ObjectBuilder.DependencyResolverTest.CanReturnNullWhenNotPresent" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DependencyResolverTest.CanThrowWhenNotPresent" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DependencyResolverTest.NullBuildKey" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DependencyResolverTest.NullContext" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.DependencyResolverTest.ReturnsSingletonInstanceWhenPresent" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="LookupParameterTest" success="True" time="0.000" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.LookupParameterTest.ConstructorPolicyCanUseLookupToFindAnObject" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="MethodCallStrategyTest" success="True" time="0.016" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.MethodCallStrategyTest.ExecutesMethodsInPolicy" executed="True" success="True" time="0.016" asserts="0" />
+                  <test-case name="ObjectBuilder.MethodCallStrategyTest.NoInstance" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="MethodReflectionStrategyTest" success="True" time="0.000" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.MethodReflectionStrategyTest.DecoratedMethod" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.MethodReflectionStrategyTest.NoDecoratedMethods" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="PropertyReflectionStrategyTest" success="True" time="0.016" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.PropertyReflectionStrategyTest.DecoratedProperty" executed="True" success="True" time="0.016" asserts="0" />
+                  <test-case name="ObjectBuilder.PropertyReflectionStrategyTest.NoDecoratedProperties" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="PropertySetterStrategyTest" success="True" time="0.000" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.PropertySetterStrategyTest.NoInstance" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.PropertySetterStrategyTest.SetsPropertyInPolicy" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="ReflectionStrategyTest" success="True" time="0.016" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.ReflectionStrategyTest.CallsAddParametersToPolicy" executed="True" success="True" time="0.016" asserts="0" />
+                  <test-case name="ObjectBuilder.ReflectionStrategyTest.CallsGetMembers" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ReflectionStrategyTest.CallsMemberRequiresProcessing" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ReflectionStrategyTest.DefaultParameterBehaviorIsBuildDependencyByType" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ReflectionStrategyTest.MultipleAttributesNotAllowed" executed="True" success="True" time="0.000" asserts="0" />
+                  <test-case name="ObjectBuilder.ReflectionStrategyTest.UsesAttributeInforationWhenPresent" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite name="ValueParameterTest" success="True" time="0.000" asserts="0">
+                <results>
+                  <test-case name="ObjectBuilder.ValueParameterTest.ValueParameterReturnsStoredTypeAndValue" executed="True" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

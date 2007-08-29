@@ -1,0 +1,79 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E9C245BB-B097-417E-A395-8D74A8C172A8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ObjectBuilder</RootNamespace>
+    <AssemblyName>Tests.ObjectBuilder.Interception</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.2.10.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\3rdParty\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="HandlerPipelineTest.cs" />
+    <Compile Include="InterceptionReflectorTest.cs" />
+    <Compile Include="InterfaceInterceptorTest.cs" />
+    <Compile Include="MethodInvocationTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemotingInterceptorTest.cs" />
+    <Compile Include="Utility\RecodingHandler.cs" />
+    <Compile Include="Utility\Recorder.cs" />
+    <Compile Include="Utility\StubMethodInvocation.cs" />
+    <Compile Include="Utility\StubMethodReturn.cs" />
+    <Compile Include="Utility\StubObjectFactory.cs" />
+    <Compile Include="VirtualInterceptorTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ObjectBuilder.Injection\ObjectBuilder.Injection.csproj">
+      <Project>{1E6E101D-7D83-45C3-BE83-ECBE4F017324}</Project>
+      <Name>ObjectBuilder.Injection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ObjectBuilder.Interception\ObjectBuilder.Interception.csproj">
+      <Project>{0B8B1317-EF02-48B2-A040-C1F6BE31294D}</Project>
+      <Name>ObjectBuilder.Interception</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ObjectBuilder\ObjectBuilder.csproj">
+      <Project>{E1E3B550-5E55-451C-9C5B-AB05DD61EF49}</Project>
+      <Name>ObjectBuilder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TestUtility\TestUtility.csproj">
+      <Project>{B619A0FA-BC6F-4E95-A07C-18980E130250}</Project>
+      <Name>TestUtility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

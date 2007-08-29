@@ -1,0 +1,93 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EB70BD4C-EA84-47D2-A273-1B248874DC06}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CodePlex.DependencyInjection</RootNamespace>
+    <AssemblyName>Tests.CodePlex.DependencyInjection</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.2.10.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\3rdParty\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="ObjectBuilder, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\3rdParty\ObjectBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="ObjectBuilder.EventBroker, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\3rdParty\ObjectBuilder.EventBroker.dll</HintPath>
+    </Reference>
+    <Reference Include="ObjectBuilder.Injection, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\3rdParty\ObjectBuilder.Injection.dll</HintPath>
+    </Reference>
+    <Reference Include="ObjectBuilder.Interception, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\3rdParty\ObjectBuilder.Interception.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assert\Assert.cs" />
+    <Compile Include="Assert\AssertActualExpectedException.cs" />
+    <Compile Include="Assert\AssertException.cs" />
+    <Compile Include="Assert\ContainsException.cs" />
+    <Compile Include="Assert\DoesNotContainException.cs" />
+    <Compile Include="Assert\EmptyException.cs" />
+    <Compile Include="Assert\EqualException.cs" />
+    <Compile Include="Assert\FalseException.cs" />
+    <Compile Include="Assert\InRangeException.cs" />
+    <Compile Include="Assert\IsTypeException.cs" />
+    <Compile Include="Assert\NotEmptyException.cs" />
+    <Compile Include="Assert\NotEqualException.cs" />
+    <Compile Include="Assert\NotNullException.cs" />
+    <Compile Include="Assert\NotSameException.cs" />
+    <Compile Include="Assert\NullException.cs" />
+    <Compile Include="Assert\SameException.cs" />
+    <Compile Include="Assert\ThrowsException.cs" />
+    <Compile Include="Assert\TrueException.cs" />
+    <Compile Include="DependencyContainerTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\RecodingHandler.cs" />
+    <Compile Include="Utility\Recorder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CodePlex.DependencyInjection\CodePlex.DependencyInjection.csproj">
+      <Project>{4E52C0D8-B2D1-4400-9288-2FA5EDE8817C}</Project>
+      <Name>CodePlex.DependencyInjection</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

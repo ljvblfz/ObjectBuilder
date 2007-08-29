@@ -1,0 +1,127 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectBuilder", "ObjectBuilder\ObjectBuilder.csproj", "{E1E3B550-5E55-451C-9C5B-AB05DD61EF49}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectBuilder.EventBroker", "ObjectBuilder.EventBroker\ObjectBuilder.EventBroker.csproj", "{111FE7F1-0F22-4E43-BE23-6E6EB4E50905}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectBuilder.Injection", "ObjectBuilder.Injection\ObjectBuilder.Injection.csproj", "{1E6E101D-7D83-45C3-BE83-ECBE4F017324}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectBuilder.Interception", "ObjectBuilder.Interception\ObjectBuilder.Interception.csproj", "{0B8B1317-EF02-48B2-A040-C1F6BE31294D}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.ObjectBuilder", "Tests.ObjectBuilder\Tests.ObjectBuilder.csproj", "{02BDF798-A924-4F07-A607-75B3C20EDA6E}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.ObjectBuilder.EventBroker", "Tests.ObjectBuilder.EventBroker\Tests.ObjectBuilder.EventBroker.csproj", "{27D6373E-8C30-4CF8-AC0F-D920AB05E938}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.ObjectBuilder.Injection", "Tests.ObjectBuilder.Injection\Tests.ObjectBuilder.Injection.csproj", "{36050780-753C-482E-A11F-7651FBA6AA49}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.ObjectBuilder.Interception", "Tests.ObjectBuilder.Interception\Tests.ObjectBuilder.Interception.csproj", "{E9C245BB-B097-417E-A395-8D74A8C172A8}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtility", "TestUtility\TestUtility.csproj", "{B619A0FA-BC6F-4E95-A07C-18980E130250}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{C88392D7-60A0-4969-BFEE-028D47FA7D5F}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5688A5AD-6385-41E2-A801-A26A24DEF3F1}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E1E3B550-5E55-451C-9C5B-AB05DD61EF49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1E3B550-5E55-451C-9C5B-AB05DD61EF49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1E3B550-5E55-451C-9C5B-AB05DD61EF49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1E3B550-5E55-451C-9C5B-AB05DD61EF49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{111FE7F1-0F22-4E43-BE23-6E6EB4E50905}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{111FE7F1-0F22-4E43-BE23-6E6EB4E50905}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{111FE7F1-0F22-4E43-BE23-6E6EB4E50905}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{111FE7F1-0F22-4E43-BE23-6E6EB4E50905}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E6E101D-7D83-45C3-BE83-ECBE4F017324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E6E101D-7D83-45C3-BE83-ECBE4F017324}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E6E101D-7D83-45C3-BE83-ECBE4F017324}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E6E101D-7D83-45C3-BE83-ECBE4F017324}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B8B1317-EF02-48B2-A040-C1F6BE31294D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B8B1317-EF02-48B2-A040-C1F6BE31294D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B8B1317-EF02-48B2-A040-C1F6BE31294D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B8B1317-EF02-48B2-A040-C1F6BE31294D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02BDF798-A924-4F07-A607-75B3C20EDA6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02BDF798-A924-4F07-A607-75B3C20EDA6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02BDF798-A924-4F07-A607-75B3C20EDA6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02BDF798-A924-4F07-A607-75B3C20EDA6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27D6373E-8C30-4CF8-AC0F-D920AB05E938}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27D6373E-8C30-4CF8-AC0F-D920AB05E938}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27D6373E-8C30-4CF8-AC0F-D920AB05E938}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27D6373E-8C30-4CF8-AC0F-D920AB05E938}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36050780-753C-482E-A11F-7651FBA6AA49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36050780-753C-482E-A11F-7651FBA6AA49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36050780-753C-482E-A11F-7651FBA6AA49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36050780-753C-482E-A11F-7651FBA6AA49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9C245BB-B097-417E-A395-8D74A8C172A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9C245BB-B097-417E-A395-8D74A8C172A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9C245BB-B097-417E-A395-8D74A8C172A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9C245BB-B097-417E-A395-8D74A8C172A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B619A0FA-BC6F-4E95-A07C-18980E130250}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B619A0FA-BC6F-4E95-A07C-18980E130250}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B619A0FA-BC6F-4E95-A07C-18980E130250}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B619A0FA-BC6F-4E95-A07C-18980E130250}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E1E3B550-5E55-451C-9C5B-AB05DD61EF49} = {C88392D7-60A0-4969-BFEE-028D47FA7D5F}
+		{111FE7F1-0F22-4E43-BE23-6E6EB4E50905} = {C88392D7-60A0-4969-BFEE-028D47FA7D5F}
+		{1E6E101D-7D83-45C3-BE83-ECBE4F017324} = {C88392D7-60A0-4969-BFEE-028D47FA7D5F}
+		{0B8B1317-EF02-48B2-A040-C1F6BE31294D} = {C88392D7-60A0-4969-BFEE-028D47FA7D5F}
+		{B619A0FA-BC6F-4E95-A07C-18980E130250} = {C88392D7-60A0-4969-BFEE-028D47FA7D5F}
+		{02BDF798-A924-4F07-A607-75B3C20EDA6E} = {5688A5AD-6385-41E2-A801-A26A24DEF3F1}
+		{E9C245BB-B097-417E-A395-8D74A8C172A8} = {5688A5AD-6385-41E2-A801-A26A24DEF3F1}
+		{27D6373E-8C30-4CF8-AC0F-D920AB05E938} = {5688A5AD-6385-41E2-A801-A26A24DEF3F1}
+		{36050780-753C-482E-A11F-7651FBA6AA49} = {5688A5AD-6385-41E2-A801-A26A24DEF3F1}
+	EndGlobalSection
+EndGlobal

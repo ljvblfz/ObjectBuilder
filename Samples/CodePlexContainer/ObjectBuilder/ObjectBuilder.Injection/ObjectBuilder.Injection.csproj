@@ -1,0 +1,92 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1E6E101D-7D83-45C3-BE83-ECBE4F017324}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ObjectBuilder</RootNamespace>
+    <AssemblyName>ObjectBuilder.Injection</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>GlobalAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="DependencyMissingException.cs" />
+    <Compile Include="DependencyResolver.cs" />
+    <Compile Include="IMemberInfo.cs" />
+    <Compile Include="InvalidAttributeException.cs" />
+    <Compile Include="MethodMemberInfo.cs" />
+    <Compile Include="NotPresentBehavior.cs" />
+    <Compile Include="Parameters\DependencyAttribute.cs" />
+    <Compile Include="Creation\InjectionConstructorAttribute.cs" />
+    <Compile Include="Method\InjectionMethodAttribute.cs" />
+    <Compile Include="Parameters\ParameterAttribute.cs" />
+    <Compile Include="Creation\ActivatorCreationPolicy.cs" />
+    <Compile Include="Creation\ConstructorCreationPolicy.cs" />
+    <Compile Include="Creation\ConstructorReflectionStrategy.cs" />
+    <Compile Include="Creation\CreationStrategy.cs" />
+    <Compile Include="Creation\DefaultCreationPolicy.cs" />
+    <Compile Include="Creation\ICreationPolicy.cs" />
+    <Compile Include="Method\IMethodCallInfo.cs" />
+    <Compile Include="Method\IMethodCallPolicy.cs" />
+    <Compile Include="Method\MethodCallPolicy.cs" />
+    <Compile Include="Method\MethodCallStrategy.cs" />
+    <Compile Include="Method\MethodReflectionStrategy.cs" />
+    <Compile Include="Method\NamedMethodCallInfo.cs" />
+    <Compile Include="Method\ReflectionMethodCallInfo.cs" />
+    <Compile Include="Parameters\DependencyParameter.cs" />
+    <Compile Include="Parameters\IParameter.cs" />
+    <Compile Include="Parameters\KnownTypeParameter.cs" />
+    <Compile Include="Parameters\LookupParameter.cs" />
+    <Compile Include="Parameters\ValueParameter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyMemberInfo.cs" />
+    <Compile Include="Property\IPropertySetterInfo.cs" />
+    <Compile Include="Property\IPropertySetterPolicy.cs" />
+    <Compile Include="Property\NamedPropertySetterInfo.cs" />
+    <Compile Include="Property\PropertyReflectionStrategy.cs" />
+    <Compile Include="Property\PropertySetterPolicy.cs" />
+    <Compile Include="Property\PropertySetterStrategy.cs" />
+    <Compile Include="Property\ReflectionPropertySetterInfo.cs" />
+    <Compile Include="ReflectionStrategy.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ObjectBuilder\ObjectBuilder.csproj">
+      <Project>{E1E3B550-5E55-451C-9C5B-AB05DD61EF49}</Project>
+      <Name>ObjectBuilder</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
