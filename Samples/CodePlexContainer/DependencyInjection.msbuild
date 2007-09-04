@@ -1,0 +1,18 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
+  <Target Name="Build">
+    
+    <MSBuild Projects="ObjectBuilder\ObjectBuilder.msbuild" Targets="$(BuildTarget)"/>
+    
+    <CreateItem Include="ObjectBuilder\ObjectBuilder\bin\Release\ObjectBuilder.???;ObjectBuilder\ObjectBuilder.EventBroker\bin\Release\ObjectBuilder.EventBroker.???;ObjectBuilder\ObjectBuilder.Injection\bin\Release\ObjectBuilder.Injection.???;ObjectBuilder\ObjectBuilder.Interception\bin\Release\ObjectBuilder.Interception.???">
+      <Output ItemName="ObjectBuilderDlls" TaskParameter="Include"/>
+    </CreateItem>
+    <Copy SourceFiles="@(ObjectBuilderDlls)" DestinationFolder="3rdParty"/>
+    
+    <MSBuild Projects="CodePlexContainer\CodePlexContainer.msbuild" Targets="$(BuildTarget)"/>
+    
+    <MSBuild Projects="OttawaContainer\OttawaContainer.msbuild" Targets="$(BuildTarget)"/>
+    
+  </Target>
+
+</Project>
