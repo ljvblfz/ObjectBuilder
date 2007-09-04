@@ -1,0 +1,4 @@
+<ignore xmlns='http://www.codeplex.com/schema/IgnoreListSchema-1.0.xsd'>
+  <add>*.xml</add>
+  <add>*.gpstate</add>
+</ignore>

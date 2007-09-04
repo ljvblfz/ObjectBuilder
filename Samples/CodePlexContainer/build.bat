@@ -16,6 +16,12 @@ pushd CodePlexContainer
 call build %1
 popd
 
+if errorlevel 1 goto End
+
+pushd OttawaContainer
+call build %1
+popd
+
 goto End
 
 :Usage

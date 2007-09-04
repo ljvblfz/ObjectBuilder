@@ -1,0 +1,11 @@
+Top question:
+
+- Should we implement both the MicroKernel and Windsor?
+
+Things we just kinda ran across that we want to implement:
+
+- Lifecycles (see http://www.castleproject.org/container/documentation/v1rc3/usersguide/lifecycles.html though docs appear to be wrong about Release calling Dispose)
+- Attributes for lifestyles (see http://www.castleproject.org/container/documentation/v1rc3/usersguide/lifestyles.html)
+- Pooling - does this use Release() to figure out when it can reuse components?
+- Custom lifestyles?
+- XML configuration
