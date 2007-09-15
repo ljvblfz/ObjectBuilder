@@ -20,7 +20,7 @@ namespace ObjectBuilder
 
         public override IReadableLocator ParentLocator
         {
-            get { return new ReadOnlyLocator(innerLocator.ParentLocator); }
+            get { return innerLocator.ParentLocator == null ? null : new ReadOnlyLocator(innerLocator.ParentLocator); }
         }
 
         public override bool ReadOnly

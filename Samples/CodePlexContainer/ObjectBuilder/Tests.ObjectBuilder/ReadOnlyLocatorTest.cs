@@ -54,6 +54,17 @@ namespace ObjectBuilder
         }
 
         [Test]
+        public void NullParentLocatorOfInnerLocatorReturnsNullParentLocator()
+        {
+            Locator locator = new Locator();
+            ReadOnlyLocator readOnlyLocator = new ReadOnlyLocator(locator);
+
+            IReadableLocator parentLocator = readOnlyLocator.ParentLocator;
+
+            Assert.Null(parentLocator);
+        }
+
+        [Test]
         public void ItemsContainedInLocatorContainedInReadOnlyLocator()
         {
             Locator innerLocator = new Locator();
