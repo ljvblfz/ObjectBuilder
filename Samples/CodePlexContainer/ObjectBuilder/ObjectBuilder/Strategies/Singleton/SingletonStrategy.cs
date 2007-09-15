@@ -9,9 +9,8 @@ namespace ObjectBuilder
             if (context.Locator == null || context.Lifetime == null)
                 return base.BuildUp(context, buildKey, existing);
 
-            lock (context.Locator)
-                if (context.Locator.Contains(buildKey))
-                    return context.Locator.Get(buildKey);
+            if (context.Locator.Contains(buildKey))
+                return context.Locator.Get(buildKey);
 
             existing = base.BuildUp(context, buildKey, existing);
 
@@ -19,11 +18,8 @@ namespace ObjectBuilder
 
             if (singletonPolicy != null && singletonPolicy.IsSingleton)
             {
-                lock (context.Locator)
-                    context.Locator.Add(buildKey, existing);
-
-                lock (context.Lifetime)
-                    context.Lifetime.Add(existing);
+                context.Locator.Add(buildKey, existing);
+                context.Lifetime.Add(existing);
             }
 
             return existing;
