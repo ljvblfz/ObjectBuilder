@@ -1,23 +1,9 @@
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class MethodReflectionStrategyTest
     {
-        [Test]
-        public void NoDecoratedMethods()
-        {
-            MockBuilderContext context = new MockBuilderContext();
-            MethodReflectionStrategy strategy = new MethodReflectionStrategy();
-
-            strategy.BuildUp(context, typeof(object), null);
-
-            IMethodCallPolicy policy = context.Policies.Get<IMethodCallPolicy>(typeof(object));
-            Assert.Null(policy);
-        }
-
         [Test]
         public void DecoratedMethod()
         {
@@ -31,6 +17,18 @@ namespace ObjectBuilder
             Assert.NotEmpty(policy.Methods);
             foreach (ReflectionMethodCallInfo method in policy.Methods)
                 Assert.Equal(typeof(Decorated).GetMethod("Method"), method.Method);
+        }
+
+        [Test]
+        public void NoDecoratedMethods()
+        {
+            MockBuilderContext context = new MockBuilderContext();
+            MethodReflectionStrategy strategy = new MethodReflectionStrategy();
+
+            strategy.BuildUp(context, typeof(object), null);
+
+            IMethodCallPolicy policy = context.Policies.Get<IMethodCallPolicy>(typeof(object));
+            Assert.Null(policy);
         }
 
         internal class Decorated

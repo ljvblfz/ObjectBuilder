@@ -1,24 +1,10 @@
 using System;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class PropertyReflectionStrategyTest
     {
-        [Test]
-        public void NoDecoratedProperties()
-        {
-            MockBuilderContext context = new MockBuilderContext();
-            PropertyReflectionStrategy strategy = new PropertyReflectionStrategy();
-
-            strategy.BuildUp(context, typeof(object), null);
-
-            IPropertySetterPolicy policy = context.Policies.Get<IPropertySetterPolicy>(typeof(object));
-            Assert.Null(policy);
-        }
-
         [Test]
         public void DecoratedProperty()
         {
@@ -32,6 +18,18 @@ namespace ObjectBuilder
             Assert.NotEmpty(policy.Properties);
             foreach (ReflectionPropertySetterInfo property in policy.Properties)
                 Assert.Equal(typeof(Decorated).GetProperty("Property"), property.Property);
+        }
+
+        [Test]
+        public void NoDecoratedProperties()
+        {
+            MockBuilderContext context = new MockBuilderContext();
+            PropertyReflectionStrategy strategy = new PropertyReflectionStrategy();
+
+            strategy.BuildUp(context, typeof(object), null);
+
+            IPropertySetterPolicy policy = context.Policies.Get<IPropertySetterPolicy>(typeof(object));
+            Assert.Null(policy);
         }
 
         internal class Decorated

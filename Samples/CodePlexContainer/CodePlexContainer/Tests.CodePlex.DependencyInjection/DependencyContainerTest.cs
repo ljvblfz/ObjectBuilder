@@ -1,7 +1,6 @@
 using System;
 using ObjectBuilder;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace CodePlex.DependencyInjection
 {
@@ -11,7 +10,6 @@ namespace CodePlex.DependencyInjection
 
     public class DependencyContainerTest
     {
-        [TestFixture]
         public class Configuration
         {
             [Test]
@@ -35,9 +33,20 @@ namespace CodePlex.DependencyInjection
             }
         }
 
-        [TestFixture]
         public class EventBroker
         {
+            [Test]
+            public void RegisterByAttributes()
+            {
+                DependencyContainer container = new DependencyContainer();
+                EventSourceAttr source = container.Get<EventSourceAttr>();
+                EventSinkAttr sink = container.Get<EventSinkAttr>();
+
+                source.Invoke();
+
+                Assert.NotNull(sink.HandlerArgs);
+            }
+
             [Test]
             public void RegisterByCode()
             {
@@ -52,27 +61,27 @@ namespace CodePlex.DependencyInjection
                 Assert.NotNull(sink.HandlerArgs);
             }
 
-            [Test]
-            public void RegisterByAttributes()
+            internal class EventSinkAttr
             {
-                DependencyContainer container = new DependencyContainer();
-                EventSourceAttr source = container.Get<EventSourceAttr>();
-                EventSinkAttr sink = container.Get<EventSinkAttr>();
+                public EventArgs HandlerArgs;
 
-                source.Invoke();
-
-                Assert.NotNull(sink.HandlerArgs);
+                [EventSink("MyEvent")]
+                public void TheHandler(object sender,
+                                       EventArgs e)
+                {
+                    HandlerArgs = e;
+                }
             }
 
-            internal class EventSourceCode
+            internal class EventSinkCode
             {
-                public void Invoke()
-                {
-                    if (TheEvent != null)
-                        TheEvent(this, EventArgs.Empty);
-                }
+                public EventArgs HandlerArgs;
 
-                public event EventHandler<EventArgs> TheEvent;
+                public void TheHandler(object sender,
+                                       EventArgs e)
+                {
+                    HandlerArgs = e;
+                }
             }
 
             internal class EventSourceAttr
@@ -87,44 +96,20 @@ namespace CodePlex.DependencyInjection
                 public event EventHandler<EventArgs> TheEvent;
             }
 
-            internal class EventSinkCode
+            internal class EventSourceCode
             {
-                public EventArgs HandlerArgs;
-
-                public void TheHandler(object sender,
-                                       EventArgs e)
+                public void Invoke()
                 {
-                    HandlerArgs = e;
+                    if (TheEvent != null)
+                        TheEvent(this, EventArgs.Empty);
                 }
-            }
 
-            internal class EventSinkAttr
-            {
-                public EventArgs HandlerArgs;
-
-                [EventSink("MyEvent")]
-                public void TheHandler(object sender,
-                                       EventArgs e)
-                {
-                    HandlerArgs = e;
-                }
+                public event EventHandler<EventArgs> TheEvent;
             }
         }
 
-        [TestFixture]
         public class ExistingObjects
         {
-            [Test]
-            public void NullThrows()
-            {
-                DependencyContainer container = new DependencyContainer();
-
-                Assert.Throws<ArgumentNullException>(delegate
-                                                     {
-                                                         container.Inject(null);
-                                                     });
-            }
-
             [Test]
             public void CanInjectExistingObject()
             {
@@ -135,6 +120,17 @@ namespace CodePlex.DependencyInjection
                 container.Inject(obj);
 
                 Assert.Equal("Hello world", obj.Name);
+            }
+
+            [Test]
+            public void NullThrows()
+            {
+                DependencyContainer container = new DependencyContainer();
+
+                Assert.Throws<ArgumentNullException>(delegate
+                                                     {
+                                                         container.Inject(null);
+                                                     });
             }
 
             // Helpers
@@ -152,20 +148,23 @@ namespace CodePlex.DependencyInjection
             }
         }
 
-        [TestFixture]
         public class InterceptInterface
         {
             [Test]
-            public void InterceptViaCode()
+            public void ExceptionsAreUnchanged()
             {
                 Recorder.Records.Clear();
                 DependencyContainer container = new DependencyContainer();
                 container.RegisterTypeMapping<ISpy, SpyInterface>();
-                container.InterceptInterface<SpyInterface>(typeof(ISpy).GetMethod("InterceptedMethod"),
+                container.InterceptInterface<SpyInterface>(typeof(ISpy).GetMethod("ThrowsException"),
                                                            new RecordingHandler());
 
                 ISpy obj = container.Get<ISpy>();
-                obj.InterceptedMethod();
+
+                Assert.Throws<Exception>(delegate
+                                         {
+                                             obj.ThrowsException();
+                                         });
 
                 Assert.Equal(3, Recorder.Records.Count);
                 Assert.Equal("Before Method", Recorder.Records[0]);
@@ -190,25 +189,27 @@ namespace CodePlex.DependencyInjection
             }
 
             [Test]
-            public void ExceptionsAreUnchanged()
+            public void InterceptViaCode()
             {
                 Recorder.Records.Clear();
                 DependencyContainer container = new DependencyContainer();
                 container.RegisterTypeMapping<ISpy, SpyInterface>();
-                container.InterceptInterface<SpyInterface>(typeof(ISpy).GetMethod("ThrowsException"),
+                container.InterceptInterface<SpyInterface>(typeof(ISpy).GetMethod("InterceptedMethod"),
                                                            new RecordingHandler());
 
                 ISpy obj = container.Get<ISpy>();
-
-                Assert.Throws<Exception>(delegate
-                                         {
-                                             obj.ThrowsException();
-                                         });
+                obj.InterceptedMethod();
 
                 Assert.Equal(3, Recorder.Records.Count);
                 Assert.Equal("Before Method", Recorder.Records[0]);
                 Assert.Equal("In Method", Recorder.Records[1]);
                 Assert.Equal("After Method", Recorder.Records[2]);
+            }
+
+            public interface ISpy
+            {
+                void InterceptedMethod();
+                void ThrowsException();
             }
 
             internal sealed class SpyInterface : ISpy
@@ -238,15 +239,8 @@ namespace CodePlex.DependencyInjection
                     throw new Exception();
                 }
             }
-
-            public interface ISpy
-            {
-                void InterceptedMethod();
-                void ThrowsException();
-            }
         }
 
-        [TestFixture]
         public class InterceptInterface_GenericMethods
         {
             [Test]
@@ -269,11 +263,6 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[5]);
             }
 
-            public interface IFoo
-            {
-                void Bar<T>(T value);
-            }
-
             public class Foo : IFoo
             {
                 [InterfaceIntercept(typeof(RecordingHandler))]
@@ -282,9 +271,13 @@ namespace CodePlex.DependencyInjection
                     Recorder.Records.Add("Passed: " + value);
                 }
             }
+
+            public interface IFoo
+            {
+                void Bar<T>(T value);
+            }
         }
 
-        [TestFixture]
         public class InterceptInterface_Properties
         {
             [Test]
@@ -307,11 +300,6 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[5]);
             }
 
-            public interface IFoo
-            {
-                string MyProperty { get; set; }
-            }
-
             public class Foo : IFoo
             {
                 public string MyProperty
@@ -327,20 +315,22 @@ namespace CodePlex.DependencyInjection
                     set { Recorder.Records.Add("PropSet: " + value); }
                 }
             }
+
+            public interface IFoo
+            {
+                string MyProperty { get; set; }
+            }
         }
 
-        [TestFixture]
         public class InterceptRemoting
         {
             [Test]
-            public void InterceptViaCode()
+            public void InterceptViaAttributes()
             {
                 Recorder.Records.Clear();
                 DependencyContainer container = new DependencyContainer();
-                container.InterceptRemoting<SpyMBRO>(typeof(SpyMBRO).GetMethod("InterceptedMethod"),
-                                                     new RecordingHandler());
 
-                SpyMBRO obj = container.Get<SpyMBRO>();
+                SpyMBROWithAttribute obj = container.Get<SpyMBROWithAttribute>();
                 obj.InterceptedMethod();
 
                 Assert.Equal(3, Recorder.Records.Count);
@@ -350,12 +340,14 @@ namespace CodePlex.DependencyInjection
             }
 
             [Test]
-            public void InterceptViaAttributes()
+            public void InterceptViaCode()
             {
                 Recorder.Records.Clear();
                 DependencyContainer container = new DependencyContainer();
+                container.InterceptRemoting<SpyMBRO>(typeof(SpyMBRO).GetMethod("InterceptedMethod"),
+                                                     new RecordingHandler());
 
-                SpyMBROWithAttribute obj = container.Get<SpyMBROWithAttribute>();
+                SpyMBRO obj = container.Get<SpyMBRO>();
                 obj.InterceptedMethod();
 
                 Assert.Equal(3, Recorder.Records.Count);
@@ -375,23 +367,6 @@ namespace CodePlex.DependencyInjection
                     {
                         container.Get<ISpy>();
                     });
-            }
-
-            internal class SpyMBRO : MarshalByRefObject
-            {
-                public void InterceptedMethod()
-                {
-                    Recorder.Records.Add("In Method");
-                }
-            }
-
-            internal class SpyMBROWithAttribute : MarshalByRefObject
-            {
-                [RemotingIntercept(typeof(RecordingHandler))]
-                public void InterceptedMethod()
-                {
-                    Recorder.Records.Add("In Method");
-                }
             }
 
             internal interface ISpy
@@ -417,45 +392,27 @@ namespace CodePlex.DependencyInjection
                     Recorder.Records.Add("OnTearingDown");
                 }
             }
+
+            internal class SpyMBRO : MarshalByRefObject
+            {
+                public void InterceptedMethod()
+                {
+                    Recorder.Records.Add("In Method");
+                }
+            }
+
+            internal class SpyMBROWithAttribute : MarshalByRefObject
+            {
+                [RemotingIntercept(typeof(RecordingHandler))]
+                public void InterceptedMethod()
+                {
+                    Recorder.Records.Add("In Method");
+                }
+            }
         }
 
-        [TestFixture]
         public class InterceptVirtual
         {
-            [Test]
-            public void InterceptViaCode()
-            {
-                Recorder.Records.Clear();
-                DependencyContainer container = new DependencyContainer();
-                container.InterceptVirtual<SpyVirtual>(typeof(SpyVirtual).GetMethod("InterceptedMethod"),
-                                                       new RecordingHandler());
-
-                SpyVirtual obj = container.Get<SpyVirtual>();
-                obj.InterceptedMethod();
-                obj.NonInterceptedMethod();
-
-                Assert.Equal(4, Recorder.Records.Count);
-                Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In Method", Recorder.Records[1]);
-                Assert.Equal("After Method", Recorder.Records[2]);
-                Assert.Equal("In Non-Intercepted Method", Recorder.Records[3]);
-            }
-
-            [Test]
-            public void InterceptViaAttributes()
-            {
-                Recorder.Records.Clear();
-                DependencyContainer container = new DependencyContainer();
-
-                SpyVirtualAttributes obj = container.Get<SpyVirtualAttributes>();
-                obj.InterceptedMethod();
-
-                Assert.Equal(3, Recorder.Records.Count);
-                Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In Method", Recorder.Records[1]);
-                Assert.Equal("After Method", Recorder.Records[2]);
-            }
-
             [Test]
             public void ExceptionsAreUnchanged()
             {
@@ -475,6 +432,40 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("Before Method", Recorder.Records[0]);
                 Assert.Equal("In Method", Recorder.Records[1]);
                 Assert.Equal("After Method", Recorder.Records[2]);
+            }
+
+            [Test]
+            public void InterceptViaAttributes()
+            {
+                Recorder.Records.Clear();
+                DependencyContainer container = new DependencyContainer();
+
+                SpyVirtualAttributes obj = container.Get<SpyVirtualAttributes>();
+                obj.InterceptedMethod();
+
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In Method", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+            }
+
+            [Test]
+            public void InterceptViaCode()
+            {
+                Recorder.Records.Clear();
+                DependencyContainer container = new DependencyContainer();
+                container.InterceptVirtual<SpyVirtual>(typeof(SpyVirtual).GetMethod("InterceptedMethod"),
+                                                       new RecordingHandler());
+
+                SpyVirtual obj = container.Get<SpyVirtual>();
+                obj.InterceptedMethod();
+                obj.NonInterceptedMethod();
+
+                Assert.Equal(4, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In Method", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+                Assert.Equal("In Non-Intercepted Method", Recorder.Records[3]);
             }
 
             public class SpyVirtual
@@ -506,9 +497,27 @@ namespace CodePlex.DependencyInjection
             }
         }
 
-        [TestFixture]
         public class InterceptVirtual_Generics
         {
+            [Test]
+            public void GenericMethodOnGenericClass()
+            {
+                Recorder.Records.Clear();
+                DependencyContainer container = new DependencyContainer();
+
+                GenericFoo<int> obj = container.Get<GenericFoo<int>>();
+                obj.Baz(21, 42);
+                obj.Baz(96, "world");
+
+                Assert.Equal(6, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("Passed: 21, 42", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+                Assert.Equal("Before Method", Recorder.Records[3]);
+                Assert.Equal("Passed: 96, world", Recorder.Records[4]);
+                Assert.Equal("After Method", Recorder.Records[5]);
+            }
+
             [Test]
             public void GenericMethodOnNonGenericClass()
             {
@@ -543,25 +552,6 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
-            public void GenericMethodOnGenericClass()
-            {
-                Recorder.Records.Clear();
-                DependencyContainer container = new DependencyContainer();
-
-                GenericFoo<int> obj = container.Get<GenericFoo<int>>();
-                obj.Baz(21, 42);
-                obj.Baz(96, "world");
-
-                Assert.Equal(6, Recorder.Records.Count);
-                Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("Passed: 21, 42", Recorder.Records[1]);
-                Assert.Equal("After Method", Recorder.Records[2]);
-                Assert.Equal("Before Method", Recorder.Records[3]);
-                Assert.Equal("Passed: 96, world", Recorder.Records[4]);
-                Assert.Equal("After Method", Recorder.Records[5]);
-            }
-
             public class Foo
             {
                 [VirtualIntercept(typeof(RecordingHandler))]
@@ -588,18 +578,18 @@ namespace CodePlex.DependencyInjection
             }
         }
 
-        [TestFixture]
         public class Singletons
         {
             [Test]
-            public void ObjectsAreNotSingletonByDefault()
+            public void CanRegisterSingletonInstance()
             {
                 DependencyContainer container = new DependencyContainer();
+                MyObject obj = new MyObject();
+                container.RegisterSingletonInstance<IMyObject>(obj);
 
-                object obj1 = container.Get<object>();
-                object obj2 = container.Get<object>();
+                IMyObject result = container.Get<IMyObject>();
 
-                Assert.NotSame(obj1, obj2);
+                Assert.Same(result, obj);
             }
 
             [Test]
@@ -617,18 +607,6 @@ namespace CodePlex.DependencyInjection
             }
 
             [Test]
-            public void CanRegisterSingletonInstance()
-            {
-                DependencyContainer container = new DependencyContainer();
-                MyObject obj = new MyObject();
-                container.RegisterSingletonInstance<IMyObject>(obj);
-
-                IMyObject result = container.Get<IMyObject>();
-
-                Assert.Same(result, obj);
-            }
-
-            [Test]
             public void NestedContainerCanReturnObjectsFromInnerContainer()
             {
                 DependencyContainer innerContainer = new DependencyContainer();
@@ -639,9 +617,19 @@ namespace CodePlex.DependencyInjection
 
                 Assert.Equal("Hello world", result);
             }
+
+            [Test]
+            public void ObjectsAreNotSingletonByDefault()
+            {
+                DependencyContainer container = new DependencyContainer();
+
+                object obj1 = container.Get<object>();
+                object obj2 = container.Get<object>();
+
+                Assert.NotSame(obj1, obj2);
+            }
         }
 
-        [TestFixture]
         public class TypeMapping
         {
             [Test]
@@ -657,6 +645,17 @@ namespace CodePlex.DependencyInjection
             }
 
             [Test]
+            public void CanTypeMapFromGenericToGeneric()
+            {
+                DependencyContainer container = new DependencyContainer();
+                container.RegisterTypeMapping(typeof(IFoo<>), typeof(Foo<>));
+
+                IFoo<int> result = container.Get<IFoo<int>>();
+
+                Assert.IsType<Foo<int>>(result);
+            }
+
+            [Test]
             public void SettingTypeMappingOnInnerContainerAffectsOuterContainer()
             {
                 DependencyContainer innerContainer = new DependencyContainer();
@@ -668,20 +667,9 @@ namespace CodePlex.DependencyInjection
                 Assert.IsType<MyObject>(result);
             }
 
-            [Test]
-            public void CanTypeMapFromGenericToGeneric()
-            {
-                DependencyContainer container = new DependencyContainer();
-                container.RegisterTypeMapping(typeof(IFoo<>), typeof(Foo<>));
-
-                IFoo<int> result = container.Get<IFoo<int>>();
-
-                Assert.IsType<Foo<int>>(result);
-            }
+            public class Foo<T> : IFoo<T> {}
 
             public interface IFoo<T> {}
-
-            public class Foo<T> : IFoo<T> {}
         }
     }
 }

@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class RemotingInterceptorTest
     {
         [Test]
@@ -52,24 +50,26 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void PassesParameters()
+        public void Exceptions()
         {
             Recorder.Records.Clear();
-            SpyWithParameters rawObject = new SpyWithParameters();
-            MethodBase method = typeof(SpyWithParameters).GetMethod("InterceptedMethod");
+            SpyException rawObject = new SpyException();
+            MethodBase method = typeof(SpyException).GetMethod("InterceptedMethod");
             Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
             List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+            handlers.Add(new RecordingHandler());
             dictionary.Add(method, handlers);
-            int i = 9;
-            string s;
 
-            SpyWithParameters wrapped = RemotingInterceptor.Wrap(rawObject, dictionary);
-            int result = wrapped.InterceptedMethod(4.2, ref i, out s);
+            SpyException wrapped = RemotingInterceptor.Wrap(rawObject, dictionary);
 
-            Assert.Equal(42, result);
-            Assert.Equal(18, i);
-            Assert.Equal("MyString", s);
-            Assert.Equal("d = 4.2", Recorder.Records[0]);
+            Assert.Throws<NotImplementedException>(delegate
+                                                   {
+                                                       wrapped.InterceptedMethod();
+                                                   });
+
+            Assert.Equal(2, Recorder.Records.Count);
+            Assert.Equal("Before Method", Recorder.Records[0]);
+            Assert.Equal("After Method", Recorder.Records[1]);
         }
 
         [Test]
@@ -95,26 +95,24 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void Exceptions()
+        public void PassesParameters()
         {
             Recorder.Records.Clear();
-            SpyException rawObject = new SpyException();
-            MethodBase method = typeof(SpyException).GetMethod("InterceptedMethod");
+            SpyWithParameters rawObject = new SpyWithParameters();
+            MethodBase method = typeof(SpyWithParameters).GetMethod("InterceptedMethod");
             Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
             List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
-            handlers.Add(new RecordingHandler());
             dictionary.Add(method, handlers);
+            int i = 9;
+            string s;
 
-            SpyException wrapped = RemotingInterceptor.Wrap(rawObject, dictionary);
+            SpyWithParameters wrapped = RemotingInterceptor.Wrap(rawObject, dictionary);
+            int result = wrapped.InterceptedMethod(4.2, ref i, out s);
 
-            Assert.Throws<NotImplementedException>(delegate
-                                                   {
-                                                       wrapped.InterceptedMethod();
-                                                   });
-
-            Assert.Equal(2, Recorder.Records.Count);
-            Assert.Equal("Before Method", Recorder.Records[0]);
-            Assert.Equal("After Method", Recorder.Records[1]);
+            Assert.Equal(42, result);
+            Assert.Equal(18, i);
+            Assert.Equal("MyString", s);
+            Assert.Equal("d = 4.2", Recorder.Records[0]);
         }
 
         [Test]
@@ -132,7 +130,29 @@ namespace ObjectBuilder
             wrapped.InterceptedMethod(); // Does not throw because it was short circuited
         }
 
-        internal class SpyMBROClass : MarshalByRefObject
+        internal interface ISpyInterface
+        {
+            void InterceptedMethod();
+        }
+
+        internal class ShortCircuitHandler : IInterceptionHandler
+        {
+            public IMethodReturn Invoke(IMethodInvocation call,
+                                        GetNextHandlerDelegate getNext)
+            {
+                return new StubMethodReturn();
+            }
+        }
+
+        internal class SpyException : MarshalByRefObject
+        {
+            public void InterceptedMethod()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        internal class SpyInterfaceClass : ISpyInterface
         {
             public void InterceptedMethod()
             {
@@ -140,12 +160,7 @@ namespace ObjectBuilder
             }
         }
 
-        internal interface ISpyInterface
-        {
-            void InterceptedMethod();
-        }
-
-        internal class SpyInterfaceClass : ISpyInterface
+        internal class SpyMBROClass : MarshalByRefObject
         {
             public void InterceptedMethod()
             {
@@ -177,23 +192,6 @@ namespace ObjectBuilder
                 result.Outputs["s"] = "ANewString";
                 result.ReturnValue = 46 & 2;
                 return result;
-            }
-        }
-
-        internal class SpyException : MarshalByRefObject
-        {
-            public void InterceptedMethod()
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        internal class ShortCircuitHandler : IInterceptionHandler
-        {
-            public IMethodReturn Invoke(IMethodInvocation call,
-                                        GetNextHandlerDelegate getNext)
-            {
-                return new StubMethodReturn();
             }
         }
     }

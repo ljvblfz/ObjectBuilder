@@ -1,30 +1,26 @@
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class DefaultCreationPolicyTest
     {
         [Test]
-        public void ParameterlessConstructor()
+        public void ConstructorWithValueType()
         {
-            MockBuilderContext context = CreateContext();
+            MockBuilderContext ctx = CreateContext();
 
-            object result = context.HeadOfChain.BuildUp(context, typeof(object), null);
+            CtorValueTypeObject result = (CtorValueTypeObject)ctx.HeadOfChain.BuildUp(ctx, typeof(CtorValueTypeObject), null);
 
             Assert.NotNull(result);
+            Assert.Equal(0, result.IntValue);
         }
 
-        [Test]
-        public void ParameterizedConstructor()
+        static MockBuilderContext CreateContext()
         {
-            MockBuilderContext context = CreateContext();
-
-            ParameterizedCtor result = (ParameterizedCtor)context.HeadOfChain.BuildUp(context, typeof(ParameterizedCtor), null);
-
-            Assert.NotNull(result);
-            Assert.NotNull(result.Foo);
+            MockBuilderContext result = new MockBuilderContext();
+            result.Strategies.Add(new CreationStrategy());
+            result.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
+            return result;
         }
 
         [Test]
@@ -52,6 +48,27 @@ namespace ObjectBuilder
         }
 
         [Test]
+        public void ParameterizedConstructor()
+        {
+            MockBuilderContext context = CreateContext();
+
+            ParameterizedCtor result = (ParameterizedCtor)context.HeadOfChain.BuildUp(context, typeof(ParameterizedCtor), null);
+
+            Assert.NotNull(result);
+            Assert.NotNull(result.Foo);
+        }
+
+        [Test]
+        public void ParameterlessConstructor()
+        {
+            MockBuilderContext context = CreateContext();
+
+            object result = context.HeadOfChain.BuildUp(context, typeof(object), null);
+
+            Assert.NotNull(result);
+        }
+
+        [Test]
         public void ValueTypeCanBeConstructed()
         {
             MockBuilderContext context = CreateContext();
@@ -71,35 +88,6 @@ namespace ObjectBuilder
             Assert.NotNull(result.ObjectValue);
         }
 
-        [Test]
-        public void ConstructorWithValueType()
-        {
-            MockBuilderContext ctx = CreateContext();
-
-            CtorValueTypeObject result = (CtorValueTypeObject)ctx.HeadOfChain.BuildUp(ctx, typeof(CtorValueTypeObject), null);
-
-            Assert.NotNull(result);
-            Assert.Equal(0, result.IntValue);
-        }
-
-        static MockBuilderContext CreateContext()
-        {
-            MockBuilderContext result = new MockBuilderContext();
-            result.Strategies.Add(new CreationStrategy());
-            result.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
-            return result;
-        }
-
-        class ParameterizedCtor
-        {
-            public readonly object Foo;
-
-            public ParameterizedCtor(object foo)
-            {
-                Foo = foo;
-            }
-        }
-
         class CascadingCtor
         {
             public readonly ParameterizedCtor CtorObject;
@@ -107,6 +95,16 @@ namespace ObjectBuilder
             public CascadingCtor(ParameterizedCtor ctorObject)
             {
                 CtorObject = ctorObject;
+            }
+        }
+
+        class CtorValueTypeObject
+        {
+            public readonly int IntValue;
+
+            public CtorValueTypeObject(int i)
+            {
+                IntValue = i;
             }
         }
 
@@ -123,13 +121,13 @@ namespace ObjectBuilder
             }
         }
 
-        class CtorValueTypeObject
+        class ParameterizedCtor
         {
-            public readonly int IntValue;
+            public readonly object Foo;
 
-            public CtorValueTypeObject(int i)
+            public ParameterizedCtor(object foo)
             {
-                IntValue = i;
+                Foo = foo;
             }
         }
 

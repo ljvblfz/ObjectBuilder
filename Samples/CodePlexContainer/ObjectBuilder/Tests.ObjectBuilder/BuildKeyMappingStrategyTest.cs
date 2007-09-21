@@ -1,26 +1,9 @@
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class BuildKeyMappingStrategyTest
     {
-        [Test]
-        public void CanMapInterfacesToConcreteTypes()
-        {
-            MockBuilderContext context = new MockBuilderContext();
-            context.Policies.Set<IBuildKeyMappingPolicy>(new BuildKeyMappingPolicy(typeof(Foo)), typeof(IFoo));
-            BuildKeyMappingStrategy strategy = new BuildKeyMappingStrategy();
-            context.Strategies.Add(strategy);
-            SpyStrategy spy = new SpyStrategy();
-            context.Strategies.Add(spy);
-
-            strategy.BuildUp(context, typeof(IFoo), null);
-
-            Assert.Equal<object>(typeof(Foo), spy.BuildKey);
-        }
-
         [Test]
         public void CanMakeArbitraryKeysToConcreteTypes()
         {
@@ -51,6 +34,29 @@ namespace ObjectBuilder
             Assert.Equal<object>(typeof(Foo<int>), spy.BuildKey);
         }
 
+        [Test]
+        public void CanMapInterfacesToConcreteTypes()
+        {
+            MockBuilderContext context = new MockBuilderContext();
+            context.Policies.Set<IBuildKeyMappingPolicy>(new BuildKeyMappingPolicy(typeof(Foo)), typeof(IFoo));
+            BuildKeyMappingStrategy strategy = new BuildKeyMappingStrategy();
+            context.Strategies.Add(strategy);
+            SpyStrategy spy = new SpyStrategy();
+            context.Strategies.Add(spy);
+
+            strategy.BuildUp(context, typeof(IFoo), null);
+
+            Assert.Equal<object>(typeof(Foo), spy.BuildKey);
+        }
+
+        class Foo : IFoo {}
+
+        class Foo<T> : IFoo<T> {}
+
+        interface IFoo {}
+
+        interface IFoo<T> {}
+
         class SpyStrategy : BuilderStrategy
         {
             public object BuildKey;
@@ -63,13 +69,5 @@ namespace ObjectBuilder
                 return null;
             }
         }
-
-        interface IFoo {}
-
-        class Foo : IFoo {}
-
-        interface IFoo<T> {}
-
-        class Foo<T> : IFoo<T> {}
     }
 }

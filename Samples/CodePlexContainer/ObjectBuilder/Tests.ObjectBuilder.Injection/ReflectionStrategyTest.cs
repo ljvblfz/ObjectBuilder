@@ -1,14 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class ReflectionStrategyTest
     {
+        [Test]
+        public void CallsAddParametersToPolicy()
+        {
+            TestableReflectionStrategy strategy = new TestableReflectionStrategy();
+            MockBuilderContext context = new MockBuilderContext();
+            MethodInfo method = typeof(Dummy).GetMethod("Method1");
+            strategy.GetMembers__Result.Add(new MethodMemberInfo<MethodInfo>(method));
+
+            strategy.BuildUp(context, "foo", null);
+
+            Assert.Same(context, strategy.AddParametersToPolicy_Context);
+            Assert.Same("foo", strategy.AddParametersToPolicy_BuildKey);
+            Assert.Same(method, strategy.AddParametersToPolicy_Member);
+        }
+
         [Test]
         public void CallsGetMembers()
         {
@@ -40,21 +53,6 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void CallsAddParametersToPolicy()
-        {
-            TestableReflectionStrategy strategy = new TestableReflectionStrategy();
-            MockBuilderContext context = new MockBuilderContext();
-            MethodInfo method = typeof(Dummy).GetMethod("Method1");
-            strategy.GetMembers__Result.Add(new MethodMemberInfo<MethodInfo>(method));
-
-            strategy.BuildUp(context, "foo", null);
-
-            Assert.Same(context, strategy.AddParametersToPolicy_Context);
-            Assert.Same("foo", strategy.AddParametersToPolicy_BuildKey);
-            Assert.Same(method, strategy.AddParametersToPolicy_Member);
-        }
-
-        [Test]
         public void DefaultParameterBehaviorIsBuildDependencyByType()
         {
             TestableReflectionStrategy strategy = new TestableReflectionStrategy();
@@ -71,6 +69,21 @@ namespace ObjectBuilder
         }
 
         [Test]
+        public void MultipleAttributesNotAllowed()
+        {
+            TestableReflectionStrategy strategy = new TestableReflectionStrategy();
+            MockBuilderContext context = new MockBuilderContext();
+            MethodInfo method = typeof(Dummy).GetMethod("Method3");
+            strategy.GetMembers__Result.Add(new MethodMemberInfo<MethodInfo>(method));
+
+            Assert.Throws<InvalidAttributeException>(
+                delegate
+                {
+                    strategy.BuildUp(context, "foo", null);
+                });
+        }
+
+        [Test]
         public void UsesAttributeInforationWhenPresent()
         {
             TestableReflectionStrategy strategy = new TestableReflectionStrategy();
@@ -84,21 +97,6 @@ namespace ObjectBuilder
             DependencyParameter dependency = Assert.IsType<DependencyParameter>(parameter);
             Assert.Equal<object>("bar", dependency.BuildKey);
             Assert.Equal(NotPresentBehavior.Throw, dependency.NotPresentBehavior);
-        }
-
-        [Test]
-        public void MultipleAttributesNotAllowed()
-        {
-            TestableReflectionStrategy strategy = new TestableReflectionStrategy();
-            MockBuilderContext context = new MockBuilderContext();
-            MethodInfo method = typeof(Dummy).GetMethod("Method3");
-            strategy.GetMembers__Result.Add(new MethodMemberInfo<MethodInfo>(method));
-
-            Assert.Throws<InvalidAttributeException>(
-                delegate
-                {
-                    strategy.BuildUp(context, "foo", null);
-                });
         }
 
         internal class Dummy

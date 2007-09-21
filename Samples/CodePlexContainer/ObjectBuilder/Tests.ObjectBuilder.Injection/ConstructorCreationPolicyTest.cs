@@ -1,35 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class ConstructorCreationPolicyTest
     {
         [Test]
-        public void NullConstructor()
+        public void CreatesObjectAndPassesValue()
         {
-            Assert.Throws<ArgumentNullException>(
-                delegate
-                {
-                    new ConstructorCreationPolicy(null);
-                });
-        }
-
-        [Test]
-        public void NullContext()
-        {
+            MockBuilderContext context = new MockBuilderContext();
             ConstructorInfo constructor = typeof(Dummy).GetConstructor(new Type[] { typeof(int) });
-            ConstructorCreationPolicy policy = new ConstructorCreationPolicy(constructor);
+            ConstructorCreationPolicy policy = new ConstructorCreationPolicy(constructor, Params(42));
 
-            Assert.Throws<ArgumentNullException>(
-                delegate
-                {
-                    policy.Create(null, typeof(Dummy));
-                });
+            Dummy result = (Dummy)policy.Create(context, typeof(Dummy));
+
+            Assert.NotNull(result);
+            Assert.Equal(42, result.val);
         }
 
         [Test]
@@ -61,16 +49,26 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void CreatesObjectAndPassesValue()
+        public void NullConstructor()
         {
-            MockBuilderContext context = new MockBuilderContext();
+            Assert.Throws<ArgumentNullException>(
+                delegate
+                {
+                    new ConstructorCreationPolicy(null);
+                });
+        }
+
+        [Test]
+        public void NullContext()
+        {
             ConstructorInfo constructor = typeof(Dummy).GetConstructor(new Type[] { typeof(int) });
-            ConstructorCreationPolicy policy = new ConstructorCreationPolicy(constructor, Params(42));
+            ConstructorCreationPolicy policy = new ConstructorCreationPolicy(constructor);
 
-            Dummy result = (Dummy)policy.Create(context, typeof(Dummy));
-
-            Assert.NotNull(result);
-            Assert.Equal(42, result.val);
+            Assert.Throws<ArgumentNullException>(
+                delegate
+                {
+                    policy.Create(null, typeof(Dummy));
+                });
         }
 
         static IEnumerable<IParameter> Params(params object[] parameters)

@@ -1,12 +1,32 @@
 using System;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class CreationStrategyTest
     {
+        static MockBuilderContext CreateContext()
+        {
+            MockBuilderContext result = new MockBuilderContext();
+            result.Strategies.Add(new SingletonStrategy());
+            result.Strategies.Add(new CreationStrategy());
+            return result;
+        }
+
+        [Test]
+        public void DoesNotUsePolicyWhenPassedExistingObject()
+        {
+            object existing = new object();
+            MockBuilderContext context = CreateContext();
+            StubCreationPolicy policy = new StubCreationPolicy();
+            context.Policies.SetDefault<ICreationPolicy>(policy);
+
+            object result = context.HeadOfChain.BuildUp(context, typeof(object), existing);
+
+            Assert.False(policy.Create__Called);
+            Assert.Same(existing, result);
+        }
+
         [Test]
         public void NoCreationPolicy()
         {
@@ -36,29 +56,9 @@ namespace ObjectBuilder
             Assert.Same(obj, result);
         }
 
-        [Test]
-        public void DoesNotUsePolicyWhenPassedExistingObject()
-        {
-            object existing = new object();
-            MockBuilderContext context = CreateContext();
-            StubCreationPolicy policy = new StubCreationPolicy();
-            context.Policies.SetDefault<ICreationPolicy>(policy);
-
-            object result = context.HeadOfChain.BuildUp(context, typeof(object), existing);
-
-            Assert.False(policy.Create__Called);
-            Assert.Same(existing, result);
-        }
-
-        static MockBuilderContext CreateContext()
-        {
-            MockBuilderContext result = new MockBuilderContext();
-            result.Strategies.Add(new SingletonStrategy());
-            result.Strategies.Add(new CreationStrategy());
-            return result;
-        }
-
         internal abstract class AbstractClass {}
+
+        internal class Dependent {}
 
         internal class Depending
         {
@@ -69,7 +69,5 @@ namespace ObjectBuilder
                 ConstructorObject = obj;
             }
         }
-
-        internal class Dependent {}
     }
 }

@@ -1,22 +1,18 @@
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class DependencyAttributeTest
     {
         [Test]
-        public void ReturnsDependencyParameter()
+        public void DefaultBuildKeyIsAnnotatedMemberType()
         {
-            DependencyAttribute attribute = new DependencyAttribute("Foo");
-            attribute.NotPresentBehavior = NotPresentBehavior.Throw;
+            DependencyAttribute attribute = new DependencyAttribute();
 
             IParameter result = attribute.CreateParameter(typeof(object));
 
             DependencyParameter parameter = Assert.IsType<DependencyParameter>(result);
-            Assert.Equal<object>("Foo", parameter.BuildKey);
-            Assert.Equal(NotPresentBehavior.Throw, parameter.NotPresentBehavior);
+            Assert.Equal<object>(typeof(object), parameter.BuildKey);
         }
 
         [Test]
@@ -31,14 +27,16 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void DefaultBuildKeyIsAnnotatedMemberType()
+        public void ReturnsDependencyParameter()
         {
-            DependencyAttribute attribute = new DependencyAttribute();
+            DependencyAttribute attribute = new DependencyAttribute("Foo");
+            attribute.NotPresentBehavior = NotPresentBehavior.Throw;
 
             IParameter result = attribute.CreateParameter(typeof(object));
 
             DependencyParameter parameter = Assert.IsType<DependencyParameter>(result);
-            Assert.Equal<object>(typeof(object), parameter.BuildKey);
+            Assert.Equal<object>("Foo", parameter.BuildKey);
+            Assert.Equal(NotPresentBehavior.Throw, parameter.NotPresentBehavior);
         }
     }
 }

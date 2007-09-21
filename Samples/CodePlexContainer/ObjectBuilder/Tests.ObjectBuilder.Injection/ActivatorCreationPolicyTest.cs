@@ -1,23 +1,21 @@
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class ActivatorCreationPolicyTest
     {
         [Test]
-        public void NullContext()
+        public void CreatesObjectAndPassesValue()
         {
-            ActivatorCreationPolicy policy = new ActivatorCreationPolicy();
+            MockBuilderContext context = new MockBuilderContext();
+            ActivatorCreationPolicy policy = new ActivatorCreationPolicy(Params(42));
 
-            Assert.Throws<ArgumentNullException>(
-                delegate
-                {
-                    policy.Create(null, typeof(Dummy));
-                });
+            Dummy result = (Dummy)policy.Create(context, typeof(Dummy));
+
+            Assert.NotNull(result);
+            Assert.Equal(42, result.val);
         }
 
         [Test]
@@ -34,15 +32,15 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void CreatesObjectAndPassesValue()
+        public void NullContext()
         {
-            MockBuilderContext context = new MockBuilderContext();
-            ActivatorCreationPolicy policy = new ActivatorCreationPolicy(Params(42));
+            ActivatorCreationPolicy policy = new ActivatorCreationPolicy();
 
-            Dummy result = (Dummy)policy.Create(context, typeof(Dummy));
-
-            Assert.NotNull(result);
-            Assert.Equal(42, result.val);
+            Assert.Throws<ArgumentNullException>(
+                delegate
+                {
+                    policy.Create(null, typeof(Dummy));
+                });
         }
 
         static IEnumerable<IParameter> Params(params object[] parameters)

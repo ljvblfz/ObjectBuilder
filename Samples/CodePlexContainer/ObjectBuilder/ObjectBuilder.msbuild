@@ -25,10 +25,10 @@
   </Target>
 
   <Target Name="UnitTest">
-    <Exec Command="$(CodePlex3rdParty)\nunit-console.exe /nologo /noshadow /xml=Tests.ObjectBuilder.results.xml Tests.ObjectBuilder\bin\Release\Tests.ObjectBuilder.dll"/>
-    <Exec Command="$(CodePlex3rdParty)\nunit-console.exe /nologo /noshadow /xml=Tests.ObjectBuilder.EventBroker.results.xml Tests.ObjectBuilder.EventBroker\bin\Release\Tests.ObjectBuilder.EventBroker.dll"/>
-    <Exec Command="$(CodePlex3rdParty)\nunit-console.exe /nologo /noshadow /xml=Tests.ObjectBuilder.Injection.results.xml Tests.ObjectBuilder.Injection\bin\Release\Tests.ObjectBuilder.Injection.dll"/>
-    <Exec Command="$(CodePlex3rdParty)\nunit-console.exe /nologo /noshadow /xml=Tests.ObjectBuilder.Interception.results.xml Tests.ObjectBuilder.Interception\bin\Release\Tests.ObjectBuilder.Interception.dll"/>
+    <Exec Command="..\3rdParty\xunit.console.exe Tests.ObjectBuilder\bin\Release\Tests.ObjectBuilder.dll /nunit Tests.ObjectBuilder.results.xml"/>
+    <Exec Command="..\3rdParty\xunit.console.exe Tests.ObjectBuilder.EventBroker\bin\Release\Tests.ObjectBuilder.EventBroker.dll /nunit Tests.ObjectBuilder.EventBroker.results.xml"/>
+    <Exec Command="..\3rdParty\xunit.console.exe Tests.ObjectBuilder.Injection\bin\Release\Tests.ObjectBuilder.Injection.dll /nunit Tests.ObjectBuilder.Injection.results.xml"/>
+    <Exec Command="..\3rdParty\xunit.console.exe Tests.ObjectBuilder.Interception\bin\Release\Tests.ObjectBuilder.Interception.dll /nunit Tests.ObjectBuilder.Interception.results.xml"/>
   </Target>
 
   <Target Name="SetVersionNumber">

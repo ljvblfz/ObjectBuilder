@@ -1,13 +1,21 @@
 using System;
 using System.Threading;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace Ottawa
 {
     public class OttawaContainerAcceptanceTests
     {
-        [TestFixture]
+        class DisposableObject : IDisposable
+        {
+            public bool disposeCalled;
+
+            public void Dispose()
+            {
+                disposeCalled = true;
+            }
+        }
+
         public class Dispose
         {
             [Test]
@@ -23,7 +31,6 @@ namespace Ottawa
             }
         }
 
-        [TestFixture]
         public class Errors
         {
             [Test]
@@ -60,18 +67,6 @@ namespace Ottawa
                     delegate
                     {
                         container.AddComponent<DateTime>("");
-                    });
-            }
-
-            [Test]
-            public void DefaultContainerDoesNotResolveAutomatically()
-            {
-                OttawaContainer container = new OttawaContainer();
-
-                Assert.Throws<ComponentNotFoundException>(
-                    delegate
-                    {
-                        container.Resolve<object>();
                     });
             }
 
@@ -113,38 +108,39 @@ namespace Ottawa
                         container.Resolve<int>();
                     });
             }
+
+            [Test]
+            public void DefaultContainerDoesNotResolveAutomatically()
+            {
+                OttawaContainer container = new OttawaContainer();
+
+                Assert.Throws<ComponentNotFoundException>(
+                    delegate
+                    {
+                        container.Resolve<object>();
+                    });
+            }
         }
 
-        [TestFixture]
+        class Foo : IFoo
+        {
+            public static int ctorCount;
+
+            public Foo()
+            {
+                ctorCount++;
+            }
+        }
+
+        class Foo2 : IFoo {}
+
+        abstract class FooAbstract {}
+
+        interface IFoo {}
+
         public class Lifestyle
         {
-            [Test]
-            public void Singleton()
-            {
-                OttawaContainer container = new OttawaContainer();
-                container.AddComponentWithLifestyle<object>("", LifestyleType.Singleton);
-
-                object obj1 = container.Resolve<object>("");
-                object obj2 = container.Resolve<object>("");
-
-                Assert.NotNull(obj1);
-                Assert.NotNull(obj2);
-                Assert.Same(obj1, obj2);
-            }
-
-            [Test]
-            public void Transient()
-            {
-                OttawaContainer container = new OttawaContainer();
-                container.AddComponentWithLifestyle<object>("", LifestyleType.Transient);
-
-                object obj1 = container.Resolve<object>("");
-                object obj2 = container.Resolve<object>("");
-
-                Assert.NotSame(obj1, obj2);
-            }
-
-            [Test, Ignore("Threading support not implemented yet")]
+            [Test(Skip="Threading support not implemented yet")]
             public void CanResolveObjectsPerThread()
             {
                 object obj1a = null, obj1b = null, obj2a, obj2b;
@@ -170,9 +166,34 @@ namespace Ottawa
                 Assert.Same(obj2a, obj2b);
                 Assert.NotSame(obj1a, obj2a);
             }
+
+            [Test]
+            public void Singleton()
+            {
+                OttawaContainer container = new OttawaContainer();
+                container.AddComponentWithLifestyle<object>("", LifestyleType.Singleton);
+
+                object obj1 = container.Resolve<object>("");
+                object obj2 = container.Resolve<object>("");
+
+                Assert.NotNull(obj1);
+                Assert.NotNull(obj2);
+                Assert.Same(obj1, obj2);
+            }
+
+            [Test]
+            public void Transient()
+            {
+                OttawaContainer container = new OttawaContainer();
+                container.AddComponentWithLifestyle<object>("", LifestyleType.Transient);
+
+                object obj1 = container.Resolve<object>("");
+                object obj2 = container.Resolve<object>("");
+
+                Assert.NotSame(obj1, obj2);
+            }
         }
 
-        [TestFixture]
         public class Release
         {
             [Test]
@@ -190,9 +211,47 @@ namespace Ottawa
             }
         }
 
-        [TestFixture]
         public class Resolve
         {
+            [Test]
+            public void AddingTwoComponentAndServicesForTheSamKeyThrows()
+            {
+                OttawaContainer container = new OttawaContainer();
+                container.AddComponent<IFoo, Foo>("");
+
+                Assert.Throws<ComponentRegistrationException>(
+                    delegate
+                    {
+                        container.AddComponent<object, Foo2>("");
+                    });
+            }
+
+            [Test]
+            public void AddingTwoComponentsForTheSameServiceTypeResolvesToTheFirstOne()
+            {
+                OttawaContainer container = new OttawaContainer();
+                container.AddComponent<IFoo, Foo>("");
+                container.AddComponent<IFoo, Foo2>("bob");
+
+                IFoo result = container.Resolve<IFoo>();
+
+                Assert.IsType<Foo>(result);
+            }
+
+            [Test]
+            public void CanAddTheSameComponentUnderDifferentKeys()
+            {
+                OttawaContainer container = new OttawaContainer();
+                container.AddComponent<object>("");
+                container.AddComponent<object>("foo");
+
+                object resolvedEmpty = container.Resolve<object>("");
+                object resolvedByName = container.Resolve<object>("foo");
+
+                Assert.NotNull(resolvedEmpty);
+                Assert.NotNull(resolvedByName);
+            }
+
             [Test]
             public void CanResolveByKey()
             {
@@ -227,28 +286,32 @@ namespace Ottawa
             }
 
             [Test]
-            public void AddingTwoComponentsForTheSameServiceTypeResolvesToTheFirstOne()
+            public void SameTypeWithSameNameIsSameInstance()
             {
                 OttawaContainer container = new OttawaContainer();
-                container.AddComponent<IFoo, Foo>("");
-                container.AddComponent<IFoo, Foo2>("bob");
+                container.AddComponent<object>("");
 
-                IFoo result = container.Resolve<IFoo>();
+                object result1 = container.Resolve<object>("");
+                object result2 = container.Resolve<object>("");
 
-                Assert.IsType<Foo>(result);
+                Assert.NotNull(result1);
+                Assert.NotNull(result2);
+                Assert.Same(result1, result2);
             }
 
             [Test]
-            public void AddingTwoComponentAndServicesForTheSamKeyThrows()
+            public void SameTypeWithTwoDifferentNamesIsTwoDifferenceInstances()
             {
                 OttawaContainer container = new OttawaContainer();
-                container.AddComponent<IFoo, Foo>("");
+                container.AddComponent<object>("");
+                container.AddComponent<object>("foo");
 
-                Assert.Throws<ComponentRegistrationException>(
-                    delegate
-                    {
-                        container.AddComponent<object, Foo2>("");
-                    });
+                object resolvedEmpty = container.Resolve<object>("");
+                object resolvedByName = container.Resolve<object>("foo");
+
+                Assert.NotNull(resolvedEmpty);
+                Assert.NotNull(resolvedByName);
+                Assert.NotSame(resolvedEmpty, resolvedByName);
             }
 
             [Test]
@@ -277,75 +340,6 @@ namespace Ottawa
 
                 Assert.Equal(1, Foo.ctorCount);
             }
-
-            [Test]
-            public void CanAddTheSameComponentUnderDifferentKeys()
-            {
-                OttawaContainer container = new OttawaContainer();
-                container.AddComponent<object>("");
-                container.AddComponent<object>("foo");
-
-                object resolvedEmpty = container.Resolve<object>("");
-                object resolvedByName = container.Resolve<object>("foo");
-
-                Assert.NotNull(resolvedEmpty);
-                Assert.NotNull(resolvedByName);
-            }
-
-            [Test]
-            public void SameTypeWithSameNameIsSameInstance()
-            {
-                OttawaContainer container = new OttawaContainer();
-                container.AddComponent<object>("");
-
-                object result1 = container.Resolve<object>("");
-                object result2 = container.Resolve<object>("");
-
-                Assert.NotNull(result1);
-                Assert.NotNull(result2);
-                Assert.Same(result1, result2);
-            }
-
-            [Test]
-            public void SameTypeWithTwoDifferentNamesIsTwoDifferenceInstances()
-            {
-                OttawaContainer container = new OttawaContainer();
-                container.AddComponent<object>("");
-                container.AddComponent<object>("foo");
-
-                object resolvedEmpty = container.Resolve<object>("");
-                object resolvedByName = container.Resolve<object>("foo");
-
-                Assert.NotNull(resolvedEmpty);
-                Assert.NotNull(resolvedByName);
-                Assert.NotSame(resolvedEmpty, resolvedByName);
-            }
         }
-
-        class DisposableObject : IDisposable
-        {
-            public bool disposeCalled;
-
-            public void Dispose()
-            {
-                disposeCalled = true;
-            }
-        }
-
-        class Foo : IFoo
-        {
-            public static int ctorCount;
-
-            public Foo()
-            {
-                ctorCount++;
-            }
-        }
-
-        class Foo2 : IFoo {}
-
-        abstract class FooAbstract {}
-
-        interface IFoo {}
     }
 }

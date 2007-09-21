@@ -1,41 +1,9 @@
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class BuilderAwareStrategyTest
     {
-        [Test]
-        public void BuildIgnoresClassWithoutInterface()
-        {
-            BuilderAwareStrategy strategy = new BuilderAwareStrategy();
-            MockBuilderContext context = new MockBuilderContext();
-            Ignorant obj = new Ignorant();
-
-            context.Strategies.Add(strategy);
-
-            context.HeadOfChain.BuildUp(context, typeof(Ignorant), obj);
-
-            Assert.False(obj.OnBuiltUp__Called);
-            Assert.False(obj.OnTearingDown__Called);
-        }
-
-        [Test]
-        public void TearDownIgnoresClassWithoutInterface()
-        {
-            BuilderAwareStrategy strategy = new BuilderAwareStrategy();
-            MockBuilderContext context = new MockBuilderContext();
-            Ignorant obj = new Ignorant();
-
-            context.Strategies.Add(strategy);
-
-            context.HeadOfChain.TearDown(context, obj);
-
-            Assert.False(obj.OnBuiltUp__Called);
-            Assert.False(obj.OnTearingDown__Called);
-        }
-
         [Test]
         public void BuildCallsClassWithInterface()
         {
@@ -50,6 +18,36 @@ namespace ObjectBuilder
             Assert.True(obj.OnBuiltUp__Called);
             Assert.False(obj.OnTearingDown__Called);
             Assert.Equal<object>(typeof(Aware), obj.OnBuiltUp_BuildKey);
+        }
+
+        [Test]
+        public void BuildChecksConcreteTypeAndNotRequestedType()
+        {
+            BuilderAwareStrategy strategy = new BuilderAwareStrategy();
+            MockBuilderContext context = new MockBuilderContext();
+            Aware obj = new Aware();
+
+            context.Strategies.Add(strategy);
+
+            context.HeadOfChain.BuildUp(context, typeof(Ignorant), obj);
+
+            Assert.True(obj.OnBuiltUp__Called);
+            Assert.False(obj.OnTearingDown__Called);
+        }
+
+        [Test]
+        public void BuildIgnoresClassWithoutInterface()
+        {
+            BuilderAwareStrategy strategy = new BuilderAwareStrategy();
+            MockBuilderContext context = new MockBuilderContext();
+            Ignorant obj = new Ignorant();
+
+            context.Strategies.Add(strategy);
+
+            context.HeadOfChain.BuildUp(context, typeof(Ignorant), obj);
+
+            Assert.False(obj.OnBuiltUp__Called);
+            Assert.False(obj.OnTearingDown__Called);
         }
 
         [Test]
@@ -68,19 +66,21 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void BuildChecksConcreteTypeAndNotRequestedType()
+        public void TearDownIgnoresClassWithoutInterface()
         {
             BuilderAwareStrategy strategy = new BuilderAwareStrategy();
             MockBuilderContext context = new MockBuilderContext();
-            Aware obj = new Aware();
+            Ignorant obj = new Ignorant();
 
             context.Strategies.Add(strategy);
 
-            context.HeadOfChain.BuildUp(context, typeof(Ignorant), obj);
+            context.HeadOfChain.TearDown(context, obj);
 
-            Assert.True(obj.OnBuiltUp__Called);
+            Assert.False(obj.OnBuiltUp__Called);
             Assert.False(obj.OnTearingDown__Called);
         }
+
+        class Aware : Ignorant, IBuilderAware {}
 
         class Ignorant
         {
@@ -99,7 +99,5 @@ namespace ObjectBuilder
                 OnTearingDown__Called = true;
             }
         }
-
-        class Aware : Ignorant, IBuilderAware {}
     }
 }

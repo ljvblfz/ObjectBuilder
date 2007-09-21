@@ -1,12 +1,44 @@
 using System;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class LifetimeContainerTest
     {
+        [Test]
+        public void CanDetermineIfLifetimeContainerContainsObject()
+        {
+            ILifetimeContainer container = new LifetimeContainer();
+            object obj = new object();
+
+            container.Add(obj);
+
+            Assert.True(container.Contains(obj));
+        }
+
+        [Test]
+        public void CanEnumerateItemsInContainer()
+        {
+            ILifetimeContainer container = new LifetimeContainer();
+            DisposableObject mdo = new DisposableObject();
+
+            container.Add(mdo);
+
+            int count = 0;
+            bool foundMdo = false;
+
+            foreach (object obj in container)
+            {
+                count++;
+
+                if (ReferenceEquals(mdo, obj))
+                    foundMdo = true;
+            }
+
+            Assert.Equal(1, count);
+            Assert.True(foundMdo);
+        }
+
         [Test]
         public void ContainerEnsuresObjectsWontBeCollected()
         {
@@ -37,61 +69,6 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void RemovingItemsFromContainerDoesNotDisposeThem()
-        {
-            ILifetimeContainer container = new LifetimeContainer();
-            DisposableObject mdo = new DisposableObject();
-
-            container.Add(mdo);
-            container.Remove(mdo);
-            container.Dispose();
-
-            Assert.False(mdo.WasDisposed);
-        }
-
-        [Test]
-        public void CanEnumerateItemsInContainer()
-        {
-            ILifetimeContainer container = new LifetimeContainer();
-            DisposableObject mdo = new DisposableObject();
-
-            container.Add(mdo);
-
-            int count = 0;
-            bool foundMdo = false;
-
-            foreach (object obj in container)
-            {
-                count++;
-
-                if (ReferenceEquals(mdo, obj))
-                    foundMdo = true;
-            }
-
-            Assert.Equal(1, count);
-            Assert.True(foundMdo);
-        }
-
-        [Test]
-        public void CanDetermineIfLifetimeContainerContainsObject()
-        {
-            ILifetimeContainer container = new LifetimeContainer();
-            object obj = new object();
-
-            container.Add(obj);
-
-            Assert.True(container.Contains(obj));
-        }
-
-        [Test]
-        public void RemovingNonContainedItemDoesNotThrow()
-        {
-            ILifetimeContainer container = new LifetimeContainer();
-
-            container.Remove(new object());
-        }
-
-        [Test]
         public void DisposingItemsFromContainerDisposesInReverseOrderAdded()
         {
             ILifetimeContainer container = new LifetimeContainer();
@@ -110,15 +87,25 @@ namespace ObjectBuilder
             Assert.Equal(3, obj1.DisposePosition);
         }
 
-        class DisposeOrderCounter : IDisposable
+        [Test]
+        public void RemovingItemsFromContainerDoesNotDisposeThem()
         {
-            static int count = 0;
-            public int DisposePosition;
+            ILifetimeContainer container = new LifetimeContainer();
+            DisposableObject mdo = new DisposableObject();
 
-            public void Dispose()
-            {
-                DisposePosition = ++count;
-            }
+            container.Add(mdo);
+            container.Remove(mdo);
+            container.Dispose();
+
+            Assert.False(mdo.WasDisposed);
+        }
+
+        [Test]
+        public void RemovingNonContainedItemDoesNotThrow()
+        {
+            ILifetimeContainer container = new LifetimeContainer();
+
+            container.Remove(new object());
         }
 
         class DisposableObject : IDisposable
@@ -128,6 +115,17 @@ namespace ObjectBuilder
             public void Dispose()
             {
                 WasDisposed = true;
+            }
+        }
+
+        class DisposeOrderCounter : IDisposable
+        {
+            static int count = 0;
+            public int DisposePosition;
+
+            public void Dispose()
+            {
+                DisposePosition = ++count;
             }
         }
     }

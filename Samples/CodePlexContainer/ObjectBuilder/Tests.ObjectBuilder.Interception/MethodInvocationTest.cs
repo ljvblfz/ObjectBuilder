@@ -1,11 +1,9 @@
 using System;
 using System.Reflection;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class MethodInvocationTest
     {
         [Test]

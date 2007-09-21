@@ -1,12 +1,22 @@
 using System;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class StagedStrategyChainTest
     {
+        static void AssertOrder(IStrategyChain chain,
+                                params FakeStrategy[] strategies)
+        {
+            IBuilderStrategy current = chain.Head;
+
+            foreach (FakeStrategy strategy in strategies)
+            {
+                Assert.Same(strategy, current);
+                current = chain.GetNext(current);
+            }
+        }
+
         [Test]
         public void InnerStrategiesComeBeforeOuterStrategiesInStrategyChain()
         {
@@ -39,18 +49,6 @@ namespace ObjectBuilder
             StrategyChain chain = outerChain.MakeStrategyChain();
 
             AssertOrder(chain, innerStage1, outerStage1, innerStage2, outerStage2);
-        }
-
-        static void AssertOrder(StrategyChain chain,
-                                params FakeStrategy[] strategies)
-        {
-            IBuilderStrategy current = chain.Head;
-
-            foreach (FakeStrategy strategy in strategies)
-            {
-                Assert.Same(strategy, current);
-                current = chain.GetNext(current);
-            }
         }
 
         enum FakeStage

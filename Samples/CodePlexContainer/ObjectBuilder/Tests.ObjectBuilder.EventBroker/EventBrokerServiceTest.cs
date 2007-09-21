@@ -1,47 +1,13 @@
 using System;
 using System.Reflection;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
     public class EventBrokerServiceTest
     {
-        [TestFixture]
         public class AcceptanceTests
         {
-            [Test]
-            public void RegistrationSourceFirst()
-            {
-                EventBrokerService service = new EventBrokerService();
-                SpyEventSource source = new SpyEventSource();
-                SpyEventSink sink = new SpyEventSink();
-                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
-                MethodInfo sinkMethod = sink.GetType().GetMethod("MySink");
-                service.RegisterSource(source, sourceEvent, "MyEvent");
-                service.RegisterSink(sink, sinkMethod, "MyEvent");
-
-                source.InvokeMySource();
-
-                Assert.Equal(source.SourceText, sink.EventValue);
-            }
-
-            [Test]
-            public void RegistrationSinkFirst()
-            {
-                EventBrokerService service = new EventBrokerService();
-                SpyEventSource source = new SpyEventSource();
-                SpyEventSink sink = new SpyEventSink();
-                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
-                MethodInfo sinkMethod = sink.GetType().GetMethod("MySink");
-                service.RegisterSink(sink, sinkMethod, "MyEvent");
-                service.RegisterSource(source, sourceEvent, "MyEvent");
-
-                source.InvokeMySource();
-
-                Assert.Equal(source.SourceText, sink.EventValue);
-            }
-
             [Test]
             public void ExceptionsAreCollectedAndRethrown()
             {
@@ -63,6 +29,38 @@ namespace ObjectBuilder
 
                 Assert.Equal(2, ex.Exceptions.Count);
             }
+
+            [Test]
+            public void RegistrationSinkFirst()
+            {
+                EventBrokerService service = new EventBrokerService();
+                SpyEventSource source = new SpyEventSource();
+                SpyEventSink sink = new SpyEventSink();
+                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
+                MethodInfo sinkMethod = sink.GetType().GetMethod("MySink");
+                service.RegisterSink(sink, sinkMethod, "MyEvent");
+                service.RegisterSource(source, sourceEvent, "MyEvent");
+
+                source.InvokeMySource();
+
+                Assert.Equal(source.SourceText, sink.EventValue);
+            }
+
+            [Test]
+            public void RegistrationSourceFirst()
+            {
+                EventBrokerService service = new EventBrokerService();
+                SpyEventSource source = new SpyEventSource();
+                SpyEventSink sink = new SpyEventSink();
+                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
+                MethodInfo sinkMethod = sink.GetType().GetMethod("MySink");
+                service.RegisterSource(source, sourceEvent, "MyEvent");
+                service.RegisterSink(sink, sinkMethod, "MyEvent");
+
+                source.InvokeMySource();
+
+                Assert.Equal(source.SourceText, sink.EventValue);
+            }
         }
 
         internal class ExceptionThrowingSink
@@ -74,32 +72,19 @@ namespace ObjectBuilder
             }
         }
 
-        [TestFixture]
         public class RegisterSink
         {
             [Test]
-            public void NullSink()
+            public void InvalidMethodSignature()
             {
                 EventBrokerService service = new EventBrokerService();
                 SpyEventSink sink = new SpyEventSink();
-                MethodInfo sinkMethod = sink.GetType().GetMethod("MySink");
+                MethodInfo sinkMethod = sink.GetType().GetMethod("NonSinkMethod");
 
-                Assert.Throws<ArgumentNullException>(delegate
-                                                     {
-                                                         service.RegisterSink(null, sinkMethod, "MyEvent");
-                                                     });
-            }
-
-            [Test]
-            public void NullMethod()
-            {
-                EventBrokerService service = new EventBrokerService();
-                SpyEventSink sink = new SpyEventSink();
-
-                Assert.Throws<ArgumentNullException>(delegate
-                                                     {
-                                                         service.RegisterSink(sink, null, "MyEvent");
-                                                     });
+                Assert.Throws<ArgumentException>(delegate
+                                                 {
+                                                     service.RegisterSink(sink, sinkMethod, "MyEvent");
+                                                 });
             }
 
             [Test]
@@ -116,35 +101,33 @@ namespace ObjectBuilder
             }
 
             [Test]
-            public void InvalidMethodSignature()
+            public void NullMethod()
             {
                 EventBrokerService service = new EventBrokerService();
                 SpyEventSink sink = new SpyEventSink();
-                MethodInfo sinkMethod = sink.GetType().GetMethod("NonSinkMethod");
-
-                Assert.Throws<ArgumentException>(delegate
-                                                 {
-                                                     service.RegisterSink(sink, sinkMethod, "MyEvent");
-                                                 });
-            }
-        }
-
-        [TestFixture]
-        public class RegisterSource
-        {
-            [Test]
-            public void NullSource()
-            {
-                EventBrokerService service = new EventBrokerService();
-                SpyEventSource source = new SpyEventSource();
-                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
 
                 Assert.Throws<ArgumentNullException>(delegate
                                                      {
-                                                         service.RegisterSource(null, sourceEvent, "MyEvent");
+                                                         service.RegisterSink(sink, null, "MyEvent");
                                                      });
             }
 
+            [Test]
+            public void NullSink()
+            {
+                EventBrokerService service = new EventBrokerService();
+                SpyEventSink sink = new SpyEventSink();
+                MethodInfo sinkMethod = sink.GetType().GetMethod("MySink");
+
+                Assert.Throws<ArgumentNullException>(delegate
+                                                     {
+                                                         service.RegisterSink(null, sinkMethod, "MyEvent");
+                                                     });
+            }
+        }
+
+        public class RegisterSource
+        {
             [Test]
             public void NullEvent()
             {
@@ -167,6 +150,19 @@ namespace ObjectBuilder
                 Assert.Throws<ArgumentNullException>(delegate
                                                      {
                                                          service.RegisterSource(source, sourceEvent, null);
+                                                     });
+            }
+
+            [Test]
+            public void NullSource()
+            {
+                EventBrokerService service = new EventBrokerService();
+                SpyEventSource source = new SpyEventSource();
+                EventInfo sourceEvent = source.GetType().GetEvent("MySource");
+
+                Assert.Throws<ArgumentNullException>(delegate
+                                                     {
+                                                         service.RegisterSource(null, sourceEvent, "MyEvent");
                                                      });
             }
         }
@@ -210,20 +206,8 @@ namespace ObjectBuilder
             public event EventHandler<EventArgs<string>> MySource;
         }
 
-        [TestFixture]
         public class UnregisterSink
         {
-            [Test]
-            public void NullSink()
-            {
-                EventBrokerService service = new EventBrokerService();
-
-                Assert.Throws<ArgumentNullException>(delegate
-                                                     {
-                                                         service.UnregisterSink(null, "MyEvent");
-                                                     });
-            }
-
             [Test]
             public void NullEventID()
             {
@@ -232,6 +216,17 @@ namespace ObjectBuilder
                 Assert.Throws<ArgumentNullException>(delegate
                                                      {
                                                          service.UnregisterSink(new object(), null);
+                                                     });
+            }
+
+            [Test]
+            public void NullSink()
+            {
+                EventBrokerService service = new EventBrokerService();
+
+                Assert.Throws<ArgumentNullException>(delegate
+                                                     {
+                                                         service.UnregisterSink(null, "MyEvent");
                                                      });
             }
 
@@ -253,20 +248,8 @@ namespace ObjectBuilder
             }
         }
 
-        [TestFixture]
         public class UnregisterSource
         {
-            [Test]
-            public void NullSource()
-            {
-                EventBrokerService service = new EventBrokerService();
-
-                Assert.Throws<ArgumentNullException>(delegate
-                                                     {
-                                                         service.UnregisterSource(null, "MyEvent");
-                                                     });
-            }
-
             [Test]
             public void NullEventID()
             {
@@ -275,6 +258,17 @@ namespace ObjectBuilder
                 Assert.Throws<ArgumentNullException>(delegate
                                                      {
                                                          service.UnregisterSink(new object(), null);
+                                                     });
+            }
+
+            [Test]
+            public void NullSource()
+            {
+                EventBrokerService service = new EventBrokerService();
+
+                Assert.Throws<ArgumentNullException>(delegate
+                                                     {
+                                                         service.UnregisterSource(null, "MyEvent");
                                                      });
             }
 
@@ -292,7 +286,6 @@ namespace ObjectBuilder
             }
         }
 
-        [TestFixture]
         public class WeakReferences
         {
             [Test]

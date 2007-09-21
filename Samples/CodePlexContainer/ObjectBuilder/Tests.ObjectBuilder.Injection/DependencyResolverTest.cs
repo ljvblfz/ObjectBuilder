@@ -1,44 +1,10 @@
 using System;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class DependencyResolverTest
     {
-        [Test]
-        public void NullContext()
-        {
-            Assert.Throws<ArgumentNullException>(
-                delegate
-                {
-                    DependencyResolver.Resolve(null, "foo", NotPresentBehavior.Null);
-                });
-        }
-
-        [Test]
-        public void NullBuildKey()
-        {
-            MockBuilderContext context = new MockBuilderContext();
-
-            Assert.Throws<ArgumentNullException>(
-                delegate
-                {
-                    DependencyResolver.Resolve(context, null, NotPresentBehavior.Null);
-                });
-        }
-
-        [Test]
-        public void ReturnsSingletonInstanceWhenPresent()
-        {
-            MockBuilderContext context = new MockBuilderContext();
-            object obj = new object();
-            context.Locator.Add("foo", obj);
-
-            Assert.Same(obj, DependencyResolver.Resolve(context, "foo", NotPresentBehavior.Null));
-        }
-
         [Test]
         public void CanBuildObjectWhenNotPresent()
         {
@@ -80,6 +46,38 @@ namespace ObjectBuilder
             result.Policies.SetDefault<ICreationPolicy>(new DefaultCreationPolicy());
             result.Policies.SetDefault<ISingletonPolicy>(new SingletonPolicy(true));
             return result;
+        }
+
+        [Test]
+        public void NullBuildKey()
+        {
+            MockBuilderContext context = new MockBuilderContext();
+
+            Assert.Throws<ArgumentNullException>(
+                delegate
+                {
+                    DependencyResolver.Resolve(context, null, NotPresentBehavior.Null);
+                });
+        }
+
+        [Test]
+        public void NullContext()
+        {
+            Assert.Throws<ArgumentNullException>(
+                delegate
+                {
+                    DependencyResolver.Resolve(null, "foo", NotPresentBehavior.Null);
+                });
+        }
+
+        [Test]
+        public void ReturnsSingletonInstanceWhenPresent()
+        {
+            MockBuilderContext context = new MockBuilderContext();
+            object obj = new object();
+            context.Locator.Add("foo", obj);
+
+            Assert.Same(obj, DependencyResolver.Resolve(context, "foo", NotPresentBehavior.Null));
         }
 
         interface IMockObject {}

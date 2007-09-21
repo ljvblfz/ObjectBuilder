@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
@@ -36,7 +35,6 @@ namespace ObjectBuilder
             public ushort UShort;
         }
 
-        [TestFixture]
         public class FindMethod
         {
             [Test]
@@ -122,7 +120,6 @@ namespace ObjectBuilder
             }
         }
 
-        [TestFixture]
         public class GenericClasses
         {
             [Test]
@@ -255,7 +252,6 @@ namespace ObjectBuilder
             public class Foo : IFoo {}
         }
 
-        [TestFixture]
         public class GenericMethods
         {
             [Test]
@@ -353,7 +349,6 @@ namespace ObjectBuilder
             public class Foo : IFoo {}
         }
 
-        [TestFixture]
         public class InParameters
         {
             [Test]
@@ -416,7 +411,6 @@ namespace ObjectBuilder
             }
         }
 
-        [TestFixture]
         public class OutParameters
         {
             [Test]
@@ -594,7 +588,6 @@ namespace ObjectBuilder
             }
         }
 
-        [TestFixture]
         public class RefParameters
         {
             [Test]
@@ -651,7 +644,6 @@ namespace ObjectBuilder
             }
         }
 
-        [TestFixture]
         public class ReturnValues
         {
             [Test]
@@ -734,7 +726,7 @@ namespace ObjectBuilder
             sealed class SpyReturn : ISpyReturn
             {
                 public const int ValueReturn = 42;
-                public static object ObjectReturn = new object();
+                public static readonly object ObjectReturn = new object();
 
                 public void Exception()
                 {

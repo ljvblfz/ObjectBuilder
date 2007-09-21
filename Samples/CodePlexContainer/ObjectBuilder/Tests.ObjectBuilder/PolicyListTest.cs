@@ -1,23 +1,9 @@
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class PolicyListTest
     {
-        [Test]
-        public void CanAddPolicyToBagAndRetrieveIt()
-        {
-            PolicyList list = new PolicyList();
-            FakePolicy policy = new FakePolicy();
-            list.Set<IBuilderPolicy>(policy, typeof(object));
-
-            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(object));
-
-            Assert.Same(policy, result);
-        }
-
         [Test]
         public void CanAddMultiplePoliciesToBagAndRetrieveThem()
         {
@@ -33,29 +19,15 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void SetOverwritesExistingPolicy()
-        {
-            PolicyList list = new PolicyList();
-            FakePolicy policy1 = new FakePolicy();
-            FakePolicy policy2 = new FakePolicy();
-            list.Set<IBuilderPolicy>(policy1, typeof(string));
-            list.Set<IBuilderPolicy>(policy2, typeof(string));
-
-            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(string));
-
-            Assert.Same(policy2, result);
-        }
-
-        [Test]
-        public void CanClearPolicy()
+        public void CanAddPolicyToBagAndRetrieveIt()
         {
             PolicyList list = new PolicyList();
             FakePolicy policy = new FakePolicy();
+            list.Set<IBuilderPolicy>(policy, typeof(object));
 
-            list.Set<IBuilderPolicy>(policy, typeof(string));
-            list.Clear<IBuilderPolicy>(typeof(string));
+            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(object));
 
-            Assert.Null(list.Get<IBuilderPolicy>(typeof(string)));
+            Assert.Same(policy, result);
         }
 
         [Test]
@@ -68,32 +40,6 @@ namespace ObjectBuilder
             list.ClearAll();
 
             Assert.Equal(0, list.Count);
-        }
-
-        [Test]
-        public void DefaultPolicyUsedWhenSpecificPolicyIsntAvailable()
-        {
-            PolicyList list = new PolicyList();
-            FakePolicy defaultPolicy = new FakePolicy();
-            list.SetDefault<IBuilderPolicy>(defaultPolicy);
-
-            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(object));
-
-            Assert.Same(defaultPolicy, result);
-        }
-
-        [Test]
-        public void SpecificPolicyOverridesDefaultPolicy()
-        {
-            PolicyList list = new PolicyList();
-            FakePolicy defaultPolicy = new FakePolicy();
-            FakePolicy specificPolicy = new FakePolicy();
-            list.Set<IBuilderPolicy>(specificPolicy, typeof(object));
-            list.SetDefault<IBuilderPolicy>(defaultPolicy);
-
-            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(object));
-
-            Assert.Same(specificPolicy, result);
         }
 
         [Test]
@@ -110,74 +56,15 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void WillAskInnerPolicyListWhenOuterHasNoAnswer()
+        public void CanClearPolicy()
         {
-            PolicyList innerList = new PolicyList();
-            PolicyList outerList = new PolicyList(innerList);
+            PolicyList list = new PolicyList();
             FakePolicy policy = new FakePolicy();
-            innerList.Set(policy, typeof(object));
 
-            FakePolicy result = outerList.Get<FakePolicy>(typeof(object));
+            list.Set<IBuilderPolicy>(policy, typeof(string));
+            list.Clear<IBuilderPolicy>(typeof(string));
 
-            Assert.Same(policy, result);
-        }
-
-        [Test]
-        public void WillUseInnerDefaultPolicyWhenOuterHasNoAnswer()
-        {
-            PolicyList innerList = new PolicyList();
-            PolicyList outerList = new PolicyList(innerList);
-            FakePolicy policy = new FakePolicy();
-            innerList.SetDefault(policy);
-
-            FakePolicy result = outerList.Get<FakePolicy>(typeof(object));
-
-            Assert.Same(policy, result);
-        }
-
-        [Test]
-        public void OuterPolicyOverridesInnerPolicy()
-        {
-            PolicyList innerList = new PolicyList();
-            PolicyList outerList = new PolicyList(innerList);
-            FakePolicy innerPolicy = new FakePolicy();
-            FakePolicy outerPolicy = new FakePolicy();
-            innerList.Set(innerPolicy, typeof(object));
-            outerList.Set(outerPolicy, typeof(object));
-
-            FakePolicy result = outerList.Get<FakePolicy>(typeof(object));
-
-            Assert.Same(outerPolicy, result);
-        }
-
-        [Test]
-        public void SpecificInnerPolicyOverridesDefaultOuterPolicy()
-        {
-            PolicyList innerList = new PolicyList();
-            PolicyList outerList = new PolicyList(innerList);
-            FakePolicy innerPolicy = new FakePolicy();
-            FakePolicy outerPolicy = new FakePolicy();
-            innerList.Set(innerPolicy, typeof(object));
-            outerList.SetDefault(outerPolicy);
-
-            FakePolicy result = outerList.Get<FakePolicy>(typeof(object));
-
-            Assert.Same(innerPolicy, result);
-        }
-
-        [Test]
-        public void OuterPolicyDefaultOverridesInnerPolicyDefault()
-        {
-            PolicyList innerList = new PolicyList();
-            PolicyList outerList = new PolicyList(innerList);
-            FakePolicy innerPolicy = new FakePolicy();
-            FakePolicy outerPolicy = new FakePolicy();
-            innerList.SetDefault(innerPolicy);
-            outerList.SetDefault(outerPolicy);
-
-            FakePolicy result = outerList.Get<FakePolicy>(typeof(object));
-
-            Assert.Same(outerPolicy, result);
+            Assert.Null(list.Get<IBuilderPolicy>(typeof(string)));
         }
 
         [Test]
@@ -206,6 +93,62 @@ namespace ObjectBuilder
         }
 
         [Test]
+        public void DefaultPolicyUsedWhenSpecificPolicyIsntAvailable()
+        {
+            PolicyList list = new PolicyList();
+            FakePolicy defaultPolicy = new FakePolicy();
+            list.SetDefault<IBuilderPolicy>(defaultPolicy);
+
+            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(object));
+
+            Assert.Same(defaultPolicy, result);
+        }
+
+        [Test]
+        public void OuterPolicyDefaultOverridesInnerPolicyDefault()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy innerPolicy = new FakePolicy();
+            FakePolicy outerPolicy = new FakePolicy();
+            innerList.SetDefault(innerPolicy);
+            outerList.SetDefault(outerPolicy);
+
+            FakePolicy result = outerList.Get<FakePolicy>(typeof(object));
+
+            Assert.Same(outerPolicy, result);
+        }
+
+        [Test]
+        public void OuterPolicyOverridesInnerPolicy()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy innerPolicy = new FakePolicy();
+            FakePolicy outerPolicy = new FakePolicy();
+            innerList.Set(innerPolicy, typeof(object));
+            outerList.Set(outerPolicy, typeof(object));
+
+            FakePolicy result = outerList.Get<FakePolicy>(typeof(object));
+
+            Assert.Same(outerPolicy, result);
+        }
+
+        [Test]
+        public void SetOverwritesExistingPolicy()
+        {
+            PolicyList list = new PolicyList();
+            FakePolicy policy1 = new FakePolicy();
+            FakePolicy policy2 = new FakePolicy();
+            list.Set<IBuilderPolicy>(policy1, typeof(string));
+            list.Set<IBuilderPolicy>(policy2, typeof(string));
+
+            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(string));
+
+            Assert.Same(policy2, result);
+        }
+
+        [Test]
         public void SpecificGenericPolicyComesBeforeGenericPolicy()
         {
             PolicyList list = new PolicyList();
@@ -219,8 +162,63 @@ namespace ObjectBuilder
             Assert.Same(specificPolicy, result);
         }
 
-        interface IFoo<T> {}
+        [Test]
+        public void SpecificInnerPolicyOverridesDefaultOuterPolicy()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy innerPolicy = new FakePolicy();
+            FakePolicy outerPolicy = new FakePolicy();
+            innerList.Set(innerPolicy, typeof(object));
+            outerList.SetDefault(outerPolicy);
+
+            FakePolicy result = outerList.Get<FakePolicy>(typeof(object));
+
+            Assert.Same(innerPolicy, result);
+        }
+
+        [Test]
+        public void SpecificPolicyOverridesDefaultPolicy()
+        {
+            PolicyList list = new PolicyList();
+            FakePolicy defaultPolicy = new FakePolicy();
+            FakePolicy specificPolicy = new FakePolicy();
+            list.Set<IBuilderPolicy>(specificPolicy, typeof(object));
+            list.SetDefault<IBuilderPolicy>(defaultPolicy);
+
+            IBuilderPolicy result = list.Get<IBuilderPolicy>(typeof(object));
+
+            Assert.Same(specificPolicy, result);
+        }
+
+        [Test]
+        public void WillAskInnerPolicyListWhenOuterHasNoAnswer()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy policy = new FakePolicy();
+            innerList.Set(policy, typeof(object));
+
+            FakePolicy result = outerList.Get<FakePolicy>(typeof(object));
+
+            Assert.Same(policy, result);
+        }
+
+        [Test]
+        public void WillUseInnerDefaultPolicyWhenOuterHasNoAnswer()
+        {
+            PolicyList innerList = new PolicyList();
+            PolicyList outerList = new PolicyList(innerList);
+            FakePolicy policy = new FakePolicy();
+            innerList.SetDefault(policy);
+
+            FakePolicy result = outerList.Get<FakePolicy>(typeof(object));
+
+            Assert.Same(policy, result);
+        }
 
         class FakePolicy : IBuilderPolicy {}
+
+        interface IFoo<T> {}
     }
 }

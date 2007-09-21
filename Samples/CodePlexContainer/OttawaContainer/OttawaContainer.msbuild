@@ -25,7 +25,7 @@
   </Target>
 
   <Target Name="UnitTest">
-    <Exec Command="$(CodePlex3rdParty)\nunit-console.exe /nologo /noshadow /xml=Tests.OttawaContainer.results.xml Tests.OttawaContainer\bin\Release\Tests.OttawaContainer.dll"/>
+    <Exec Command="..\3rdParty\xunit.console.exe Tests.OttawaContainer\bin\Release\Tests.OttawaContainer.dll /nunit Tests.OttawaContainer.results.xml"/>
   </Target>
 
   <Target Name="SetVersionNumber">

@@ -1,26 +1,9 @@
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class MethodCallStrategyTest
     {
-        [Test]
-        public void NoInstance()
-        {
-            Spy.Executed = false;
-            MockBuilderContext context = new MockBuilderContext();
-            MethodCallStrategy strategy = new MethodCallStrategy();
-            MethodCallPolicy policy = new MethodCallPolicy();
-            policy.Methods.Add(new ReflectionMethodCallInfo(typeof(Spy).GetMethod("InjectionMethod")));
-            context.Policies.Set<IMethodCallPolicy>(policy, typeof(Spy));
-
-            strategy.BuildUp(context, typeof(Spy), null);
-
-            Assert.False(Spy.Executed);
-        }
-
         [Test]
         public void ExecutesMethodsInPolicy()
         {
@@ -34,6 +17,21 @@ namespace ObjectBuilder
             strategy.BuildUp(context, typeof(Spy), new Spy());
 
             Assert.True(Spy.Executed);
+        }
+
+        [Test]
+        public void NoInstance()
+        {
+            Spy.Executed = false;
+            MockBuilderContext context = new MockBuilderContext();
+            MethodCallStrategy strategy = new MethodCallStrategy();
+            MethodCallPolicy policy = new MethodCallPolicy();
+            policy.Methods.Add(new ReflectionMethodCallInfo(typeof(Spy).GetMethod("InjectionMethod")));
+            context.Policies.Set<IMethodCallPolicy>(policy, typeof(Spy));
+
+            strategy.BuildUp(context, typeof(Spy), null);
+
+            Assert.False(Spy.Executed);
         }
 
         internal class Spy

@@ -1,27 +1,11 @@
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class HandlerPipelineTest
     {
-        [Test]
-        public void NullHandlerLists()
-        {
-            Assert.Throws<ArgumentNullException>(delegate
-                                                 {
-                                                     new HandlerPipeline((IEnumerable<IInterceptionHandler>)null);
-                                                 });
-
-            Assert.Throws<ArgumentNullException>(delegate
-                                                 {
-                                                     new HandlerPipeline((IInterceptionHandler[])null);
-                                                 });
-        }
-
         [Test]
         public void NoHandlersCallsTarget()
         {
@@ -42,6 +26,20 @@ namespace ObjectBuilder
 
             Assert.True(called);
             Assert.Same(returnValue, result);
+        }
+
+        [Test]
+        public void NullHandlerLists()
+        {
+            Assert.Throws<ArgumentNullException>(delegate
+                                                 {
+                                                     new HandlerPipeline((IEnumerable<IInterceptionHandler>)null);
+                                                 });
+
+            Assert.Throws<ArgumentNullException>(delegate
+                                                 {
+                                                     new HandlerPipeline((IInterceptionHandler[])null);
+                                                 });
         }
 
         [Test]

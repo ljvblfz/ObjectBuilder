@@ -1,33 +1,20 @@
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
-    [TestFixture]
     public class ConstructorReflectionStrategyTest
     {
         [Test]
-        public void ZeroConstructorsOnReferenceType()
+        public void MultipleDecoratedConstructors()
         {
             MockBuilderContext context = new MockBuilderContext();
             ConstructorReflectionStrategy strategy = new ConstructorReflectionStrategy();
 
-            strategy.BuildUp(context, typeof(ZeroClass), null);
-
-            ICreationPolicy policy = context.Policies.Get<ICreationPolicy>(typeof(ZeroClass));
-            Assert.NotNull(policy);
-            Assert.IsType<ZeroClass>(policy.Create(context, typeof(ZeroClass)));
-        }
-
-        [Test]
-        public void ZeroConstructorsOnValueType()
-        {
-            MockBuilderContext context = new MockBuilderContext();
-            ConstructorReflectionStrategy strategy = new ConstructorReflectionStrategy();
-
-            strategy.BuildUp(context, typeof(ZeroStruct), null);
-
-            Assert.Null(context.Policies.Get<ICreationPolicy>(typeof(ZeroStruct)));
+            Assert.Throws<InvalidAttributeException>(
+                delegate
+                {
+                    strategy.BuildUp(context, typeof(MultiDecorated), null);
+                });
         }
 
         [Test]
@@ -57,30 +44,27 @@ namespace ObjectBuilder
         }
 
         [Test]
-        public void MultipleDecoratedConstructors()
+        public void ZeroConstructorsOnReferenceType()
         {
             MockBuilderContext context = new MockBuilderContext();
             ConstructorReflectionStrategy strategy = new ConstructorReflectionStrategy();
 
-            Assert.Throws<InvalidAttributeException>(
-                delegate
-                {
-                    strategy.BuildUp(context, typeof(MultiDecorated), null);
-                });
+            strategy.BuildUp(context, typeof(ZeroClass), null);
+
+            ICreationPolicy policy = context.Policies.Get<ICreationPolicy>(typeof(ZeroClass));
+            Assert.NotNull(policy);
+            Assert.IsType<ZeroClass>(policy.Create(context, typeof(ZeroClass)));
         }
 
-        internal class ZeroClass {}
-
-        internal struct ZeroStruct {}
-
-        internal class Undecorated
+        [Test]
+        public void ZeroConstructorsOnValueType()
         {
-            public bool Constructor__Called;
+            MockBuilderContext context = new MockBuilderContext();
+            ConstructorReflectionStrategy strategy = new ConstructorReflectionStrategy();
 
-            public Undecorated()
-            {
-                Constructor__Called = true;
-            }
+            strategy.BuildUp(context, typeof(ZeroStruct), null);
+
+            Assert.Null(context.Policies.Get<ICreationPolicy>(typeof(ZeroStruct)));
         }
 
         internal class Decorated
@@ -111,5 +95,19 @@ namespace ObjectBuilder
             public MultiDecorated(int dummy) {}
 #pragma warning restore 168
         }
+
+        internal class Undecorated
+        {
+            public bool Constructor__Called;
+
+            public Undecorated()
+            {
+                Constructor__Called = true;
+            }
+        }
+
+        internal class ZeroClass {}
+
+        internal struct ZeroStruct {}
     }
 }

@@ -1,26 +1,12 @@
 using System;
-using NUnit.Framework;
-using Assert=CodePlex.NUnitExtensions.Assert;
+using Xunit;
 
 namespace ObjectBuilder
 {
     public class BuilderTest
     {
-        [TestFixture]
         public class BuildUp
         {
-            [Test]
-            public void NullStrategies()
-            {
-                Builder builder = new Builder();
-
-                Assert.Throws<ArgumentNullException>(
-                    delegate
-                    {
-                        builder.BuildUp<object>(null, null, null, null, null, null);
-                    });
-            }
-
             [Test]
             public void EmptyStrategies()
             {
@@ -35,18 +21,15 @@ namespace ObjectBuilder
             }
 
             [Test]
-            public void StrategyStagesRunInProperOrder()
+            public void NullStrategies()
             {
                 Builder builder = new Builder();
-                StrategyChain strategies = new StrategyChain();
-                strategies.Add(new StringConcatStrategy("1"));
-                strategies.Add(new StringConcatStrategy("2"));
-                strategies.Add(new StringConcatStrategy("3"));
-                strategies.Add(new StringConcatStrategy("4"));
 
-                string s = builder.BuildUp<string>(null, null, null, strategies, null, null);
-
-                Assert.Equal("1234", s);
+                Assert.Throws<ArgumentNullException>(
+                    delegate
+                    {
+                        builder.BuildUp<object>(null, null, null, null, null, null);
+                    });
             }
 
             [Test]
@@ -64,6 +47,21 @@ namespace ObjectBuilder
 
                 Assert.Same(setStrategy.Policy, getStrategy.Policy);
                 Assert.Null(policies.Get<FakePolicy>(typeof(object)));
+            }
+
+            [Test]
+            public void StrategyStagesRunInProperOrder()
+            {
+                Builder builder = new Builder();
+                StrategyChain strategies = new StrategyChain();
+                strategies.Add(new StringConcatStrategy("1"));
+                strategies.Add(new StringConcatStrategy("2"));
+                strategies.Add(new StringConcatStrategy("3"));
+                strategies.Add(new StringConcatStrategy("4"));
+
+                string s = builder.BuildUp<string>(null, null, null, strategies, null, null);
+
+                Assert.Equal("1234", s);
             }
         }
 
@@ -132,9 +130,21 @@ namespace ObjectBuilder
             }
         }
 
-        [TestFixture]
         public class TearDown
         {
+            [Test]
+            public void EmptyStrategies()
+            {
+                Builder builder = new Builder();
+                StrategyChain strategies = new StrategyChain();
+
+                Assert.Throws<ArgumentNullException>(
+                    delegate
+                    {
+                        builder.TearDown(null, null, null, strategies, new object());
+                    });
+            }
+
             [Test]
             public void NullItem()
             {
@@ -157,19 +167,6 @@ namespace ObjectBuilder
                     delegate
                     {
                         builder.TearDown(null, null, null, null, new object());
-                    });
-            }
-
-            [Test]
-            public void EmptyStrategies()
-            {
-                Builder builder = new Builder();
-                StrategyChain strategies = new StrategyChain();
-
-                Assert.Throws<ArgumentNullException>(
-                    delegate
-                    {
-                        builder.TearDown(null, null, null, strategies, new object());
                     });
             }
 
