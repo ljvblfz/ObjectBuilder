@@ -4,7 +4,7 @@ namespace ObjectBuilder
     {
         public object BuildUp(IReadWriteLocator locator,
                               ILifetimeContainer lifetime,
-                              PolicyList policies,
+                              IPolicyList policies,
                               IStrategyChain strategies,
                               object buildKey,
                               object existing)
@@ -18,7 +18,7 @@ namespace ObjectBuilder
 
         public TTypeToBuild BuildUp<TTypeToBuild>(IReadWriteLocator locator,
                                                   ILifetimeContainer lifetime,
-                                                  PolicyList policies,
+                                                  IPolicyList policies,
                                                   IStrategyChain strategies,
                                                   object buildKey,
                                                   object existing)
@@ -28,7 +28,7 @@ namespace ObjectBuilder
 
         public TItem TearDown<TItem>(IReadWriteLocator locator,
                                      ILifetimeContainer lifetime,
-                                     PolicyList policies,
+                                     IPolicyList policies,
                                      IStrategyChain strategies,
                                      TItem item)
         {

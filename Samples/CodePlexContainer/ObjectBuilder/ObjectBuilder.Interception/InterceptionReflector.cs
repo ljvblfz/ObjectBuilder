@@ -6,13 +6,13 @@ namespace ObjectBuilder
 {
     public static class InterceptionReflector
     {
-        public static void Reflect<TBeingBuilt>(PolicyList policies,
+        public static void Reflect<TBeingBuilt>(IPolicyList policies,
                                                 IObjectFactory factory)
         {
             Reflect(typeof(TBeingBuilt), typeof(TBeingBuilt), policies, factory);
         }
 
-        public static void Reflect<TRequested, TBeingBuilt>(PolicyList policies,
+        public static void Reflect<TRequested, TBeingBuilt>(IPolicyList policies,
                                                             IObjectFactory factory)
             where TBeingBuilt : TRequested
         {
