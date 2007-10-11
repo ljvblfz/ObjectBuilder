@@ -1,4 +1,4 @@
 namespace ObjectBuilder
 {
-    public class InterfaceInterceptionPolicy : InterceptionPolicy {}
+    public class InterfaceInterceptionPolicy : InterceptionPolicy, IInterfaceInterceptionPolicy {}
 }

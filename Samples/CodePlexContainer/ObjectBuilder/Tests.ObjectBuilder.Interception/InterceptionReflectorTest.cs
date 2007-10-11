@@ -15,9 +15,9 @@ namespace ObjectBuilder
 
                 InterceptionReflector.Reflect<IFoo, FooBar>(policies, new StubObjectFactory());
 
-                Assert.Equal(1, policies.Get<VirtualInterceptionPolicy>(typeof(FooBar)).Count);
-                Assert.Equal(1, policies.Get<InterfaceInterceptionPolicy>(typeof(FooBar)).Count);
-                Assert.Equal(1, policies.Get<RemotingInterceptionPolicy>(typeof(FooBar)).Count);
+                Assert.Equal(1, policies.Get<IVirtualInterceptionPolicy>(typeof(FooBar)).Count);
+                Assert.Equal(1, policies.Get<IInterfaceInterceptionPolicy>(typeof(FooBar)).Count);
+                Assert.Equal(1, policies.Get<IRemotingInterceptionPolicy>(typeof(FooBar)).Count);
             }
 
             public class FooBar : MarshalByRefObject, IFoo
@@ -56,7 +56,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<IOneMethod, DerivedWithAddedIntercepts>(policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(DerivedWithAddedIntercepts));
+                IInterfaceInterceptionPolicy policy = policies.Get<IInterfaceInterceptionPolicy>(typeof(DerivedWithAddedIntercepts));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -71,7 +71,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<IOneMethod, DerivedOneMethod>(policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(DerivedOneMethod));
+                IInterfaceInterceptionPolicy policy = policies.Get<IInterfaceInterceptionPolicy>(typeof(DerivedOneMethod));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -97,7 +97,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<IOneMethod, OneMethod>(policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(OneMethod));
+                IInterfaceInterceptionPolicy policy = policies.Get<IInterfaceInterceptionPolicy>(typeof(OneMethod));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -111,7 +111,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(IGeneric<>).GetMethod("DoSomething");
 
                 InterceptionReflector.Reflect<IGeneric<int>, Generic<int>>(policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(Generic<>));
+                IInterfaceInterceptionPolicy policy = policies.Get<IInterfaceInterceptionPolicy>(typeof(Generic<>));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -125,7 +125,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(IInterface1).GetMethod("InterceptedMethod1");
 
                 InterceptionReflector.Reflect<IInterface1, TwoInterfaceClass>(policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(TwoInterfaceClass));
+                IInterfaceInterceptionPolicy policy = policies.Get<IInterfaceInterceptionPolicy>(typeof(TwoInterfaceClass));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -149,7 +149,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(IOneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<IOneMethod, OneMethodTwoAttributes>(policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(OneMethodTwoAttributes));
+                IInterfaceInterceptionPolicy policy = policies.Get<IInterfaceInterceptionPolicy>(typeof(OneMethodTwoAttributes));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -165,29 +165,13 @@ namespace ObjectBuilder
                 MethodBase method2 = typeof(ITwoMethods).GetMethod("InterceptedMethod2");
 
                 InterceptionReflector.Reflect<ITwoMethods, TwoMethods>(policies, new StubObjectFactory());
-                InterfaceInterceptionPolicy policy = policies.Get<InterfaceInterceptionPolicy>(typeof(TwoMethods));
+                IInterfaceInterceptionPolicy policy = policies.Get<IInterfaceInterceptionPolicy>(typeof(TwoMethods));
 
                 Assert.Equal(2, policy.Count);
                 Assert.Equal(1, policy[method1].Count);
                 Assert.IsType<RecordingHandler>(policy[method1][0]);
                 Assert.Equal(1, policy[method2].Count);
                 Assert.IsType<RecordingHandler>(policy[method2][0]);
-            }
-
-            // Helpers
-
-            internal class DerivedOneMethod : OneMethod {}
-
-            internal class DerivedWithAddedIntercepts : OneMethod
-            {
-                [InterfaceIntercept(typeof(RecordingHandler))]
-                public override void InterceptedMethod() {}
-            }
-
-            internal class Generic<T> : IGeneric<T>
-            {
-                [InterfaceIntercept(typeof(RecordingHandler))]
-                public void DoSomething(T data) {}
             }
 
             public interface IGeneric<T>
@@ -205,11 +189,6 @@ namespace ObjectBuilder
                 void InterceptedMethod2();
             }
 
-            internal interface INonPublicInterface
-            {
-                void InterceptedMethod();
-            }
-
             public interface IOneMethod
             {
                 void InterceptedMethod();
@@ -219,6 +198,25 @@ namespace ObjectBuilder
             {
                 void InterceptedMethod1();
                 void InterceptedMethod2();
+            }
+
+            internal class DerivedOneMethod : OneMethod {}
+
+            internal class DerivedWithAddedIntercepts : OneMethod
+            {
+                [InterfaceIntercept(typeof(RecordingHandler))]
+                public override void InterceptedMethod() {}
+            }
+
+            internal class Generic<T> : IGeneric<T>
+            {
+                [InterfaceIntercept(typeof(RecordingHandler))]
+                public void DoSomething(T data) {}
+            }
+
+            internal interface INonPublicInterface
+            {
+                void InterceptedMethod();
             }
 
             internal class NonPublicInterface : INonPublicInterface
@@ -270,7 +268,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(DerivedWithAddedIntercepts).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<DerivedWithAddedIntercepts>(policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(DerivedWithAddedIntercepts));
+                IRemotingInterceptionPolicy policy = policies.Get<IRemotingInterceptionPolicy>(typeof(DerivedWithAddedIntercepts));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -285,7 +283,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(DerivedOneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<DerivedOneMethod>(policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(DerivedOneMethod));
+                IRemotingInterceptionPolicy policy = policies.Get<IRemotingInterceptionPolicy>(typeof(DerivedOneMethod));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -311,7 +309,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(OneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<OneMethod>(policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(OneMethod));
+                IRemotingInterceptionPolicy policy = policies.Get<IRemotingInterceptionPolicy>(typeof(OneMethod));
 
                 Assert.NotNull(policy);
                 Assert.Equal(1, policy.Count);
@@ -326,7 +324,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(OneMethodTwoAttributes).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<OneMethodTwoAttributes>(policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(OneMethodTwoAttributes));
+                IRemotingInterceptionPolicy policy = policies.Get<IRemotingInterceptionPolicy>(typeof(OneMethodTwoAttributes));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -342,7 +340,7 @@ namespace ObjectBuilder
                 MethodBase method2 = typeof(TwoMethods).GetMethod("InterceptedMethod2");
 
                 InterceptionReflector.Reflect<TwoMethods>(policies, new StubObjectFactory());
-                RemotingInterceptionPolicy policy = policies.Get<RemotingInterceptionPolicy>(typeof(TwoMethods));
+                IRemotingInterceptionPolicy policy = policies.Get<IRemotingInterceptionPolicy>(typeof(TwoMethods));
 
                 Assert.Equal(2, policy.Count);
                 Assert.Equal(1, policy[method1].Count);
@@ -399,7 +397,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(DerivedWithAddedIntercepts).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<DerivedWithAddedIntercepts>(policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(DerivedWithAddedIntercepts));
+                IVirtualInterceptionPolicy policy = policies.Get<IVirtualInterceptionPolicy>(typeof(DerivedWithAddedIntercepts));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -414,7 +412,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(DerivedOneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<DerivedOneMethod>(policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(DerivedOneMethod));
+                IVirtualInterceptionPolicy policy = policies.Get<IVirtualInterceptionPolicy>(typeof(DerivedOneMethod));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -452,7 +450,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(OneMethod).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<OneMethod>(policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(OneMethod));
+                IVirtualInterceptionPolicy policy = policies.Get<IVirtualInterceptionPolicy>(typeof(OneMethod));
 
                 Assert.NotNull(policy);
                 Assert.Equal(1, policy.Count);
@@ -467,7 +465,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(Generic<>).GetMethod("DoSomething");
 
                 InterceptionReflector.Reflect<Generic<int>>(policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(Generic<>));
+                IVirtualInterceptionPolicy policy = policies.Get<IVirtualInterceptionPolicy>(typeof(Generic<>));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(1, policy[method].Count);
@@ -493,7 +491,7 @@ namespace ObjectBuilder
                 MethodBase method = typeof(OneMethodTwoAttributes).GetMethod("InterceptedMethod");
 
                 InterceptionReflector.Reflect<OneMethodTwoAttributes>(policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(OneMethodTwoAttributes));
+                IVirtualInterceptionPolicy policy = policies.Get<IVirtualInterceptionPolicy>(typeof(OneMethodTwoAttributes));
 
                 Assert.Equal(1, policy.Count);
                 Assert.Equal(2, policy[method].Count);
@@ -509,7 +507,7 @@ namespace ObjectBuilder
                 MethodBase method2 = typeof(TwoMethods).GetMethod("InterceptedMethod2");
 
                 InterceptionReflector.Reflect<TwoMethods>(policies, new StubObjectFactory());
-                VirtualInterceptionPolicy policy = policies.Get<VirtualInterceptionPolicy>(typeof(TwoMethods));
+                IVirtualInterceptionPolicy policy = policies.Get<IVirtualInterceptionPolicy>(typeof(TwoMethods));
 
                 Assert.Equal(2, policy.Count);
                 Assert.Equal(1, policy[method1].Count);
@@ -542,14 +540,6 @@ namespace ObjectBuilder
             {
                 [VirtualIntercept(typeof(RecordingHandler))]
                 public virtual void DoSomething(T data) {}
-            }
-
-            // Helpers
-
-            internal class InternalClass
-            {
-                [VirtualIntercept(typeof(RecordingHandler))]
-                public virtual void InterceptedMethod() {}
             }
 
             public class NonVirtualMethod
@@ -593,6 +583,12 @@ namespace ObjectBuilder
             public class VirtualSealed : OneMethod
             {
                 public override sealed void InterceptedMethod() {}
+            }
+
+            internal class InternalClass
+            {
+                [VirtualIntercept(typeof(RecordingHandler))]
+                public virtual void InterceptedMethod() {}
             }
         }
     }

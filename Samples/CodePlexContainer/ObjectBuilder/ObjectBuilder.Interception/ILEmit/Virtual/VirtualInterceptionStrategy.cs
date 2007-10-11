@@ -11,7 +11,7 @@ namespace ObjectBuilder
                                        object existing)
         {
             ICreationPolicy creationPolicy = context.Policies.Get<ICreationPolicy>(buildKey);
-            VirtualInterceptionPolicy interceptionPolicy = context.Policies.Get<VirtualInterceptionPolicy>(buildKey);
+            IVirtualInterceptionPolicy interceptionPolicy = context.Policies.Get<IVirtualInterceptionPolicy>(buildKey);
             Type typeToBuild;
 
             if (creationPolicy != null &&

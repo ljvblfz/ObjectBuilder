@@ -41,10 +41,12 @@
     <Compile Include="IInterceptionPolicy.cs" />
     <Compile Include="ILEmit\ILEmitInterceptor.cs" />
     <Compile Include="ILEmit\ILEmitProxy.cs" />
+    <Compile Include="ILEmit\Interface\IInterfaceInterceptionPolicy.cs" />
     <Compile Include="ILEmit\Interface\InterfaceInterceptAttribute.cs" />
     <Compile Include="ILEmit\Interface\InterfaceInterceptionPolicy.cs" />
     <Compile Include="ILEmit\Interface\InterfaceInterceptionStrategy.cs" />
     <Compile Include="ILEmit\Interface\InterfaceInterceptor.cs" />
+    <Compile Include="ILEmit\Virtual\IVirtualInterceptionPolicy.cs" />
     <Compile Include="ILEmit\Virtual\VirtualInterceptAttribute.cs" />
     <Compile Include="ILEmit\Virtual\VirtualInterceptionPolicy.cs" />
     <Compile Include="ILEmit\Virtual\VirtualInterceptionStrategy.cs" />
@@ -63,6 +65,7 @@
     <Compile Include="OutputParameterCollection.cs" />
     <Compile Include="ParameterCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Remoting\IRemotingInterceptionPolicy.cs" />
     <Compile Include="Remoting\RemotingInterceptAttribute.cs" />
     <Compile Include="Remoting\RemotingInterceptionPolicy.cs" />
     <Compile Include="Remoting\RemotingInterceptionStrategy.cs" />

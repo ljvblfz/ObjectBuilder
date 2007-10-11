@@ -1,4 +1,4 @@
 namespace ObjectBuilder
 {
-    public class RemotingInterceptionPolicy : InterceptionPolicy {}
+    public class RemotingInterceptionPolicy : InterceptionPolicy, IRemotingInterceptionPolicy {}
 }

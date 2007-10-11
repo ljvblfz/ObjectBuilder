@@ -9,9 +9,14 @@ namespace ObjectBuilder
         public VirtualInterceptAttribute(Type handlerType)
             : base(handlerType) {}
 
-        public override Type PolicyType
+        public override Type PolicyConcreteType
         {
             get { return typeof(VirtualInterceptionPolicy); }
+        }
+
+        public override Type PolicyInterfaceType
+        {
+            get { return typeof(IVirtualInterceptionPolicy); }
         }
 
         public override void ValidateInterceptionForMethod(MethodBase method)

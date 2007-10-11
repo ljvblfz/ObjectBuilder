@@ -16,7 +16,7 @@ namespace ObjectBuilder
                 if (!TryGetTypeFromBuildKey(context.OriginalBuildKey, out originalType))
                     originalType = typeToBuild;
 
-                RemotingInterceptionPolicy policy = context.Policies.Get<RemotingInterceptionPolicy>(buildKey);
+                IRemotingInterceptionPolicy policy = context.Policies.Get<IRemotingInterceptionPolicy>(buildKey);
 
                 if (existing != null && policy != null)
                     existing = RemotingInterceptor.Wrap(existing, originalType, policy);

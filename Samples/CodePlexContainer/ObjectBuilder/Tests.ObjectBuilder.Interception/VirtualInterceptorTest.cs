@@ -56,9 +56,9 @@ namespace ObjectBuilder
                     });
             }
 
-            class PrivateClass {}
-
             public sealed class SealedClass {}
+
+            class PrivateClass {}
         }
 
         public class GenericClasses
@@ -664,8 +664,8 @@ namespace ObjectBuilder
             public class SpyReturn
             {
                 public const int ValueReturn = 42;
-                public readonly int ConstructorValue;
                 public static object ObjectReturn = new object();
+                public readonly int ConstructorValue;
 
                 public SpyReturn(int x)
                 {

@@ -5,10 +5,10 @@ namespace ObjectBuilder
 {
     public class StagedStrategyChain<TStageEnum>
     {
+        static readonly Array stageValues = Enum.GetValues(typeof(TStageEnum));
         readonly StagedStrategyChain<TStageEnum> innerChain;
         readonly object lockObject = new object();
         readonly Dictionary<TStageEnum, List<IBuilderStrategy>> stages;
-        static readonly Array stageValues = Enum.GetValues(typeof(TStageEnum));
 
         public StagedStrategyChain()
         {

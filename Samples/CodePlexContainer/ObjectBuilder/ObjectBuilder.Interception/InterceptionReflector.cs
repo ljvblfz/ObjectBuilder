@@ -35,8 +35,8 @@ namespace ObjectBuilder
             foreach (MethodInfo method in typeBeingBuilt.GetMethods())
                 ReflectOnMethod(typeRequested, typeBeingBuilt, typePolicies, method, factory);
 
-            foreach (InterceptionPolicy policy in typePolicies.Values)
-                policyList.Set(policy.GetType(), policy, typeBeingBuilt);
+            foreach (KeyValuePair<Type, InterceptionPolicy> kvp in typePolicies)
+                policyList.Set(kvp.Key, kvp.Value, typeBeingBuilt);
         }
 
         static void ReflectOnMethod(Type typeRequested,
@@ -45,14 +45,16 @@ namespace ObjectBuilder
                                     MethodBase method,
                                     IObjectFactory factory)
         {
-            Dictionary<Type, List<IInterceptionHandler>> methodHandlers = new Dictionary<Type, List<IInterceptionHandler>>();
+            Dictionary<KeyValuePair<Type, Type>, List<IInterceptionHandler>> methodHandlers = new Dictionary<KeyValuePair<Type, Type>, List<IInterceptionHandler>>();
             MethodBase methodForPolicy = method;
 
             foreach (InterceptAttribute attr in method.GetCustomAttributes(typeof(InterceptAttribute), true))
             {
-                if (!methodHandlers.ContainsKey(attr.PolicyType))
+                KeyValuePair<Type, Type> key = new KeyValuePair<Type, Type>(attr.PolicyInterfaceType, attr.PolicyConcreteType);
+
+                if (!methodHandlers.ContainsKey(key))
                 {
-                    if (!typePolicies.ContainsKey(attr.PolicyType))
+                    if (!typePolicies.ContainsKey(attr.PolicyInterfaceType))
                         attr.ValidateInterceptionForType(typeRequested, typeBeingBuilt);
 
                     attr.ValidateInterceptionForMethod(method);
@@ -61,18 +63,18 @@ namespace ObjectBuilder
                     if (methodForPolicy == null)
                         return;
 
-                    methodHandlers[attr.PolicyType] = new List<IInterceptionHandler>();
+                    methodHandlers[key] = new List<IInterceptionHandler>();
                 }
 
-                methodHandlers[attr.PolicyType].Add((IInterceptionHandler)factory.Get(attr.HandlerType));
+                methodHandlers[key].Add((IInterceptionHandler)factory.Get(attr.HandlerType));
             }
 
-            foreach (Type policyType in methodHandlers.Keys)
+            foreach (KeyValuePair<Type, Type> key in methodHandlers.Keys)
             {
-                if (!typePolicies.ContainsKey(policyType))
-                    typePolicies[policyType] = (InterceptionPolicy)factory.Get(policyType);
+                if (!typePolicies.ContainsKey(key.Key))
+                    typePolicies[key.Key] = (InterceptionPolicy)factory.Get(key.Value);
 
-                typePolicies[policyType].Add(methodForPolicy, methodHandlers[policyType]);
+                typePolicies[key.Key].Add(methodForPolicy, methodHandlers[key]);
             }
         }
     }

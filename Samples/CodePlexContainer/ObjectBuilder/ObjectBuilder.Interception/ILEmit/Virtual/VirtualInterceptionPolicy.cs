@@ -1,4 +1,4 @@
 namespace ObjectBuilder
 {
-    public class VirtualInterceptionPolicy : InterceptionPolicy {}
+    public class VirtualInterceptionPolicy : InterceptionPolicy, IVirtualInterceptionPolicy {}
 }

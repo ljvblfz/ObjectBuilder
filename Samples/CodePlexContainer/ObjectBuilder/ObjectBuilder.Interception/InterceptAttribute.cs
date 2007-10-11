@@ -17,7 +17,9 @@ namespace ObjectBuilder
             get { return handlerType; }
         }
 
-        public abstract Type PolicyType { get; }
+        public abstract Type PolicyConcreteType { get; }
+
+        public abstract Type PolicyInterfaceType { get; }
 
         public virtual MethodBase GetMethodBaseForPolicy(Type typeRequested,
                                                          MethodBase method)

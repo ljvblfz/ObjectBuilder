@@ -88,6 +88,16 @@ namespace ObjectBuilder
             Assert.NotNull(result.ObjectValue);
         }
 
+        internal struct ValueTypeWithCtor
+        {
+            public readonly object ObjectValue;
+
+            public ValueTypeWithCtor(object o)
+            {
+                ObjectValue = o;
+            }
+        }
+
         class CascadingCtor
         {
             public readonly ParameterizedCtor CtorObject;
@@ -128,16 +138,6 @@ namespace ObjectBuilder
             public ParameterizedCtor(object foo)
             {
                 Foo = foo;
-            }
-        }
-
-        internal struct ValueTypeWithCtor
-        {
-            public readonly object ObjectValue;
-
-            public ValueTypeWithCtor(object o)
-            {
-                ObjectValue = o;
             }
         }
     }

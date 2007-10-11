@@ -65,6 +65,62 @@ namespace ObjectBuilder
             }
         }
 
+        public class TearDown
+        {
+            [Test]
+            public void EmptyStrategies()
+            {
+                Builder builder = new Builder();
+                StrategyChain strategies = new StrategyChain();
+
+                Assert.Throws<ArgumentNullException>(
+                    delegate
+                    {
+                        builder.TearDown(null, null, null, strategies, new object());
+                    });
+            }
+
+            [Test]
+            public void NullItem()
+            {
+                Builder builder = new Builder();
+                StrategyChain strategies = new StrategyChain();
+
+                Assert.Throws<ArgumentNullException>(
+                    delegate
+                    {
+                        builder.TearDown<object>(null, null, null, strategies, null);
+                    });
+            }
+
+            [Test]
+            public void NullStrategies()
+            {
+                Builder builder = new Builder();
+
+                Assert.Throws<ArgumentNullException>(
+                    delegate
+                    {
+                        builder.TearDown(null, null, null, null, new object());
+                    });
+            }
+
+            [Test]
+            public void StrategiesRunInReverseOrder()
+            {
+                Builder builder = new Builder();
+                StrategyChain strategies = new StrategyChain();
+                strategies.Add(new StringConcatStrategy("1"));
+                strategies.Add(new StringConcatStrategy("2"));
+                strategies.Add(new StringConcatStrategy("3"));
+                strategies.Add(new StringConcatStrategy("4"));
+
+                string s = builder.TearDown(null, null, null, strategies, "");
+
+                Assert.Equal("4321", s);
+            }
+        }
+
         // Helpers
 
         class FakePolicy : IBuilderPolicy {}
@@ -127,62 +183,6 @@ namespace ObjectBuilder
                                             object item)
             {
                 return base.TearDown(context, AppendString(item));
-            }
-        }
-
-        public class TearDown
-        {
-            [Test]
-            public void EmptyStrategies()
-            {
-                Builder builder = new Builder();
-                StrategyChain strategies = new StrategyChain();
-
-                Assert.Throws<ArgumentNullException>(
-                    delegate
-                    {
-                        builder.TearDown(null, null, null, strategies, new object());
-                    });
-            }
-
-            [Test]
-            public void NullItem()
-            {
-                Builder builder = new Builder();
-                StrategyChain strategies = new StrategyChain();
-
-                Assert.Throws<ArgumentNullException>(
-                    delegate
-                    {
-                        builder.TearDown<object>(null, null, null, strategies, null);
-                    });
-            }
-
-            [Test]
-            public void NullStrategies()
-            {
-                Builder builder = new Builder();
-
-                Assert.Throws<ArgumentNullException>(
-                    delegate
-                    {
-                        builder.TearDown(null, null, null, null, new object());
-                    });
-            }
-
-            [Test]
-            public void StrategiesRunInReverseOrder()
-            {
-                Builder builder = new Builder();
-                StrategyChain strategies = new StrategyChain();
-                strategies.Add(new StringConcatStrategy("1"));
-                strategies.Add(new StringConcatStrategy("2"));
-                strategies.Add(new StringConcatStrategy("3"));
-                strategies.Add(new StringConcatStrategy("4"));
-
-                string s = builder.TearDown(null, null, null, strategies, "");
-
-                Assert.Equal("4321", s);
             }
         }
     }

@@ -9,9 +9,14 @@ namespace ObjectBuilder
         public InterfaceInterceptAttribute(Type handlerType)
             : base(handlerType) {}
 
-        public override Type PolicyType
+        public override Type PolicyConcreteType
         {
             get { return typeof(InterfaceInterceptionPolicy); }
+        }
+
+        public override Type PolicyInterfaceType
+        {
+            get { return typeof(IInterfaceInterceptionPolicy); }
         }
 
         public override MethodBase GetMethodBaseForPolicy(Type typeRequested,

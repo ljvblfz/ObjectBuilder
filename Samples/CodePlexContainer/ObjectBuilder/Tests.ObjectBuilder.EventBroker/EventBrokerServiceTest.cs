@@ -63,15 +63,6 @@ namespace ObjectBuilder
             }
         }
 
-        internal class ExceptionThrowingSink
-        {
-            public void MySink(object sender,
-                               EventArgs<string> e)
-            {
-                throw new Exception("No thanks");
-            }
-        }
-
         public class RegisterSink
         {
             [Test]
@@ -165,45 +156,6 @@ namespace ObjectBuilder
                                                          service.RegisterSource(null, sourceEvent, "MyEvent");
                                                      });
             }
-        }
-
-        internal class SpyEventSink
-        {
-            public string EventValue;
-            public bool WasCalled;
-
-            public void MySink(object sender,
-                               EventArgs<string> e)
-            {
-                WasCalled = true;
-                EventValue = e.Data;
-            }
-
-            public void NonSinkMethod() {}
-        }
-
-        internal class SpyEventSource
-        {
-            public static bool FinalizerCalled;
-            public string SourceText = "Hello, world!";
-
-            public bool HasHandlers
-            {
-                get { return MySource != null; }
-            }
-
-            ~SpyEventSource()
-            {
-                FinalizerCalled = true;
-            }
-
-            public void InvokeMySource()
-            {
-                if (MySource != null)
-                    MySource(this, new EventArgs<string>(SourceText));
-            }
-
-            public event EventHandler<EventArgs<string>> MySource;
         }
 
         public class UnregisterSink
@@ -317,6 +269,54 @@ namespace ObjectBuilder
 
                 Assert.True(SpyEventSource.FinalizerCalled);
             }
+        }
+
+        internal class ExceptionThrowingSink
+        {
+            public void MySink(object sender,
+                               EventArgs<string> e)
+            {
+                throw new Exception("No thanks");
+            }
+        }
+
+        internal class SpyEventSink
+        {
+            public string EventValue;
+            public bool WasCalled;
+
+            public void MySink(object sender,
+                               EventArgs<string> e)
+            {
+                WasCalled = true;
+                EventValue = e.Data;
+            }
+
+            public void NonSinkMethod() {}
+        }
+
+        internal class SpyEventSource
+        {
+            public static bool FinalizerCalled;
+            public string SourceText = "Hello, world!";
+
+            public bool HasHandlers
+            {
+                get { return MySource != null; }
+            }
+
+            ~SpyEventSource()
+            {
+                FinalizerCalled = true;
+            }
+
+            public void InvokeMySource()
+            {
+                if (MySource != null)
+                    MySource(this, new EventArgs<string>(SourceText));
+            }
+
+            public event EventHandler<EventArgs<string>> MySource;
         }
     }
 }

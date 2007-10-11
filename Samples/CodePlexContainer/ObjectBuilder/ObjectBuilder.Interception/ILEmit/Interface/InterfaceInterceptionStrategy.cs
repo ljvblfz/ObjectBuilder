@@ -11,7 +11,7 @@ namespace ObjectBuilder
                                        object existing)
         {
             ICreationPolicy creationPolicy = context.Policies.Get<ICreationPolicy>(buildKey);
-            InterfaceInterceptionPolicy interceptionPolicy = context.Policies.Get<InterfaceInterceptionPolicy>(buildKey);
+            IInterfaceInterceptionPolicy interceptionPolicy = context.Policies.Get<IInterfaceInterceptionPolicy>(buildKey);
             Type typeToBuild;
 
             if (creationPolicy != null &&

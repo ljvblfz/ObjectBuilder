@@ -38,38 +38,6 @@ namespace ObjectBuilder
         public class FindMethod
         {
             [Test]
-            public void MethodNotFound()
-            {
-                MethodInfo result = InterfaceInterceptor.FindMethod("ThisMethodDoesNotExist", new Type[0], typeof(Object).GetMethods());
-
-                Assert.Null(result);
-            }
-
-            [Test]
-            public void ParameterTypesNotMatching()
-            {
-                MethodInfo result = InterfaceInterceptor.FindMethod("ToString", new Type[] { typeof(int) }, typeof(Object).GetMethods());
-
-                Assert.Null(result);
-            }
-
-            [Test]
-            public void NonGenericClass()
-            {
-                MethodInfo result = InterfaceInterceptor.FindMethod("ToString", new Type[0], typeof(Object).GetMethods());
-
-                Assert.Same(typeof(Object).GetMethod("ToString"), result);
-            }
-
-            [Test]
-            public void GenericClassNonGenericMethod()
-            {
-                MethodInfo result = InterfaceInterceptor.FindMethod("RemoveAt", new Type[] { typeof(int) }, typeof(IList<>).GetMethods());
-
-                Assert.Same(typeof(IList<>).GetMethod("RemoveAt"), result);
-            }
-
-            [Test]
             public void GenericClassGenericMethod()
             {
                 MethodInfo result = InterfaceInterceptor.FindMethod("Insert", new object[] { typeof(int), "T" }, typeof(IList<>).GetMethods());
@@ -86,6 +54,30 @@ namespace ObjectBuilder
             }
 
             [Test]
+            public void GenericClassNonGenericMethod()
+            {
+                MethodInfo result = InterfaceInterceptor.FindMethod("RemoveAt", new Type[] { typeof(int) }, typeof(IList<>).GetMethods());
+
+                Assert.Same(typeof(IList<>).GetMethod("RemoveAt"), result);
+            }
+
+            [Test]
+            public void MethodNotFound()
+            {
+                MethodInfo result = InterfaceInterceptor.FindMethod("ThisMethodDoesNotExist", new Type[0], typeof(Object).GetMethods());
+
+                Assert.Null(result);
+            }
+
+            [Test]
+            public void NonGenericClass()
+            {
+                MethodInfo result = InterfaceInterceptor.FindMethod("ToString", new Type[0], typeof(Object).GetMethods());
+
+                Assert.Same(typeof(Object).GetMethod("ToString"), result);
+            }
+
+            [Test]
             public void Overloads()
             {
                 MethodInfo result1 = InterfaceInterceptor.FindMethod("Overload", new Type[0], typeof(IFoo<>).GetMethods());
@@ -98,13 +90,12 @@ namespace ObjectBuilder
                 Assert.NotSame(result1, result2);
             }
 
-            public interface IFoo<T>
+            [Test]
+            public void ParameterTypesNotMatching()
             {
-                void Bar<T2>(T data,
-                             T2 data2);
+                MethodInfo result = InterfaceInterceptor.FindMethod("ToString", new Type[] { typeof(int) }, typeof(Object).GetMethods());
 
-                void Overload();
-                void Overload(int x);
+                Assert.Null(result);
             }
 
             public class Foo<T> : IFoo<T>
@@ -118,30 +109,19 @@ namespace ObjectBuilder
 
                 public void Overload(int x) {}
             }
+
+            public interface IFoo<T>
+            {
+                void Bar<T2>(T data,
+                             T2 data2);
+
+                void Overload();
+                void Overload(int x);
+            }
         }
 
         public class GenericClasses
         {
-            [Test]
-            public void NonGenericMethod()
-            {
-                Recorder.Records.Clear();
-                RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(IGenericSpy<>).GetMethod("MethodWhichTakesGenericData");
-                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
-                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
-                handlers.Add(handler);
-                dictionary.Add(method, handlers);
-
-                IGenericSpy<int> result = WrapAndCreateType<IGenericSpy<int>, GenericSpy<int>>(dictionary);
-                result.MethodWhichTakesGenericData(24);
-
-                Assert.Equal(3, Recorder.Records.Count);
-                Assert.Equal("Before Method", Recorder.Records[0]);
-                Assert.Equal("In method with data 24", Recorder.Records[1]);
-                Assert.Equal("After Method", Recorder.Records[2]);
-            }
-
             [Test]
             public void GenericMethod()
             {
@@ -159,6 +139,26 @@ namespace ObjectBuilder
                 Assert.Equal(3, Recorder.Records.Count);
                 Assert.Equal("Before Method", Recorder.Records[0]);
                 Assert.Equal("In method with data 46 and 2", Recorder.Records[1]);
+                Assert.Equal("After Method", Recorder.Records[2]);
+            }
+
+            [Test]
+            public void NonGenericMethod()
+            {
+                Recorder.Records.Clear();
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(IGenericSpy<>).GetMethod("MethodWhichTakesGenericData");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
+
+                IGenericSpy<int> result = WrapAndCreateType<IGenericSpy<int>, GenericSpy<int>>(dictionary);
+                result.MethodWhichTakesGenericData(24);
+
+                Assert.Equal(3, Recorder.Records.Count);
+                Assert.Equal("Before Method", Recorder.Records[0]);
+                Assert.Equal("In method with data 24", Recorder.Records[1]);
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
@@ -203,14 +203,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            public interface IGenericSpy<T>
-            {
-                void GenericMethod<T1>(T data,
-                                       T1 data1);
-
-                T GenericReturn<T1>(T1 data);
-                void MethodWhichTakesGenericData(T data);
-            }
+            public class Foo : IFoo {}
 
             public class GenericSpy<T> : IGenericSpy<T>
             {
@@ -232,12 +225,6 @@ namespace ObjectBuilder
                 }
             }
 
-            public interface IGenericSpyWithWhereClause<T>
-                where T : class, IFoo
-            {
-                void Method(T data);
-            }
-
             public class GenericSpyWithWhereClause<T> : IGenericSpyWithWhereClause<T>
                 where T : class, IFoo
             {
@@ -249,7 +236,20 @@ namespace ObjectBuilder
 
             public interface IFoo {}
 
-            public class Foo : IFoo {}
+            public interface IGenericSpy<T>
+            {
+                void GenericMethod<T1>(T data,
+                                       T1 data1);
+
+                T GenericReturn<T1>(T1 data);
+                void MethodWhichTakesGenericData(T data);
+            }
+
+            public interface IGenericSpyWithWhereClause<T>
+                where T : class, IFoo
+            {
+                void Method(T data);
+            }
         }
 
         public class GenericMethods
@@ -315,6 +315,10 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
+            public class Foo : IFoo {}
+
+            public interface IFoo {}
+
             public interface INonGenericSpy
             {
                 void GenericMethod<T>(T data);
@@ -343,10 +347,6 @@ namespace ObjectBuilder
                     Recorder.Records.Add("In method with data " + data);
                 }
             }
-
-            public interface IFoo {}
-
-            public class Foo : IFoo {}
         }
 
         public class InParameters
@@ -414,20 +414,48 @@ namespace ObjectBuilder
         public class OutParameters
         {
             [Test]
-            public void OutReferenceType()
+            public void OutComplexValueType()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(ISpyOut).GetMethod("OutReferenceType");
+                MethodBase method = typeof(ISpyOut).GetMethod("OutComplexValueType");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
                 ISpyOut result = WrapAndCreateType<ISpyOut, SpyOut>(dictionary);
-                string outReference;
-                result.OutReferenceType(out outReference);
+                ComplexValueType outValue;
+                result.OutComplexValueType(out outValue);
 
-                Assert.Equal("Hello, world!", outReference);
+                Assert.Equal(byte.MaxValue, outValue.Byte);
+                Assert.Equal('a', outValue.Char);
+                Assert.Equal(decimal.MaxValue, outValue.Decimal);
+                Assert.Equal(double.MaxValue, outValue.Double);
+                Assert.Equal(float.MaxValue, outValue.Float);
+                Assert.Equal(int.MaxValue, outValue.Int);
+                Assert.Equal(long.MaxValue, outValue.Long);
+                Assert.Equal(short.MaxValue, outValue.Short);
+                Assert.Equal("Hello, world!", outValue.String);
+                Assert.Equal(uint.MaxValue, outValue.UInt);
+                Assert.Equal(ulong.MaxValue, outValue.ULong);
+                Assert.Equal(ushort.MaxValue, outValue.UShort);
+            }
+
+            [Test]
+            public void OutDouble()
+            {
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(ISpyOut).GetMethod("OutDouble");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
+
+                ISpyOut result = WrapAndCreateType<ISpyOut, SpyOut>(dictionary);
+                double outValue;
+                result.OutDouble(out outValue);
+
+                Assert.Equal(double.MaxValue, outValue);
             }
 
             [Test]
@@ -482,48 +510,20 @@ namespace ObjectBuilder
             }
 
             [Test]
-            public void OutDouble()
+            public void OutReferenceType()
             {
                 RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(ISpyOut).GetMethod("OutDouble");
+                MethodBase method = typeof(ISpyOut).GetMethod("OutReferenceType");
                 Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
                 List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
                 handlers.Add(handler);
                 dictionary.Add(method, handlers);
 
                 ISpyOut result = WrapAndCreateType<ISpyOut, SpyOut>(dictionary);
-                double outValue;
-                result.OutDouble(out outValue);
+                string outReference;
+                result.OutReferenceType(out outReference);
 
-                Assert.Equal(double.MaxValue, outValue);
-            }
-
-            [Test]
-            public void OutComplexValueType()
-            {
-                RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(ISpyOut).GetMethod("OutComplexValueType");
-                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
-                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
-                handlers.Add(handler);
-                dictionary.Add(method, handlers);
-
-                ISpyOut result = WrapAndCreateType<ISpyOut, SpyOut>(dictionary);
-                ComplexValueType outValue;
-                result.OutComplexValueType(out outValue);
-
-                Assert.Equal(byte.MaxValue, outValue.Byte);
-                Assert.Equal('a', outValue.Char);
-                Assert.Equal(decimal.MaxValue, outValue.Decimal);
-                Assert.Equal(double.MaxValue, outValue.Double);
-                Assert.Equal(float.MaxValue, outValue.Float);
-                Assert.Equal(int.MaxValue, outValue.Int);
-                Assert.Equal(long.MaxValue, outValue.Long);
-                Assert.Equal(short.MaxValue, outValue.Short);
-                Assert.Equal("Hello, world!", outValue.String);
-                Assert.Equal(uint.MaxValue, outValue.UInt);
-                Assert.Equal(ulong.MaxValue, outValue.ULong);
-                Assert.Equal(ushort.MaxValue, outValue.UShort);
+                Assert.Equal("Hello, world!", outReference);
             }
 
             public interface ISpyOut
@@ -647,6 +647,23 @@ namespace ObjectBuilder
         public class ReturnValues
         {
             [Test]
+            public void Exception()
+            {
+                RecordingHandler handler = new RecordingHandler();
+                MethodBase method = typeof(ISpyReturn).GetMethod("Exception");
+                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
+                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
+                handlers.Add(handler);
+                dictionary.Add(method, handlers);
+
+                ISpyReturn result = WrapAndCreateType<ISpyReturn, SpyReturn>(dictionary);
+                Assert.Throws<ArgumentException>(delegate
+                                                 {
+                                                     result.Exception();
+                                                 });
+            }
+
+            [Test]
             public void NoReturnValue()
             {
                 Recorder.Records.Clear();
@@ -696,23 +713,6 @@ namespace ObjectBuilder
                 int retValue = result.ReturnsValueType();
 
                 Assert.Equal(SpyReturn.ValueReturn, retValue);
-            }
-
-            [Test]
-            public void Exception()
-            {
-                RecordingHandler handler = new RecordingHandler();
-                MethodBase method = typeof(ISpyReturn).GetMethod("Exception");
-                Dictionary<MethodBase, List<IInterceptionHandler>> dictionary = new Dictionary<MethodBase, List<IInterceptionHandler>>();
-                List<IInterceptionHandler> handlers = new List<IInterceptionHandler>();
-                handlers.Add(handler);
-                dictionary.Add(method, handlers);
-
-                ISpyReturn result = WrapAndCreateType<ISpyReturn, SpyReturn>(dictionary);
-                Assert.Throws<ArgumentException>(delegate
-                                                 {
-                                                     result.Exception();
-                                                 });
             }
 
             public interface ISpyReturn
