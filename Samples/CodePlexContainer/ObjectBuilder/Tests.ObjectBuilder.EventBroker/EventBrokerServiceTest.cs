@@ -8,7 +8,7 @@ namespace ObjectBuilder
     {
         public class AcceptanceTests
         {
-            [Test]
+            [Fact]
             public void ExceptionsAreCollectedAndRethrown()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -30,7 +30,7 @@ namespace ObjectBuilder
                 Assert.Equal(2, ex.Exceptions.Count);
             }
 
-            [Test]
+            [Fact]
             public void RegistrationSinkFirst()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -46,7 +46,7 @@ namespace ObjectBuilder
                 Assert.Equal(source.SourceText, sink.EventValue);
             }
 
-            [Test]
+            [Fact]
             public void RegistrationSourceFirst()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -65,7 +65,7 @@ namespace ObjectBuilder
 
         public class RegisterSink
         {
-            [Test]
+            [Fact]
             public void InvalidMethodSignature()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -78,7 +78,7 @@ namespace ObjectBuilder
                                                  });
             }
 
-            [Test]
+            [Fact]
             public void NullEventID()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -91,7 +91,7 @@ namespace ObjectBuilder
                                                      });
             }
 
-            [Test]
+            [Fact]
             public void NullMethod()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -103,7 +103,7 @@ namespace ObjectBuilder
                                                      });
             }
 
-            [Test]
+            [Fact]
             public void NullSink()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -119,7 +119,7 @@ namespace ObjectBuilder
 
         public class RegisterSource
         {
-            [Test]
+            [Fact]
             public void NullEvent()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -131,7 +131,7 @@ namespace ObjectBuilder
                                                      });
             }
 
-            [Test]
+            [Fact]
             public void NullEventID()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -144,7 +144,7 @@ namespace ObjectBuilder
                                                      });
             }
 
-            [Test]
+            [Fact]
             public void NullSource()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -160,7 +160,7 @@ namespace ObjectBuilder
 
         public class UnregisterSink
         {
-            [Test]
+            [Fact]
             public void NullEventID()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -171,7 +171,7 @@ namespace ObjectBuilder
                                                      });
             }
 
-            [Test]
+            [Fact]
             public void NullSink()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -182,7 +182,7 @@ namespace ObjectBuilder
                                                      });
             }
 
-            [Test]
+            [Fact]
             public void UnregisterSinkUnwiresHandler()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -202,7 +202,7 @@ namespace ObjectBuilder
 
         public class UnregisterSource
         {
-            [Test]
+            [Fact]
             public void NullEventID()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -213,7 +213,7 @@ namespace ObjectBuilder
                                                      });
             }
 
-            [Test]
+            [Fact]
             public void NullSource()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -224,7 +224,7 @@ namespace ObjectBuilder
                                                      });
             }
 
-            [Test]
+            [Fact]
             public void UnregisterSourceUnwiresHandler()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -240,7 +240,7 @@ namespace ObjectBuilder
 
         public class WeakReferences
         {
-            [Test]
+            [Fact]
             public void SinksAreStoredWithWeakReferences()
             {
                 EventBrokerService service = new EventBrokerService();
@@ -256,7 +256,7 @@ namespace ObjectBuilder
                                     });
             }
 
-            [Test]
+            [Fact]
             public void SourcesAreStoredWithWeakReferences()
             {
                 SpyEventSource.FinalizerCalled = false;

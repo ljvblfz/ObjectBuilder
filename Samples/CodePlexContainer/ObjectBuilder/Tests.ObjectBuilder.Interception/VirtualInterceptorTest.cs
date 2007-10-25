@@ -36,7 +36,7 @@ namespace ObjectBuilder
 
         public class Errors
         {
-            [Test]
+            [Fact]
             public void CannotInterceptNonPublicClass()
             {
                 Assert.Throws<TypeLoadException>(
@@ -46,7 +46,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void CannotInterceptSealedClass()
             {
                 Assert.Throws<TypeLoadException>(
@@ -63,7 +63,7 @@ namespace ObjectBuilder
 
         public class GenericClasses
         {
-            [Test]
+            [Fact]
             public void GenericMethod()
             {
                 Recorder.Records.Clear();
@@ -83,7 +83,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void NonGenericMethod()
             {
                 Recorder.Records.Clear();
@@ -103,7 +103,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void ReturnsDataOfGenericType()
             {
                 Recorder.Records.Clear();
@@ -124,7 +124,7 @@ namespace ObjectBuilder
                 Assert.Equal(default(int), value);
             }
 
-            [Test]
+            [Fact]
             public void WhereClauseOnClass()
             {
                 Recorder.Records.Clear();
@@ -180,7 +180,7 @@ namespace ObjectBuilder
 
         public class GenericMethods
         {
-            [Test]
+            [Fact]
             public void GenericMethod()
             {
                 Recorder.Records.Clear();
@@ -200,7 +200,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void ReturnsDataOfGenericType()
             {
                 Recorder.Records.Clear();
@@ -221,7 +221,7 @@ namespace ObjectBuilder
                 Assert.Equal(default(int), value);
             }
 
-            [Test]
+            [Fact]
             public void WhereClauseOnMethod()
             {
                 Recorder.Records.Clear();
@@ -268,7 +268,7 @@ namespace ObjectBuilder
 
         public class InParameters
         {
-            [Test]
+            [Fact]
             public void OneParameter()
             {
                 Recorder.Records.Clear();
@@ -289,7 +289,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void TwentyParameters()
             {
                 Recorder.Records.Clear();
@@ -310,7 +310,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void TwoParameters()
             {
                 Recorder.Records.Clear();
@@ -375,7 +375,7 @@ namespace ObjectBuilder
 
         public class OutParameters
         {
-            [Test]
+            [Fact]
             public void OutComplexValueType()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -403,7 +403,7 @@ namespace ObjectBuilder
                 Assert.Equal(ushort.MaxValue, outValue.UShort);
             }
 
-            [Test]
+            [Fact]
             public void OutDouble()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -420,7 +420,7 @@ namespace ObjectBuilder
                 Assert.Equal(double.MaxValue, outValue);
             }
 
-            [Test]
+            [Fact]
             public void OutInt16()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -437,7 +437,7 @@ namespace ObjectBuilder
                 Assert.Equal(short.MaxValue, outValue);
             }
 
-            [Test]
+            [Fact]
             public void OutInt32()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -454,7 +454,7 @@ namespace ObjectBuilder
                 Assert.Equal(int.MaxValue, outValue);
             }
 
-            [Test]
+            [Fact]
             public void OutInt64()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -471,7 +471,7 @@ namespace ObjectBuilder
                 Assert.Equal(long.MaxValue, outValue);
             }
 
-            [Test]
+            [Fact]
             public void OutReferenceType()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -541,7 +541,7 @@ namespace ObjectBuilder
 
         public class RefParameters
         {
-            [Test]
+            [Fact]
             public void RefClassParameter()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -558,7 +558,7 @@ namespace ObjectBuilder
                 Assert.Equal("Hello, world!", refValue);
             }
 
-            [Test]
+            [Fact]
             public void RefValueType()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -591,7 +591,7 @@ namespace ObjectBuilder
 
         public class ReturnValues
         {
-            [Test]
+            [Fact]
             public void Exception()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -608,7 +608,7 @@ namespace ObjectBuilder
                                                  });
             }
 
-            [Test]
+            [Fact]
             public void NoReturnValue()
             {
                 Recorder.Records.Clear();
@@ -629,7 +629,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void ReturnsClassType()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -645,7 +645,7 @@ namespace ObjectBuilder
                 Assert.Same(SpyReturn.ObjectReturn, retValue);
             }
 
-            [Test]
+            [Fact]
             public void ReturnsValueType()
             {
                 RecordingHandler handler = new RecordingHandler();

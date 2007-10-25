@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class LookupParameterTest
     {
-        [Test]
+        [Fact]
         public void ConstructorPolicyCanUseLookupToFindAnObject()
         {
             MockBuilderContext ctx = new MockBuilderContext();

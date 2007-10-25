@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class PolicyListTest
     {
-        [Test]
+        [Fact]
         public void CanAddMultiplePoliciesToBagAndRetrieveThem()
         {
             PolicyList list = new PolicyList();
@@ -18,7 +18,7 @@ namespace ObjectBuilder
             Assert.Same(policy2, list.Get<IBuilderPolicy>("2"));
         }
 
-        [Test]
+        [Fact]
         public void CanAddPolicyToBagAndRetrieveIt()
         {
             PolicyList list = new PolicyList();
@@ -30,7 +30,7 @@ namespace ObjectBuilder
             Assert.Same(policy, result);
         }
 
-        [Test]
+        [Fact]
         public void CanClearAllPolicies()
         {
             PolicyList list = new PolicyList();
@@ -42,7 +42,7 @@ namespace ObjectBuilder
             Assert.Equal(0, list.Count);
         }
 
-        [Test]
+        [Fact]
         public void CanClearDefaultPolicy()
         {
             PolicyList list = new PolicyList();
@@ -55,7 +55,7 @@ namespace ObjectBuilder
             Assert.Null(result);
         }
 
-        [Test]
+        [Fact]
         public void CanClearPolicy()
         {
             PolicyList list = new PolicyList();
@@ -67,7 +67,7 @@ namespace ObjectBuilder
             Assert.Null(list.Get<IBuilderPolicy>(typeof(string)));
         }
 
-        [Test]
+        [Fact]
         public void CanGetLocalPolicy()
         {
             PolicyList innerList = new PolicyList();
@@ -80,7 +80,7 @@ namespace ObjectBuilder
             Assert.Null(result);
         }
 
-        [Test]
+        [Fact]
         public void CanRegisterGenericPolicyAndRetrieveWithSpecificGenericInstance()
         {
             PolicyList list = new PolicyList();
@@ -92,7 +92,7 @@ namespace ObjectBuilder
             Assert.Same(policy, result);
         }
 
-        [Test]
+        [Fact]
         public void DefaultPolicyUsedWhenSpecificPolicyIsntAvailable()
         {
             PolicyList list = new PolicyList();
@@ -104,7 +104,7 @@ namespace ObjectBuilder
             Assert.Same(defaultPolicy, result);
         }
 
-        [Test]
+        [Fact]
         public void OuterPolicyDefaultOverridesInnerPolicyDefault()
         {
             PolicyList innerList = new PolicyList();
@@ -119,7 +119,7 @@ namespace ObjectBuilder
             Assert.Same(outerPolicy, result);
         }
 
-        [Test]
+        [Fact]
         public void OuterPolicyOverridesInnerPolicy()
         {
             PolicyList innerList = new PolicyList();
@@ -134,7 +134,7 @@ namespace ObjectBuilder
             Assert.Same(outerPolicy, result);
         }
 
-        [Test]
+        [Fact]
         public void SetOverwritesExistingPolicy()
         {
             PolicyList list = new PolicyList();
@@ -148,7 +148,7 @@ namespace ObjectBuilder
             Assert.Same(policy2, result);
         }
 
-        [Test]
+        [Fact]
         public void SpecificGenericPolicyComesBeforeGenericPolicy()
         {
             PolicyList list = new PolicyList();
@@ -162,7 +162,7 @@ namespace ObjectBuilder
             Assert.Same(specificPolicy, result);
         }
 
-        [Test]
+        [Fact]
         public void SpecificInnerPolicyOverridesDefaultOuterPolicy()
         {
             PolicyList innerList = new PolicyList();
@@ -177,7 +177,7 @@ namespace ObjectBuilder
             Assert.Same(innerPolicy, result);
         }
 
-        [Test]
+        [Fact]
         public void SpecificPolicyOverridesDefaultPolicy()
         {
             PolicyList list = new PolicyList();
@@ -191,7 +191,7 @@ namespace ObjectBuilder
             Assert.Same(specificPolicy, result);
         }
 
-        [Test]
+        [Fact]
         public void WillAskInnerPolicyListWhenOuterHasNoAnswer()
         {
             PolicyList innerList = new PolicyList();
@@ -204,7 +204,7 @@ namespace ObjectBuilder
             Assert.Same(policy, result);
         }
 
-        [Test]
+        [Fact]
         public void WillUseInnerDefaultPolicyWhenOuterHasNoAnswer()
         {
             PolicyList innerList = new PolicyList();

@@ -8,7 +8,7 @@ namespace ObjectBuilder
     {
         public class MixedInterception
         {
-            [Test]
+            [Fact]
             public void CanMixInterceptionTypes()
             {
                 PolicyList policies = new PolicyList();
@@ -36,7 +36,7 @@ namespace ObjectBuilder
 
         public class NoInterceptionType
         {
-            [Test]
+            [Fact]
             public void ClassWithNoDecorations()
             {
                 PolicyList policies = new PolicyList();
@@ -49,7 +49,7 @@ namespace ObjectBuilder
 
         public class ViaInterface
         {
-            [Test]
+            [Fact]
             public void CanAddHandlersInInheritedClass()
             {
                 PolicyList policies = new PolicyList();
@@ -64,7 +64,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][1]);
             }
 
-            [Test]
+            [Fact]
             public void InterceptionIsInherited()
             {
                 PolicyList policies = new PolicyList();
@@ -78,7 +78,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][0]);
             }
 
-            [Test]
+            [Fact]
             public void NonPublicInterfaceNotCompatible()
             {
                 PolicyList policies = new PolicyList();
@@ -90,7 +90,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void OneInterceptedMethod()
             {
                 PolicyList policies = new PolicyList();
@@ -104,7 +104,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][0]);
             }
 
-            [Test]
+            [Fact]
             public void ReflectShouldHappenOnGenericBaseClass()
             {
                 PolicyList policies = new PolicyList();
@@ -118,7 +118,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][0]);
             }
 
-            [Test]
+            [Fact]
             public void RequestingToBuildInterface1WillNotInterceptedInterface2Methods()
             {
                 PolicyList policies = new PolicyList();
@@ -132,7 +132,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][0]);
             }
 
-            [Test]
+            [Fact]
             public void RequestingToBuildNonInterfaceMeansMethodsNotIntercepted()
             {
                 PolicyList policies = new PolicyList();
@@ -142,7 +142,7 @@ namespace ObjectBuilder
                 Assert.Equal(0, policies.Count);
             }
 
-            [Test]
+            [Fact]
             public void TwoAttributesOnOneMethod()
             {
                 PolicyList policies = new PolicyList();
@@ -157,7 +157,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][1]);
             }
 
-            [Test]
+            [Fact]
             public void TwoInterceptedMethods()
             {
                 PolicyList policies = new PolicyList();
@@ -261,7 +261,7 @@ namespace ObjectBuilder
 
         public class ViaRemoting
         {
-            [Test]
+            [Fact]
             public void CanAddHandlersInInheritedClass()
             {
                 PolicyList policies = new PolicyList();
@@ -276,7 +276,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][1]);
             }
 
-            [Test]
+            [Fact]
             public void InterceptionIsInherited()
             {
                 PolicyList policies = new PolicyList();
@@ -290,7 +290,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][0]);
             }
 
-            [Test]
+            [Fact]
             public void NonMBROTypeIncompatibleWithRemoting()
             {
                 PolicyList policies = new PolicyList();
@@ -302,7 +302,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void OneInterceptedMethod()
             {
                 PolicyList policies = new PolicyList();
@@ -317,7 +317,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][0]);
             }
 
-            [Test]
+            [Fact]
             public void TwoAttributesOnOneMethod()
             {
                 PolicyList policies = new PolicyList();
@@ -332,7 +332,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][1]);
             }
 
-            [Test]
+            [Fact]
             public void TwoInterceptedMethods()
             {
                 PolicyList policies = new PolicyList();
@@ -390,7 +390,7 @@ namespace ObjectBuilder
 
         public class ViaVirtualMethod
         {
-            [Test]
+            [Fact]
             public void CanAddHandlersInInheritedClass()
             {
                 PolicyList policies = new PolicyList();
@@ -405,7 +405,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][1]);
             }
 
-            [Test]
+            [Fact]
             public void InterceptionIsInherited()
             {
                 PolicyList policies = new PolicyList();
@@ -419,7 +419,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][0]);
             }
 
-            [Test]
+            [Fact]
             public void NonPublicTypesNotCompatible()
             {
                 PolicyList policies = new PolicyList();
@@ -431,7 +431,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void NonVirtualMethodNotCompatible()
             {
                 PolicyList policies = new PolicyList();
@@ -443,7 +443,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void OneInterceptedMethod()
             {
                 PolicyList policies = new PolicyList();
@@ -458,7 +458,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][0]);
             }
 
-            [Test]
+            [Fact]
             public void ReflectShouldHappenOnGenericBaseClass()
             {
                 PolicyList policies = new PolicyList();
@@ -472,7 +472,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][0]);
             }
 
-            [Test]
+            [Fact]
             public void SealedTypeNotCompatible()
             {
                 PolicyList policies = new PolicyList();
@@ -484,7 +484,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void TwoAttributesOnOneMethod()
             {
                 PolicyList policies = new PolicyList();
@@ -499,7 +499,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method][1]);
             }
 
-            [Test]
+            [Fact]
             public void TwoInterceptedMethods()
             {
                 PolicyList policies = new PolicyList();
@@ -516,7 +516,7 @@ namespace ObjectBuilder
                 Assert.IsType<RecordingHandler>(policy[method2][0]);
             }
 
-            [Test]
+            [Fact]
             public void VirtualSealedMethodNotCompatible()
             {
                 PolicyList policies = new PolicyList();

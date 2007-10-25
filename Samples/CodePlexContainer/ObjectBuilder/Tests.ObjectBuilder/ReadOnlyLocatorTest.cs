@@ -6,7 +6,7 @@ namespace ObjectBuilder
 {
     public class ReadOnlyLocatorTest
     {
-        [Test]
+        [Fact]
         public void CanEnumerateItemsInReadOnlyLocator()
         {
             Locator innerLocator = new Locator();
@@ -30,7 +30,7 @@ namespace ObjectBuilder
             Assert.True(sawTwo);
         }
 
-        [Test]
+        [Fact]
         public void CannotCastAReadOnlyLocatorToAReadWriteLocator()
         {
             Locator innerLocator = new Locator();
@@ -40,7 +40,7 @@ namespace ObjectBuilder
             Assert.Null(locator as IReadWriteLocator);
         }
 
-        [Test]
+        [Fact]
         public void GenericGetEnforcesDataType()
         {
             Locator innerLocator = new Locator();
@@ -54,7 +54,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void ItemsContainedInLocatorContainedInReadOnlyLocator()
         {
             Locator innerLocator = new Locator();
@@ -68,7 +68,7 @@ namespace ObjectBuilder
             Assert.False(locator.Contains(3));
         }
 
-        [Test]
+        [Fact]
         public void NullInnerLocatorThrows()
         {
             Assert.Throws<ArgumentNullException>(
@@ -78,7 +78,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NullParentLocatorOfInnerLocatorReturnsNullParentLocator()
         {
             Locator locator = new Locator();
@@ -89,7 +89,7 @@ namespace ObjectBuilder
             Assert.Null(parentLocator);
         }
 
-        [Test]
+        [Fact]
         public void ParentLocatorOfReadOnlyLocatorIsAlsoReadOnly()
         {
             Locator parentInnerLocator = new Locator();
@@ -102,7 +102,7 @@ namespace ObjectBuilder
             Assert.Null(parentLocator as IReadWriteLocator);
         }
 
-        [Test]
+        [Fact]
         public void ReadOnlyLocatorCountReflectsInnerLocatorCount()
         {
             Locator innerLocator = new Locator();

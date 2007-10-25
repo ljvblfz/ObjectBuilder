@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class ConstructorReflectionStrategyTest
     {
-        [Test]
+        [Fact]
         public void MultipleDecoratedConstructors()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -17,7 +17,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NoDecoratedConstructors()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -30,7 +30,7 @@ namespace ObjectBuilder
             Assert.True(undecorated.Constructor__Called);
         }
 
-        [Test]
+        [Fact]
         public void OneDecoratedConstructor()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -43,7 +43,7 @@ namespace ObjectBuilder
             Assert.True(decorated.Constructor__Called);
         }
 
-        [Test]
+        [Fact]
         public void ZeroConstructorsOnReferenceType()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -56,7 +56,7 @@ namespace ObjectBuilder
             Assert.IsType<ZeroClass>(policy.Create(context, typeof(ZeroClass)));
         }
 
-        [Test]
+        [Fact]
         public void ZeroConstructorsOnValueType()
         {
             MockBuilderContext context = new MockBuilderContext();

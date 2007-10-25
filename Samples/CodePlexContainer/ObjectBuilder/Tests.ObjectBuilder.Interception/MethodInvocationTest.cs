@@ -6,7 +6,7 @@ namespace ObjectBuilder
 {
     public class MethodInvocationTest
     {
-        [Test]
+        [Fact]
         public void ShouldBeAbleToChangeInputs()
         {
             MethodBase methodBase = typeof(InvocationTarget).GetMethod("FirstTarget");

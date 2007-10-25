@@ -7,7 +7,7 @@ namespace ObjectBuilder
 {
     public class EventBrokerReflectionStrategyTest
     {
-        [Test]
+        [Fact]
         public void ClassWithSink()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -20,7 +20,7 @@ namespace ObjectBuilder
             Assert.Contains(new KeyValuePair<string, MethodInfo>("Bar", typeof(Sink).GetMethod("EventSinkMethod")), policy.Sinks);
         }
 
-        [Test]
+        [Fact]
         public void ClassWithSource()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -33,7 +33,7 @@ namespace ObjectBuilder
             Assert.Contains(new KeyValuePair<string, EventInfo>("Baz", typeof(Source).GetEvent("EventSource")), policy.Sources);
         }
 
-        [Test]
+        [Fact]
         public void IgnoresNonTypeBuildKeys()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -44,7 +44,7 @@ namespace ObjectBuilder
             Assert.Null(context.Policies.Get<IEventBrokerPolicy>("Foo"));
         }
 
-        [Test]
+        [Fact]
         public void IgnoresTypesWithNoEventBrokerAttributes()
         {
             MockBuilderContext context = new MockBuilderContext();

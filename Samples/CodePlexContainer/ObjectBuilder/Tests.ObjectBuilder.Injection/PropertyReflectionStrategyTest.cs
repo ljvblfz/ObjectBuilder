@@ -5,7 +5,7 @@ namespace ObjectBuilder
 {
     public class PropertyReflectionStrategyTest
     {
-        [Test]
+        [Fact]
         public void DecoratedProperty()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -20,7 +20,7 @@ namespace ObjectBuilder
                 Assert.Equal(typeof(Decorated).GetProperty("Property"), property.Property);
         }
 
-        [Test]
+        [Fact]
         public void NoDecoratedProperties()
         {
             MockBuilderContext context = new MockBuilderContext();

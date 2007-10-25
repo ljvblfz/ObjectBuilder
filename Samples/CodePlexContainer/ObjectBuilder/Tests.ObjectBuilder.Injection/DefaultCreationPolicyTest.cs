@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class DefaultCreationPolicyTest
     {
-        [Test]
+        [Fact]
         public void ConstructorWithValueType()
         {
             MockBuilderContext ctx = CreateContext();
@@ -23,7 +23,7 @@ namespace ObjectBuilder
             return result;
         }
 
-        [Test]
+        [Fact]
         public void DependencyChainIsFollowed()
         {
             MockBuilderContext context = CreateContext();
@@ -35,7 +35,7 @@ namespace ObjectBuilder
             Assert.NotNull(result.CtorObject.Foo);
         }
 
-        [Test]
+        [Fact]
         public void MultiParameterConstructor()
         {
             MockBuilderContext context = CreateContext();
@@ -47,7 +47,7 @@ namespace ObjectBuilder
             Assert.NotNull(result.O2);
         }
 
-        [Test]
+        [Fact]
         public void ParameterizedConstructor()
         {
             MockBuilderContext context = CreateContext();
@@ -58,7 +58,7 @@ namespace ObjectBuilder
             Assert.NotNull(result.Foo);
         }
 
-        [Test]
+        [Fact]
         public void ParameterlessConstructor()
         {
             MockBuilderContext context = CreateContext();
@@ -68,7 +68,7 @@ namespace ObjectBuilder
             Assert.NotNull(result);
         }
 
-        [Test]
+        [Fact]
         public void ValueTypeCanBeConstructed()
         {
             MockBuilderContext context = CreateContext();
@@ -78,7 +78,7 @@ namespace ObjectBuilder
             Assert.Equal(0, result);
         }
 
-        [Test]
+        [Fact]
         public void ValueTypeWithConstructor()
         {
             MockBuilderContext context = CreateContext();

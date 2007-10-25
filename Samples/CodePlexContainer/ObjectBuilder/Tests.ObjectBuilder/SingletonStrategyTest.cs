@@ -25,7 +25,7 @@ namespace ObjectBuilder
             return ctx;
         }
 
-        [Test]
+        [Fact]
         public void BuildingASingletonTwiceReturnsSameInstance()
         {
             MockBuilderContext ctx = BuildContext();
@@ -37,7 +37,7 @@ namespace ObjectBuilder
             Assert.Same(i1, i2);
         }
 
-        [Test]
+        [Fact]
         public void ChildLocatorBeforeParent()
         {
             Locator parentLocator = new Locator();
@@ -51,7 +51,7 @@ namespace ObjectBuilder
             Assert.Equal("Goodbye world", result);
         }
 
-        [Test]
+        [Fact]
         public void SearchesParentLocator()
         {
             Locator parentLocator = new Locator();

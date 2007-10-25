@@ -5,7 +5,7 @@ namespace ObjectBuilder
 {
     public class DependencyResolverTest
     {
-        [Test]
+        [Fact]
         public void CanBuildObjectWhenNotPresent()
         {
             MockBuilderContext context = CreateContext();
@@ -16,7 +16,7 @@ namespace ObjectBuilder
             Assert.IsType<MockObject>(result);
         }
 
-        [Test]
+        [Fact]
         public void CanReturnNullWhenNotPresent()
         {
             MockBuilderContext context = CreateContext();
@@ -26,7 +26,7 @@ namespace ObjectBuilder
             Assert.Null(result);
         }
 
-        [Test]
+        [Fact]
         public void CanThrowWhenNotPresent()
         {
             MockBuilderContext context = CreateContext();
@@ -48,7 +48,7 @@ namespace ObjectBuilder
             return result;
         }
 
-        [Test]
+        [Fact]
         public void NullBuildKey()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -60,7 +60,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NullContext()
         {
             Assert.Throws<ArgumentNullException>(
@@ -70,7 +70,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void ReturnsSingletonInstanceWhenPresent()
         {
             MockBuilderContext context = new MockBuilderContext();

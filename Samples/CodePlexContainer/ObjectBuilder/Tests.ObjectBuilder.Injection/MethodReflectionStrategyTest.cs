@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class MethodReflectionStrategyTest
     {
-        [Test]
+        [Fact]
         public void DecoratedMethod()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -19,7 +19,7 @@ namespace ObjectBuilder
                 Assert.Equal(typeof(Decorated).GetMethod("Method"), method.Method);
         }
 
-        [Test]
+        [Fact]
         public void NoDecoratedMethods()
         {
             MockBuilderContext context = new MockBuilderContext();

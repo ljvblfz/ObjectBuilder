@@ -7,7 +7,7 @@ namespace ObjectBuilder
     {
         public class BuildUp
         {
-            [Test]
+            [Fact]
             public void EmptyStrategies()
             {
                 Builder builder = new Builder();
@@ -20,7 +20,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void NullStrategies()
             {
                 Builder builder = new Builder();
@@ -32,7 +32,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void PoliciesSetDuringBuildUpDoNotPersistAfterBuildUpComplete()
             {
                 Builder builder = new Builder();
@@ -49,7 +49,7 @@ namespace ObjectBuilder
                 Assert.Null(policies.Get<FakePolicy>(typeof(object)));
             }
 
-            [Test]
+            [Fact]
             public void StrategyStagesRunInProperOrder()
             {
                 Builder builder = new Builder();
@@ -67,7 +67,7 @@ namespace ObjectBuilder
 
         public class TearDown
         {
-            [Test]
+            [Fact]
             public void EmptyStrategies()
             {
                 Builder builder = new Builder();
@@ -80,7 +80,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void NullItem()
             {
                 Builder builder = new Builder();
@@ -93,7 +93,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void NullStrategies()
             {
                 Builder builder = new Builder();
@@ -105,7 +105,7 @@ namespace ObjectBuilder
                     });
             }
 
-            [Test]
+            [Fact]
             public void StrategiesRunInReverseOrder()
             {
                 Builder builder = new Builder();

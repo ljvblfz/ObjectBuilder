@@ -18,7 +18,7 @@ namespace Ottawa
 
         public class Dispose
         {
-            [Test]
+            [Fact]
             public void DisposingContainerDisposesObjectsInContainer()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -33,7 +33,7 @@ namespace Ottawa
 
         public class Errors
         {
-            [Test]
+            [Fact]
             public void AddComponentWithNullName()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -45,7 +45,7 @@ namespace Ottawa
                     });
             }
 
-            [Test]
+            [Fact]
             public void AddComponentWithNullType()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -57,7 +57,7 @@ namespace Ottawa
                     });
             }
 
-            [Test]
+            [Fact]
             public void AddMultipleComponentsForTheSameKey()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -70,7 +70,7 @@ namespace Ottawa
                     });
             }
 
-            [Test]
+            [Fact]
             public void CannotResolveAbstractTypes()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -83,7 +83,7 @@ namespace Ottawa
                     });
             }
 
-            [Test]
+            [Fact]
             public void CannotResolveInterfaces()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -96,7 +96,7 @@ namespace Ottawa
                     });
             }
 
-            [Test]
+            [Fact]
             public void CannotResolveValueTypes()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -109,7 +109,7 @@ namespace Ottawa
                     });
             }
 
-            [Test]
+            [Fact]
             public void DefaultContainerDoesNotResolveAutomatically()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -140,7 +140,7 @@ namespace Ottawa
 
         public class Lifestyle
         {
-            [Test(Skip="Threading support not implemented yet")]
+            [Fact(Skip="Threading support not implemented yet")]
             public void CanResolveObjectsPerThread()
             {
                 object obj1a = null, obj1b = null, obj2a, obj2b;
@@ -167,7 +167,7 @@ namespace Ottawa
                 Assert.NotSame(obj1a, obj2a);
             }
 
-            [Test]
+            [Fact]
             public void Singleton()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -181,7 +181,7 @@ namespace Ottawa
                 Assert.Same(obj1, obj2);
             }
 
-            [Test]
+            [Fact]
             public void Transient()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -196,7 +196,7 @@ namespace Ottawa
 
         public class Release
         {
-            [Test]
+            [Fact]
             public void ReleaseWithDefaultLifestyleIsNOOP()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -213,7 +213,7 @@ namespace Ottawa
 
         public class Resolve
         {
-            [Test]
+            [Fact]
             public void AddingTwoComponentAndServicesForTheSamKeyThrows()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -226,7 +226,7 @@ namespace Ottawa
                     });
             }
 
-            [Test]
+            [Fact]
             public void AddingTwoComponentsForTheSameServiceTypeResolvesToTheFirstOne()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -238,7 +238,7 @@ namespace Ottawa
                 Assert.IsType<Foo>(result);
             }
 
-            [Test]
+            [Fact]
             public void CanAddTheSameComponentUnderDifferentKeys()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -252,7 +252,7 @@ namespace Ottawa
                 Assert.NotNull(resolvedByName);
             }
 
-            [Test]
+            [Fact]
             public void CanResolveByKey()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -263,7 +263,7 @@ namespace Ottawa
                 Assert.NotNull(result);
             }
 
-            [Test]
+            [Fact]
             public void CanResolveByService()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -274,7 +274,7 @@ namespace Ottawa
                 Assert.NotNull(result);
             }
 
-            [Test]
+            [Fact]
             public void ResolveForServiceTypeCreatesClassType()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -285,7 +285,7 @@ namespace Ottawa
                 Assert.IsType<Foo>(result);
             }
 
-            [Test]
+            [Fact]
             public void SameTypeWithSameNameIsSameInstance()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -299,7 +299,7 @@ namespace Ottawa
                 Assert.Same(result1, result2);
             }
 
-            [Test]
+            [Fact]
             public void SameTypeWithTwoDifferentNamesIsTwoDifferenceInstances()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -314,7 +314,7 @@ namespace Ottawa
                 Assert.NotSame(resolvedEmpty, resolvedByName);
             }
 
-            [Test]
+            [Fact]
             public void ServiceTypeNeedNotBeCompatibleWithClassType()
             {
                 OttawaContainer container = new OttawaContainer();
@@ -326,7 +326,7 @@ namespace Ottawa
                 Assert.Null(result as IFoo);
             }
 
-            [Test]
+            [Fact]
             public void SingletonsAreNotRecreatedAfterGarbageCollection()
             {
                 Foo.ctorCount = 0;

@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class BuildKeyMappingPolicyTest
     {
-        [Test]
+        [Fact]
         public void PolicyReturnsNewBuildKey()
         {
             BuildKeyMappingPolicy policy = new BuildKeyMappingPolicy(typeof(string));

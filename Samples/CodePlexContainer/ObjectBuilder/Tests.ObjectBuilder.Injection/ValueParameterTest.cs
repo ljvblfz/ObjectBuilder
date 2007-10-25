@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class ValueParameterTest
     {
-        [Test]
+        [Fact]
         public void ValueParameterReturnsStoredTypeAndValue()
         {
             ValueParameter<int> x = new ValueParameter<int>(12);

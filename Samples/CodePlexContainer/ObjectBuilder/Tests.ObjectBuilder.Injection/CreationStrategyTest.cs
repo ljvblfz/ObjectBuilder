@@ -13,7 +13,7 @@ namespace ObjectBuilder
             return result;
         }
 
-        [Test]
+        [Fact]
         public void DoesNotUsePolicyWhenPassedExistingObject()
         {
             object existing = new object();
@@ -27,7 +27,7 @@ namespace ObjectBuilder
             Assert.Same(existing, result);
         }
 
-        [Test]
+        [Fact]
         public void NoCreationPolicy()
         {
             MockBuilderContext context = CreateContext();
@@ -39,7 +39,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void UsesPolicyToCreateObject()
         {
             object obj = new object();

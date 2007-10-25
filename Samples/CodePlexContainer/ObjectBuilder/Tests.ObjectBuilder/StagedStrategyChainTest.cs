@@ -17,7 +17,7 @@ namespace ObjectBuilder
             }
         }
 
-        [Test]
+        [Fact]
         public void InnerStrategiesComeBeforeOuterStrategiesInStrategyChain()
         {
             StagedStrategyChain<FakeStage> innerChain = new StagedStrategyChain<FakeStage>();
@@ -32,7 +32,7 @@ namespace ObjectBuilder
             AssertOrder(chain, innerStrategy, outerStrategy);
         }
 
-        [Test]
+        [Fact]
         public void OrderingAcrossStagesForStrategyChain()
         {
             StagedStrategyChain<FakeStage> innerChain = new StagedStrategyChain<FakeStage>();

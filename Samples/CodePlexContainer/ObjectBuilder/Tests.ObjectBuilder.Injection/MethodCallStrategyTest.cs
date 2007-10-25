@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class MethodCallStrategyTest
     {
-        [Test]
+        [Fact]
         public void ExecutesMethodsInPolicy()
         {
             Spy.Executed = false;
@@ -19,7 +19,7 @@ namespace ObjectBuilder
             Assert.True(Spy.Executed);
         }
 
-        [Test]
+        [Fact]
         public void NoInstance()
         {
             Spy.Executed = false;

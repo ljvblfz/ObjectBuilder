@@ -12,7 +12,7 @@ namespace CodePlex.DependencyInjection
     {
         public class Configuration
         {
-            [Test]
+            [Fact]
             public void CallsConfiguratorDuringInitialization()
             {
                 SpyConfigurator configurator = new SpyConfigurator();
@@ -35,7 +35,7 @@ namespace CodePlex.DependencyInjection
 
         public class EventBroker
         {
-            [Test]
+            [Fact]
             public void RegisterByAttributes()
             {
                 DependencyContainer container = new DependencyContainer();
@@ -47,7 +47,7 @@ namespace CodePlex.DependencyInjection
                 Assert.NotNull(sink.HandlerArgs);
             }
 
-            [Test]
+            [Fact]
             public void RegisterByCode()
             {
                 DependencyContainer container = new DependencyContainer();
@@ -110,7 +110,7 @@ namespace CodePlex.DependencyInjection
 
         public class ExistingObjects
         {
-            [Test]
+            [Fact]
             public void CanInjectExistingObject()
             {
                 ExistingObject obj = new ExistingObject();
@@ -122,7 +122,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("Hello world", obj.Name);
             }
 
-            [Test]
+            [Fact]
             public void NullThrows()
             {
                 DependencyContainer container = new DependencyContainer();
@@ -150,7 +150,7 @@ namespace CodePlex.DependencyInjection
 
         public class InterceptInterface
         {
-            [Test]
+            [Fact]
             public void ExceptionsAreUnchanged()
             {
                 Recorder.Records.Clear();
@@ -172,7 +172,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void InterceptViaAttributes()
             {
                 Recorder.Records.Clear();
@@ -188,7 +188,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void InterceptViaCode()
             {
                 Recorder.Records.Clear();
@@ -243,7 +243,7 @@ namespace CodePlex.DependencyInjection
 
         public class InterceptInterface_GenericMethods
         {
-            [Test]
+            [Fact]
             public void GenericMethodOnNonGenericInterface()
             {
                 Recorder.Records.Clear();
@@ -280,7 +280,7 @@ namespace CodePlex.DependencyInjection
 
         public class InterceptInterface_Properties
         {
-            [Test]
+            [Fact]
             public void CanInterceptPropertySettersAndGetters()
             {
                 Recorder.Records.Clear();
@@ -324,7 +324,7 @@ namespace CodePlex.DependencyInjection
 
         public class InterceptRemoting
         {
-            [Test]
+            [Fact]
             public void InterceptViaAttributes()
             {
                 Recorder.Records.Clear();
@@ -339,7 +339,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void InterceptViaCode()
             {
                 Recorder.Records.Clear();
@@ -356,7 +356,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void InterfacesNotSupported()
             {
                 DependencyContainer container = new DependencyContainer();
@@ -413,7 +413,7 @@ namespace CodePlex.DependencyInjection
 
         public class InterceptVirtual
         {
-            [Test]
+            [Fact]
             public void ExceptionsAreUnchanged()
             {
                 Recorder.Records.Clear();
@@ -434,7 +434,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void InterceptViaAttributes()
             {
                 Recorder.Records.Clear();
@@ -449,7 +449,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void InterceptViaCode()
             {
                 Recorder.Records.Clear();
@@ -499,7 +499,7 @@ namespace CodePlex.DependencyInjection
 
         public class InterceptVirtual_Generics
         {
-            [Test]
+            [Fact]
             public void GenericMethodOnGenericClass()
             {
                 Recorder.Records.Clear();
@@ -518,7 +518,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[5]);
             }
 
-            [Test]
+            [Fact]
             public void GenericMethodOnNonGenericClass()
             {
                 Recorder.Records.Clear();
@@ -537,7 +537,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("After Method", Recorder.Records[5]);
             }
 
-            [Test]
+            [Fact]
             public void NonGenericMethodOnGenericClass()
             {
                 Recorder.Records.Clear();
@@ -580,7 +580,7 @@ namespace CodePlex.DependencyInjection
 
         public class Singletons
         {
-            [Test]
+            [Fact]
             public void CanRegisterSingletonInstance()
             {
                 DependencyContainer container = new DependencyContainer();
@@ -592,7 +592,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Same(result, obj);
             }
 
-            [Test]
+            [Fact]
             public void CanRegisterTypesToBeConsideredCached()
             {
                 DependencyContainer container = new DependencyContainer();
@@ -606,7 +606,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Same(result1, result2);
             }
 
-            [Test]
+            [Fact]
             public void NestedContainerCanReturnObjectsFromInnerContainer()
             {
                 DependencyContainer innerContainer = new DependencyContainer();
@@ -618,7 +618,7 @@ namespace CodePlex.DependencyInjection
                 Assert.Equal("Hello world", result);
             }
 
-            [Test]
+            [Fact]
             public void ObjectsAreNotSingletonByDefault()
             {
                 DependencyContainer container = new DependencyContainer();
@@ -632,7 +632,7 @@ namespace CodePlex.DependencyInjection
 
         public class TypeMapping
         {
-            [Test]
+            [Fact]
             public void CanRegisterTypeMapping()
             {
                 DependencyContainer container = new DependencyContainer();
@@ -644,7 +644,7 @@ namespace CodePlex.DependencyInjection
                 Assert.IsType<MyObject>(result);
             }
 
-            [Test]
+            [Fact]
             public void CanTypeMapFromGenericToGeneric()
             {
                 DependencyContainer container = new DependencyContainer();
@@ -655,7 +655,7 @@ namespace CodePlex.DependencyInjection
                 Assert.IsType<Foo<int>>(result);
             }
 
-            [Test]
+            [Fact]
             public void SettingTypeMappingOnInnerContainerAffectsOuterContainer()
             {
                 DependencyContainer innerContainer = new DependencyContainer();

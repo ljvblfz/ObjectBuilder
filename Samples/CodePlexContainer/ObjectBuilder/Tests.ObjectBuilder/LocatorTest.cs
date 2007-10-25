@@ -6,7 +6,7 @@ namespace ObjectBuilder
 {
     public class LocatorTest
     {
-        [Test]
+        [Fact]
         public void AddingToSameKeyTwiceThrows()
         {
             object o = new object();
@@ -21,7 +21,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void AskingForAnUnregisterdObjectReturnsNull()
         {
             IReadWriteLocator locator = new Locator();
@@ -29,7 +29,7 @@ namespace ObjectBuilder
             Assert.Null(locator.Get("Foo"));
         }
 
-        [Test]
+        [Fact]
         public void AskingParentStopsAsSoonAsWeFindAMatch()
         {
             object o1 = new object();
@@ -47,7 +47,7 @@ namespace ObjectBuilder
             Assert.Same(o2, result);
         }
 
-        [Test]
+        [Fact]
         public void CanAddSameObjectTwiceWithDifferentKeys()
         {
             object o = new object();
@@ -59,7 +59,7 @@ namespace ObjectBuilder
             Assert.Same(locator.Get("foo1"), locator.Get("foo2"));
         }
 
-        [Test]
+        [Fact]
         public void CanCallContainsThroughParent()
         {
             object o = new object();
@@ -71,7 +71,7 @@ namespace ObjectBuilder
             Assert.True(childLocator.Contains("froz"));
         }
 
-        [Test]
+        [Fact]
         public void CanEnumerate()
         {
             object o1 = new object();
@@ -89,7 +89,7 @@ namespace ObjectBuilder
             }
         }
 
-        [Test]
+        [Fact]
         public void CanFindByPredicate()
         {
             bool wasCalled = false;
@@ -115,7 +115,7 @@ namespace ObjectBuilder
             Assert.Same(o1, results.Get("foo1"));
         }
 
-        [Test]
+        [Fact]
         public void CanFindOutIfContainsAKey()
         {
             object o = new object();
@@ -126,7 +126,7 @@ namespace ObjectBuilder
             Assert.False(locator.Contains("foo2"));
         }
 
-        [Test]
+        [Fact]
         public void CanRegisterObjectByName()
         {
             object o = new object();
@@ -137,7 +137,7 @@ namespace ObjectBuilder
             Assert.Same(o, locator.Get("Bar"));
         }
 
-        [Test]
+        [Fact]
         public void CanRegisterObjectByType()
         {
             object o = new object();
@@ -148,7 +148,7 @@ namespace ObjectBuilder
             Assert.Same(o, locator.Get<object>());
         }
 
-        [Test]
+        [Fact]
         public void CanRegisterObjectByTypeAndID()
         {
             object o = new object();
@@ -160,7 +160,7 @@ namespace ObjectBuilder
             Assert.Same(o, locator.Get(key));
         }
 
-        [Test]
+        [Fact]
         public void CanRegisterTwoObjectsWithDifferentKeys()
         {
             object o1 = new object();
@@ -174,7 +174,7 @@ namespace ObjectBuilder
             Assert.Same(o2, locator.Get("foo2"));
         }
 
-        [Test]
+        [Fact]
         public void CountReturnsNumberOfKeysWithLiveValues()
         {
             object o = new object();
@@ -191,7 +191,7 @@ namespace ObjectBuilder
             Assert.Equal(0, locator.Count);
         }
 
-        [Test]
+        [Fact]
         public void DefaultBehaviorIsAskingParent()
         {
             object o = new object();
@@ -203,7 +203,7 @@ namespace ObjectBuilder
             Assert.NotNull(childLocator.Get("fiz"));
         }
 
-        [Test]
+        [Fact]
         public void DefaultFindByBehaviorIsAskParent()
         {
             object o = new object();
@@ -222,7 +222,7 @@ namespace ObjectBuilder
             Assert.Equal(1, results.Count);
         }
 
-        [Test]
+        [Fact]
         public void FindingByPredicateCanClimbTheTree()
         {
             object o = new object();
@@ -242,7 +242,7 @@ namespace ObjectBuilder
             Assert.Same(o, results.Get("bar"));
         }
 
-        [Test]
+        [Fact]
         public void FindingByPredicateCanFindsResultsFromBothParentAndChild()
         {
             object o = new object();
@@ -265,7 +265,7 @@ namespace ObjectBuilder
             Assert.Same(s, results.Get("bar"));
         }
 
-        [Test]
+        [Fact]
         public void FindingByPredicateReturnsClosestResultsOnDuplicateKey()
         {
             object o1 = new object();
@@ -287,7 +287,7 @@ namespace ObjectBuilder
             Assert.Same(o2, results.Get("foo"));
         }
 
-        [Test]
+        [Fact]
         public void GetCanAskParentLocatorForAnObject()
         {
             object o = new object();
@@ -301,7 +301,7 @@ namespace ObjectBuilder
             Assert.Same(o, result);
         }
 
-        [Test]
+        [Fact]
         public void LocatorIsNotReadOnly()
         {
             IReadWriteLocator locator = new Locator();
@@ -309,7 +309,7 @@ namespace ObjectBuilder
             Assert.False(locator.ReadOnly);
         }
 
-        [Test]
+        [Fact]
         public void NullKeyOnAddThrows()
         {
             IReadWriteLocator locator = new Locator();
@@ -321,7 +321,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NullKeyOnContainsThrows()
         {
             IReadWriteLocator locator = new Locator();
@@ -333,7 +333,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NullKeyOnGetThrows()
         {
             IReadWriteLocator locator = new Locator();
@@ -345,7 +345,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NullKeyOnRemoveThrows()
         {
             IReadWriteLocator locator = new Locator();
@@ -357,7 +357,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NullPredicateOnFindByThrows()
         {
             IReadWriteLocator locator = new Locator();
@@ -369,7 +369,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NullValueOnAddThrows()
         {
             IReadWriteLocator locator = new Locator();
@@ -381,7 +381,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void RegisteringAnObjectWithTwoKeysAndRemovingOneKeyLeavesTheOtherOneInTheLocator()
         {
             object o = new object();
@@ -394,7 +394,7 @@ namespace ObjectBuilder
             Assert.Same(o, locator.Get("foo2"));
         }
 
-        [Test]
+        [Fact]
         public void RegistrationDoesNotPreventGarbageCollection()
         {
             IReadWriteLocator locator = new Locator();
@@ -405,7 +405,7 @@ namespace ObjectBuilder
             Assert.Null(locator.Get("foo"));
         }
 
-        [Test]
+        [Fact]
         public void RemovingANonExistantKeyDoesntThrow()
         {
             IReadWriteLocator locator = new Locator();
@@ -413,7 +413,7 @@ namespace ObjectBuilder
             Assert.False(locator.Remove("Baz"));
         }
 
-        [Test]
+        [Fact]
         public void RemovingOneObjectDoesntAffectOtherObjects()
         {
             object o1 = new object();
@@ -427,7 +427,7 @@ namespace ObjectBuilder
             Assert.Same(o2, locator.Get("foo2"));
         }
 
-        [Test]
+        [Fact]
         public void RetrievingARemovedObjectReturnsNull()
         {
             object o = new object();
@@ -439,7 +439,7 @@ namespace ObjectBuilder
             Assert.Null(locator.Get("Foo"));
         }
 
-        [Test]
+        [Fact]
         public void TripleNestedLocators()
         {
             object o = new object();

@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class BuilderAwareStrategyTest
     {
-        [Test]
+        [Fact]
         public void BuildCallsClassWithInterface()
         {
             BuilderAwareStrategy strategy = new BuilderAwareStrategy();
@@ -20,7 +20,7 @@ namespace ObjectBuilder
             Assert.Equal<object>(typeof(Aware), obj.OnBuiltUp_BuildKey);
         }
 
-        [Test]
+        [Fact]
         public void BuildChecksConcreteTypeAndNotRequestedType()
         {
             BuilderAwareStrategy strategy = new BuilderAwareStrategy();
@@ -35,7 +35,7 @@ namespace ObjectBuilder
             Assert.False(obj.OnTearingDown__Called);
         }
 
-        [Test]
+        [Fact]
         public void BuildIgnoresClassWithoutInterface()
         {
             BuilderAwareStrategy strategy = new BuilderAwareStrategy();
@@ -50,7 +50,7 @@ namespace ObjectBuilder
             Assert.False(obj.OnTearingDown__Called);
         }
 
-        [Test]
+        [Fact]
         public void TearDownCallsClassWithInterface()
         {
             BuilderAwareStrategy strategy = new BuilderAwareStrategy();
@@ -65,7 +65,7 @@ namespace ObjectBuilder
             Assert.True(obj.OnTearingDown__Called);
         }
 
-        [Test]
+        [Fact]
         public void TearDownIgnoresClassWithoutInterface()
         {
             BuilderAwareStrategy strategy = new BuilderAwareStrategy();

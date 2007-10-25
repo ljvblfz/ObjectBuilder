@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class BuildKeyMappingStrategyTest
     {
-        [Test]
+        [Fact]
         public void CanMakeArbitraryKeysToConcreteTypes()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -19,7 +19,7 @@ namespace ObjectBuilder
             Assert.Equal<object>(typeof(Foo), spy.BuildKey);
         }
 
-        [Test]
+        [Fact]
         public void CanMapGenericsWithIdenticalGenericParameters()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -34,7 +34,7 @@ namespace ObjectBuilder
             Assert.Equal<object>(typeof(Foo<int>), spy.BuildKey);
         }
 
-        [Test]
+        [Fact]
         public void CanMapInterfacesToConcreteTypes()
         {
             MockBuilderContext context = new MockBuilderContext();

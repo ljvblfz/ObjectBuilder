@@ -7,7 +7,7 @@ namespace ObjectBuilder
 {
     public class RemotingInterceptorTest
     {
-        [Test]
+        [Fact]
         public void CanInterceptClassDerivedFromMBRO()
         {
             Recorder.Records.Clear();
@@ -28,7 +28,7 @@ namespace ObjectBuilder
             Assert.Equal("After Method", Recorder.Records[2]);
         }
 
-        [Test]
+        [Fact]
         public void CanInterceptInterface()
         {
             Recorder.Records.Clear();
@@ -49,7 +49,7 @@ namespace ObjectBuilder
             Assert.Equal("After Method", Recorder.Records[2]);
         }
 
-        [Test]
+        [Fact]
         public void Exceptions()
         {
             Recorder.Records.Clear();
@@ -72,7 +72,7 @@ namespace ObjectBuilder
             Assert.Equal("After Method", Recorder.Records[1]);
         }
 
-        [Test]
+        [Fact]
         public void InterceptorCanInfluenceParameters()
         {
             Recorder.Records.Clear();
@@ -94,7 +94,7 @@ namespace ObjectBuilder
             Assert.Equal("d = 6.4", Recorder.Records[0]);
         }
 
-        [Test]
+        [Fact]
         public void PassesParameters()
         {
             Recorder.Records.Clear();
@@ -115,7 +115,7 @@ namespace ObjectBuilder
             Assert.Equal("d = 4.2", Recorder.Records[0]);
         }
 
-        [Test]
+        [Fact]
         public void ShortCircuit()
         {
             Recorder.Records.Clear();

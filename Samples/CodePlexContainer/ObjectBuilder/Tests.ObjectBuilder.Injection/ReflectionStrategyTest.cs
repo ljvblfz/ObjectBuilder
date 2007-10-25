@@ -7,7 +7,7 @@ namespace ObjectBuilder
 {
     public class ReflectionStrategyTest
     {
-        [Test]
+        [Fact]
         public void CallsAddParametersToPolicy()
         {
             TestableReflectionStrategy strategy = new TestableReflectionStrategy();
@@ -22,7 +22,7 @@ namespace ObjectBuilder
             Assert.Same(method, strategy.AddParametersToPolicy_Member);
         }
 
-        [Test]
+        [Fact]
         public void CallsGetMembers()
         {
             TestableReflectionStrategy strategy = new TestableReflectionStrategy();
@@ -36,7 +36,7 @@ namespace ObjectBuilder
             Assert.Same(existing, strategy.GetMembers_Existing);
         }
 
-        [Test]
+        [Fact]
         public void CallsMemberRequiresProcessing()
         {
             TestableReflectionStrategy strategy = new TestableReflectionStrategy();
@@ -52,7 +52,7 @@ namespace ObjectBuilder
             Assert.Contains(method2, strategy.MemberRequiresProcessing_Members);
         }
 
-        [Test]
+        [Fact]
         public void DefaultParameterBehaviorIsBuildDependencyByType()
         {
             TestableReflectionStrategy strategy = new TestableReflectionStrategy();
@@ -68,7 +68,7 @@ namespace ObjectBuilder
             Assert.Equal(NotPresentBehavior.Build, dependency.NotPresentBehavior);
         }
 
-        [Test]
+        [Fact]
         public void MultipleAttributesNotAllowed()
         {
             TestableReflectionStrategy strategy = new TestableReflectionStrategy();
@@ -83,7 +83,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void UsesAttributeInforationWhenPresent()
         {
             TestableReflectionStrategy strategy = new TestableReflectionStrategy();

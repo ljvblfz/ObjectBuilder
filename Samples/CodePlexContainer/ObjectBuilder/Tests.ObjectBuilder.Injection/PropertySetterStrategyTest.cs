@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class PropertySetterStrategyTest
     {
-        [Test]
+        [Fact]
         public void NoInstance()
         {
             Spy.PropertyValue = null;
@@ -20,7 +20,7 @@ namespace ObjectBuilder
             Assert.Null(Spy.PropertyValue);
         }
 
-        [Test]
+        [Fact]
         public void SetsPropertyInPolicy()
         {
             Spy.PropertyValue = null;

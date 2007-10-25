@@ -6,7 +6,7 @@ namespace ObjectBuilder
 {
     public class HandlerPipelineTest
     {
-        [Test]
+        [Fact]
         public void NoHandlersCallsTarget()
         {
             bool called = false;
@@ -28,7 +28,7 @@ namespace ObjectBuilder
             Assert.Same(returnValue, result);
         }
 
-        [Test]
+        [Fact]
         public void NullHandlerLists()
         {
             Assert.Throws<ArgumentNullException>(delegate
@@ -42,7 +42,7 @@ namespace ObjectBuilder
                                                  });
         }
 
-        [Test]
+        [Fact]
         public void OneHandler()
         {
             Recorder.Records.Clear();
@@ -62,7 +62,7 @@ namespace ObjectBuilder
             Assert.Equal("After Method", Recorder.Records[2]);
         }
 
-        [Test]
+        [Fact]
         public void TwoHandlers()
         {
             Recorder.Records.Clear();

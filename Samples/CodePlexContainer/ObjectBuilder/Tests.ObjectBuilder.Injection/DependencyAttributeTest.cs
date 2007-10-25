@@ -4,7 +4,7 @@ namespace ObjectBuilder
 {
     public class DependencyAttributeTest
     {
-        [Test]
+        [Fact]
         public void DefaultBuildKeyIsAnnotatedMemberType()
         {
             DependencyAttribute attribute = new DependencyAttribute();
@@ -15,7 +15,7 @@ namespace ObjectBuilder
             Assert.Equal<object>(typeof(object), parameter.BuildKey);
         }
 
-        [Test]
+        [Fact]
         public void DefaultNotPresentBehaviorIsBuild()
         {
             DependencyAttribute attribute = new DependencyAttribute("Foo");
@@ -26,7 +26,7 @@ namespace ObjectBuilder
             Assert.Equal(NotPresentBehavior.Build, parameter.NotPresentBehavior);
         }
 
-        [Test]
+        [Fact]
         public void ReturnsDependencyParameter()
         {
             DependencyAttribute attribute = new DependencyAttribute("Foo");

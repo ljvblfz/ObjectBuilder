@@ -6,7 +6,7 @@ namespace ObjectBuilder
 {
     public class WeakRefDictionaryTest
     {
-        [Test]
+        [Fact]
         public void AddingToSameKeyTwiceAlwaysThrows()
         {
             object o = new object();
@@ -20,7 +20,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void AskingForAKeyThatDoesntExistThrows()
         {
             WeakRefDictionary<object, object> dict = new WeakRefDictionary<object, object>();
@@ -32,7 +32,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void CanAddItemAfterPreviousItemIsCollected()
         {
             WeakRefDictionary<object, object> dict = new WeakRefDictionary<object, object>();
@@ -43,7 +43,7 @@ namespace ObjectBuilder
             dict.Add("foo", new object());
         }
 
-        [Test]
+        [Fact]
         public void CanAddSameObjectTwiceWithDifferentKeys()
         {
             object o = new object();
@@ -55,7 +55,7 @@ namespace ObjectBuilder
             Assert.Same(dict["foo1"], dict["foo2"]);
         }
 
-        [Test]
+        [Fact]
         public void CanEnumerate()
         {
             object o1 = new object();
@@ -73,7 +73,7 @@ namespace ObjectBuilder
             }
         }
 
-        [Test]
+        [Fact]
         public void CanFindOutIfContainsAKey()
         {
             WeakRefDictionary<object, object> dict = new WeakRefDictionary<object, object>();
@@ -83,7 +83,7 @@ namespace ObjectBuilder
             Assert.False(dict.ContainsKey("foo2"));
         }
 
-        [Test]
+        [Fact]
         public void CanRegisterObjectAndFindItByID()
         {
             object o = new object();
@@ -94,7 +94,7 @@ namespace ObjectBuilder
             Assert.Same(o, dict["foo"]);
         }
 
-        [Test]
+        [Fact]
         public void CanRegisterTwoObjectsAndGetThemBoth()
         {
             object o1 = new object();
@@ -108,7 +108,7 @@ namespace ObjectBuilder
             Assert.Same(o2, dict["foo2"]);
         }
 
-        [Test]
+        [Fact]
         public void CanRemoveAnObjectThatWasAlreadyAdded()
         {
             object o = new object();
@@ -124,7 +124,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void CountReturnsNumberOfKeysWithLiveValues()
         {
             object o = new object();
@@ -141,7 +141,7 @@ namespace ObjectBuilder
             Assert.Equal(0, dict.Count);
         }
 
-        [Test]
+        [Fact]
         public void KeyCanBeOfArbitraryType()
         {
             object oKey = new object();
@@ -153,7 +153,7 @@ namespace ObjectBuilder
             Assert.Same(oVal, dict[oKey]);
         }
 
-        [Test]
+        [Fact]
         public void NullIsAValidValue()
         {
             WeakRefDictionary<object, object> dict = new WeakRefDictionary<object, object>();
@@ -161,7 +161,7 @@ namespace ObjectBuilder
             Assert.Null(dict["foo"]);
         }
 
-        [Test]
+        [Fact]
         public void RegistrationDoesNotPreventGarbageCollection()
         {
             WeakRefDictionary<object, object> dict = new WeakRefDictionary<object, object>();
@@ -175,7 +175,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void RemovingAKeyDoesNotAffectOtherKeys()
         {
             object o1 = new object();
@@ -189,7 +189,7 @@ namespace ObjectBuilder
             Assert.Same(o2, dict["foo2"]);
         }
 
-        [Test]
+        [Fact]
         public void RemovingAKeyOfOneObjectDoesNotAffectOtherKeysForSameObject()
         {
             object o = new object();
@@ -202,7 +202,7 @@ namespace ObjectBuilder
             Assert.Same(o, dict["foo2"]);
         }
 
-        [Test]
+        [Fact]
         public void RemovingANonExistantKeyDoesntThrow()
         {
             WeakRefDictionary<object, object> dict = new WeakRefDictionary<object, object>();

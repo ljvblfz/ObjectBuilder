@@ -37,7 +37,7 @@ namespace ObjectBuilder
 
         public class FindMethod
         {
-            [Test]
+            [Fact]
             public void GenericClassGenericMethod()
             {
                 MethodInfo result = InterfaceInterceptor.FindMethod("Insert", new object[] { typeof(int), "T" }, typeof(IList<>).GetMethods());
@@ -45,7 +45,7 @@ namespace ObjectBuilder
                 Assert.Same(typeof(IList<>).GetMethod("Insert"), result);
             }
 
-            [Test]
+            [Fact]
             public void GenericClassGenericMethodWithExtraGenerics()
             {
                 MethodInfo result = InterfaceInterceptor.FindMethod("Bar", new object[] { "T", "T2" }, typeof(IFoo<>).GetMethods());
@@ -53,7 +53,7 @@ namespace ObjectBuilder
                 Assert.Same(typeof(IFoo<>).GetMethod("Bar"), result);
             }
 
-            [Test]
+            [Fact]
             public void GenericClassNonGenericMethod()
             {
                 MethodInfo result = InterfaceInterceptor.FindMethod("RemoveAt", new Type[] { typeof(int) }, typeof(IList<>).GetMethods());
@@ -61,7 +61,7 @@ namespace ObjectBuilder
                 Assert.Same(typeof(IList<>).GetMethod("RemoveAt"), result);
             }
 
-            [Test]
+            [Fact]
             public void MethodNotFound()
             {
                 MethodInfo result = InterfaceInterceptor.FindMethod("ThisMethodDoesNotExist", new Type[0], typeof(Object).GetMethods());
@@ -69,7 +69,7 @@ namespace ObjectBuilder
                 Assert.Null(result);
             }
 
-            [Test]
+            [Fact]
             public void NonGenericClass()
             {
                 MethodInfo result = InterfaceInterceptor.FindMethod("ToString", new Type[0], typeof(Object).GetMethods());
@@ -77,7 +77,7 @@ namespace ObjectBuilder
                 Assert.Same(typeof(Object).GetMethod("ToString"), result);
             }
 
-            [Test]
+            [Fact]
             public void Overloads()
             {
                 MethodInfo result1 = InterfaceInterceptor.FindMethod("Overload", new Type[0], typeof(IFoo<>).GetMethods());
@@ -90,7 +90,7 @@ namespace ObjectBuilder
                 Assert.NotSame(result1, result2);
             }
 
-            [Test]
+            [Fact]
             public void ParameterTypesNotMatching()
             {
                 MethodInfo result = InterfaceInterceptor.FindMethod("ToString", new Type[] { typeof(int) }, typeof(Object).GetMethods());
@@ -122,7 +122,7 @@ namespace ObjectBuilder
 
         public class GenericClasses
         {
-            [Test]
+            [Fact]
             public void GenericMethod()
             {
                 Recorder.Records.Clear();
@@ -142,7 +142,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void NonGenericMethod()
             {
                 Recorder.Records.Clear();
@@ -162,7 +162,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void ReturnsDataOfGenericType()
             {
                 Recorder.Records.Clear();
@@ -183,7 +183,7 @@ namespace ObjectBuilder
                 Assert.Equal(default(int), value);
             }
 
-            [Test]
+            [Fact]
             public void WhereClauseOnInterface()
             {
                 Recorder.Records.Clear();
@@ -254,7 +254,7 @@ namespace ObjectBuilder
 
         public class GenericMethods
         {
-            [Test]
+            [Fact]
             public void GenericMethod()
             {
                 Recorder.Records.Clear();
@@ -274,7 +274,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void ReturnsDataOfGenericType()
             {
                 Recorder.Records.Clear();
@@ -295,7 +295,7 @@ namespace ObjectBuilder
                 Assert.Equal(default(int), value);
             }
 
-            [Test]
+            [Fact]
             public void WhereClauseOnMethod()
             {
                 Recorder.Records.Clear();
@@ -351,7 +351,7 @@ namespace ObjectBuilder
 
         public class InParameters
         {
-            [Test]
+            [Fact]
             public void InReferenceParameter()
             {
                 Recorder.Records.Clear();
@@ -371,7 +371,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void InValueParameter()
             {
                 Recorder.Records.Clear();
@@ -413,7 +413,7 @@ namespace ObjectBuilder
 
         public class OutParameters
         {
-            [Test]
+            [Fact]
             public void OutComplexValueType()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -441,7 +441,7 @@ namespace ObjectBuilder
                 Assert.Equal(ushort.MaxValue, outValue.UShort);
             }
 
-            [Test]
+            [Fact]
             public void OutDouble()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -458,7 +458,7 @@ namespace ObjectBuilder
                 Assert.Equal(double.MaxValue, outValue);
             }
 
-            [Test]
+            [Fact]
             public void OutInt16()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -475,7 +475,7 @@ namespace ObjectBuilder
                 Assert.Equal(short.MaxValue, outValue);
             }
 
-            [Test]
+            [Fact]
             public void OutInt32()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -492,7 +492,7 @@ namespace ObjectBuilder
                 Assert.Equal(int.MaxValue, outValue);
             }
 
-            [Test]
+            [Fact]
             public void OutInt64()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -509,7 +509,7 @@ namespace ObjectBuilder
                 Assert.Equal(long.MaxValue, outValue);
             }
 
-            [Test]
+            [Fact]
             public void OutReferenceType()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -590,7 +590,7 @@ namespace ObjectBuilder
 
         public class RefParameters
         {
-            [Test]
+            [Fact]
             public void RefClassParameter()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -607,7 +607,7 @@ namespace ObjectBuilder
                 Assert.Equal("Hello, world!", refValue);
             }
 
-            [Test]
+            [Fact]
             public void RefValueType()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -646,7 +646,7 @@ namespace ObjectBuilder
 
         public class ReturnValues
         {
-            [Test]
+            [Fact]
             public void Exception()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -663,7 +663,7 @@ namespace ObjectBuilder
                                                  });
             }
 
-            [Test]
+            [Fact]
             public void NoReturnValue()
             {
                 Recorder.Records.Clear();
@@ -683,7 +683,7 @@ namespace ObjectBuilder
                 Assert.Equal("After Method", Recorder.Records[2]);
             }
 
-            [Test]
+            [Fact]
             public void ReturnsClassType()
             {
                 RecordingHandler handler = new RecordingHandler();
@@ -699,7 +699,7 @@ namespace ObjectBuilder
                 Assert.Same(SpyReturn.ObjectReturn, retValue);
             }
 
-            [Test]
+            [Fact]
             public void ReturnsValueType()
             {
                 RecordingHandler handler = new RecordingHandler();

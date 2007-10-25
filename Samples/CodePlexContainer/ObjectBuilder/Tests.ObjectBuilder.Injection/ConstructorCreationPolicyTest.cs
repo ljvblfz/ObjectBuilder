@@ -7,7 +7,7 @@ namespace ObjectBuilder
 {
     public class ConstructorCreationPolicyTest
     {
-        [Test]
+        [Fact]
         public void CreatesObjectAndPassesValue()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -20,7 +20,7 @@ namespace ObjectBuilder
             Assert.Equal(42, result.val);
         }
 
-        [Test]
+        [Fact]
         public void NonMatchingParameterCount()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -34,7 +34,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NonMatchingParameterTypes()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -48,7 +48,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NullConstructor()
         {
             Assert.Throws<ArgumentNullException>(
@@ -58,7 +58,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NullContext()
         {
             ConstructorInfo constructor = typeof(Dummy).GetConstructor(new Type[] { typeof(int) });

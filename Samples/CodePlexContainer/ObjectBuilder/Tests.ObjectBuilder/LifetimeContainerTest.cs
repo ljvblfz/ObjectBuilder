@@ -5,7 +5,7 @@ namespace ObjectBuilder
 {
     public class LifetimeContainerTest
     {
-        [Test]
+        [Fact]
         public void CanDetermineIfLifetimeContainerContainsObject()
         {
             ILifetimeContainer container = new LifetimeContainer();
@@ -16,7 +16,7 @@ namespace ObjectBuilder
             Assert.True(container.Contains(obj));
         }
 
-        [Test]
+        [Fact]
         public void CanEnumerateItemsInContainer()
         {
             ILifetimeContainer container = new LifetimeContainer();
@@ -39,7 +39,7 @@ namespace ObjectBuilder
             Assert.True(foundMdo);
         }
 
-        [Test]
+        [Fact]
         public void ContainerEnsuresObjectsWontBeCollected()
         {
             ILifetimeContainer container = new LifetimeContainer();
@@ -56,7 +56,7 @@ namespace ObjectBuilder
             Assert.False(mdo.WasDisposed);
         }
 
-        [Test]
+        [Fact]
         public void DisposingContainerDisposesOwnedObjects()
         {
             ILifetimeContainer container = new LifetimeContainer();
@@ -68,7 +68,7 @@ namespace ObjectBuilder
             Assert.True(mdo.WasDisposed);
         }
 
-        [Test]
+        [Fact]
         public void DisposingItemsFromContainerDisposesInReverseOrderAdded()
         {
             ILifetimeContainer container = new LifetimeContainer();
@@ -87,7 +87,7 @@ namespace ObjectBuilder
             Assert.Equal(3, obj1.DisposePosition);
         }
 
-        [Test]
+        [Fact]
         public void RemovingItemsFromContainerDoesNotDisposeThem()
         {
             ILifetimeContainer container = new LifetimeContainer();
@@ -100,7 +100,7 @@ namespace ObjectBuilder
             Assert.False(mdo.WasDisposed);
         }
 
-        [Test]
+        [Fact]
         public void RemovingNonContainedItemDoesNotThrow()
         {
             ILifetimeContainer container = new LifetimeContainer();

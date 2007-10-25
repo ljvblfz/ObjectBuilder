@@ -77,7 +77,7 @@
       &#160;<xsl:value-of select="@name"/>
       <xsl:if test="child::node()/message"> : <xsl:value-of select="child::node()/message"/></xsl:if>
       <br clear="all" />
-      <xsl:if test="failure">
+      <xsl:if test="failure/stack-trace">
         <pre><xsl:value-of select="failure/stack-trace"/></pre>
       </xsl:if>
     </div>

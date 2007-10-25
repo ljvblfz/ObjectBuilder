@@ -6,7 +6,7 @@ namespace ObjectBuilder
 {
     public class ActivatorCreationPolicyTest
     {
-        [Test]
+        [Fact]
         public void CreatesObjectAndPassesValue()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -18,7 +18,7 @@ namespace ObjectBuilder
             Assert.Equal(42, result.val);
         }
 
-        [Test]
+        [Fact]
         public void NoMatchingConstructor()
         {
             MockBuilderContext context = new MockBuilderContext();
@@ -31,7 +31,7 @@ namespace ObjectBuilder
                 });
         }
 
-        [Test]
+        [Fact]
         public void NullContext()
         {
             ActivatorCreationPolicy policy = new ActivatorCreationPolicy();
