@@ -51,6 +51,25 @@ namespace ObjectBuilder
             AssertOrder(chain, innerStage1, outerStage1, innerStage2, outerStage2);
         }
 
+        [Fact]
+        public void MultipleChildContainers()
+        {
+            StagedStrategyChain<FakeStage> innerChain = new StagedStrategyChain<FakeStage>();
+            StagedStrategyChain<FakeStage> outerChain = new StagedStrategyChain<FakeStage>(innerChain);
+            StagedStrategyChain<FakeStage> superChain = new StagedStrategyChain<FakeStage>(outerChain);
+
+            FakeStrategy innerStrategy = new FakeStrategy();
+            FakeStrategy outerStrategy = new FakeStrategy();
+            FakeStrategy superStrategy = new FakeStrategy();
+            innerChain.Add(innerStrategy, FakeStage.Stage1);
+            outerChain.Add(outerStrategy, FakeStage.Stage1);
+            superChain.Add(superStrategy, FakeStage.Stage1);
+
+            StrategyChain chain = superChain.MakeStrategyChain();
+
+            AssertOrder(chain, innerStrategy, outerStrategy, superStrategy);
+        }
+
         enum FakeStage
         {
             Stage1,

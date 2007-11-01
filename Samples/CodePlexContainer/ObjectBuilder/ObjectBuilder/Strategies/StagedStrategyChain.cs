@@ -45,6 +45,16 @@ namespace ObjectBuilder
                     stages[stage].Clear();
         }
 
+        protected IEnumerable<IBuilderStrategy> GetStrategiesInStage(TStageEnum stage)
+        {
+            if (innerChain != null)
+                foreach (IBuilderStrategy strategy in innerChain.GetStrategiesInStage(stage))
+                    yield return strategy;
+
+            foreach (IBuilderStrategy strategy in stages[stage])
+                yield return strategy;
+        }
+
         public StrategyChain MakeStrategyChain()
         {
             lock (lockObject)
@@ -52,12 +62,7 @@ namespace ObjectBuilder
                 StrategyChain result = new StrategyChain();
 
                 foreach (TStageEnum stage in stageValues)
-                {
-                    if (innerChain != null)
-                        result.AddRange(innerChain.stages[stage]);
-
-                    result.AddRange(stages[stage]);
-                }
+                    result.AddRange(GetStrategiesInStage(stage));
 
                 return result;
             }
