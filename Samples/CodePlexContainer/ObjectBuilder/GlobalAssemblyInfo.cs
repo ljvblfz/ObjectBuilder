@@ -5,4 +5,4 @@ using System.Runtime.InteropServices;
 [assembly : AssemblyProduct("ObjectBuilder")]
 [assembly : AssemblyCopyright("Copyright (C) Microsoft Corporation")]
 [assembly : ComVisible(false)]
-[assembly : AssemblyVersion("0.0.0.0")]
+[assembly : AssemblyVersion("2.0.0.0")]

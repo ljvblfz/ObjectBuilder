@@ -1,14 +1,24 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask
+    AssemblyFile='..\3rdParty\CodePlex.MSBuildTasks.dll'
+    TaskName='CodePlex.MSBuildTasks.RegexReplace'/>
+  <UsingTask
+    AssemblyFile='..\3rdParty\CodePlex.MSBuildTasks.dll'
+    TaskName='CodePlex.MSBuildTasks.Zip'/>
 
   <!-- Settings -->
 
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(ZipStoragePath)' == ''">
     <ZipStoragePath>D:\Builds\Zips\ObjectBuilder</ZipStoragePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(ccnetlabel)' == ''">
+    <ccnetlabel>0</ccnetlabel>
   </PropertyGroup>
 
   <!-- CruiseControl targets -->
 
-  <Target Name="Cruise" DependsOnTargets="SetVersionNumber;Build;UnitTest;CreateZip"/>
+  <Target Name="Cruise" DependsOnTargets="CruiseNoZip;Zip"/>
+  <Target Name="CruiseNoZip" DependsOnTargets="SetVersionNumber;Build;UnitTest"/>
 
   <!-- Meta-targets -->
 
@@ -32,12 +42,22 @@
   </Target>
 
   <Target Name="SetVersionNumber">
-    <Exec Command="$(CodePlex3rdParty)\AssemblyInfoUpdater.exe $(ccnetlabel) GlobalAssemblyInfo.cs" WorkingDirectory="."/>
+    <RegexReplace
+      Pattern='AssemblyVersion\("(\d+\.\d+\.\d+)\.\d+"\)'
+      Replacement='AssemblyVersion("$1.$(ccnetlabel)")'
+      Files='GlobalAssemblyInfo.cs'/>
   </Target>
 
-  <Target Name="CreateZip">
-    <Exec Command="$(CodePlex3rdParty)\zip.exe -r -9 $(ZipStoragePath)\ObjectBuilder-build-$(ccnetlabel).zip *.*" WorkingDirectory="ObjectBuilder.EventBroker\bin\Release"/>
-    <Exec Command="$(CodePlex3rdParty)\zip.exe -r -9 $(ZipStoragePath)\ObjectBuilder-build-$(ccnetlabel).zip *.*" WorkingDirectory="ObjectBuilder.Interception\bin\Release"/>
+  <Target Name="Zip">
+    <CreateItem Include="ObjectBuilder\bin\Release\ObjectBuilder.???;ObjectBuilder.EventBroker\bin\Release\ObjectBuilder.EventBroker.???;ObjectBuilder.Injection\bin\Release\ObjectBuilder.Injection.???;ObjectBuilder.Interception\bin\Release\ObjectBuilder.Interception.???">
+      <Output TaskParameter="Include" ItemName="ZipFileList"/>
+    </CreateItem>
+    <MakeDir Directories="$(ZipStoragePath)"/>
+    <Delete Files="$(ZipStoragePath)\ObjectBuilder-build-$(ccnetlabel).zip"/>
+    <Zip
+      ZipFileName="$(ZipStoragePath)\ObjectBuilder-build-$(ccnetlabel).zip"
+      Files="@(ZipFileList)"
+      StripPath="true"/>
   </Target>
 
 </Project>
