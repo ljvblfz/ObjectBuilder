@@ -59,5 +59,8 @@
       Files="@(ZipFileList)"
       StripPath="true"/>
   </Target>
+  
+  <Target Name="Merge" DependsOnTargets="Build">
+  </Target>
 
 </Project>

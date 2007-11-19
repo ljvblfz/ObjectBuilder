@@ -5,6 +5,7 @@
   <add recursive='true'>*.resharper</add>
   <add recursive='true'>*.suo</add>
   <add recursive='true'>*.user</add>
+  <add>Merged</add>
   <add>*.xml</add>
   <add>*.gpstate</add>
 </ignore>

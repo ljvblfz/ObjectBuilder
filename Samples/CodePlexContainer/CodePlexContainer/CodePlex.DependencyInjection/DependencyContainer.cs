@@ -216,6 +216,18 @@ namespace CodePlex.DependencyInjection
             lifetime.Add(instance);
         }
 
+        public void RegisterStrategy<TStrategy>(BuilderStage stage)
+            where TStrategy : IBuilderStrategy, new()
+        {
+            strategies.AddNew<TStrategy>(stage);
+        }
+
+        public void RegisterStrategy(IBuilderStrategy strategy,
+                                     BuilderStage stage)
+        {
+            strategies.Add(strategy, stage);
+        }
+
         public void RegisterTypeMapping<TRequested, TToBuild>()
         {
             RegisterTypeMapping(typeof(TRequested), typeof(TToBuild));
@@ -225,6 +237,32 @@ namespace CodePlex.DependencyInjection
                                         Type typeToBuild)
         {
             policies.Set<IBuildKeyMappingPolicy>(new BuildKeyMappingPolicy(typeToBuild), typeRequested);
+        }
+
+        public void SetDefaultPolicy(Type policyType,
+                                     IBuilderPolicy policy)
+        {
+            policies.SetDefault(policyType, policy);
+        }
+
+        public void SetDefaultPolicy<TPolicy>(TPolicy policy)
+            where TPolicy : IBuilderPolicy
+        {
+            policies.SetDefault(policy);
+        }
+
+        public void SetPolicy(Type policyType,
+                              IBuilderPolicy policy,
+                              Type typeToRegisterFor)
+        {
+            policies.Set(policyType, policy, typeToRegisterFor);
+        }
+
+        public void SetPolicy<TPolicy>(TPolicy policy,
+                                       Type typeToRegisterFor)
+            where TPolicy : IBuilderPolicy
+        {
+            policies.Set(policy, typeToRegisterFor);
         }
 
         public void TearDown(object existingObject)

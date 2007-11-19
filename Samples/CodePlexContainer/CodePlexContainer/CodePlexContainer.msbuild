@@ -25,7 +25,7 @@
   <Target Name="Test" DependsOnTargets="Build;UnitTest"/>
 
   <!-- Individiual targets -->
-  
+
   <Target Name="Clean">
     <MSBuild Projects="CodePlexContainer.sln" Targets="Clean" Properties="Configuration=Release"/>
   </Target>
@@ -55,6 +55,12 @@
       ZipFileName="$(ZipStoragePath)\CodePlexContainer-build-$(ccnetlabel).zip"
       Files="@(ZipFileList)"
       StripPath="true"/>
+  </Target>
+
+  <Target Name="Merge" DependsOnTargets="Build">
+    <MakeDir Directories="..\Merged"/>
+    <Delete Files="..\Merged\CodePlex.DependencyInjection.dll;..\Merged\CodePlex.DependencyInjection.pdb"/>
+    <Exec Command="..\3rdParty\ILMerge /wildcards /out:..\Merged\CodePlex.DependencyInjection.dll CodePlex.DependencyInjection\bin\Release\*.dll"/>
   </Target>
 
 </Project>
