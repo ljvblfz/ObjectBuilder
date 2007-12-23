@@ -1,9 +1,9 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <UsingTask
-    AssemblyFile='..\3rdParty\CodePlex.MSBuildTasks.dll'
+    AssemblyFile='3rdParty\CodePlex.MSBuildTasks.dll'
     TaskName='CodePlex.MSBuildTasks.RegexReplace'/>
   <UsingTask
-    AssemblyFile='..\3rdParty\CodePlex.MSBuildTasks.dll'
+    AssemblyFile='3rdParty\CodePlex.MSBuildTasks.dll'
     TaskName='CodePlex.MSBuildTasks.Zip'/>
 
   <!-- Settings -->
@@ -28,6 +28,7 @@
 
   <Target Name="Clean">
     <MSBuild Projects="CodePlexContainer.sln" Targets="Clean" Properties="Configuration=Release"/>
+    <RemoveDir Directories="Merged"/>
   </Target>
 
   <Target Name="Build">
@@ -35,7 +36,7 @@
   </Target>
 
   <Target Name="UnitTest">
-    <Exec Command="..\3rdParty\xunit.console.exe Tests.CodePlex.DependencyInjection\bin\Release\Tests.CodePlex.DependencyInjection.dll /nunit Tests.CodePlex.DependencyInjection.results.xml"/>
+    <Exec Command="3rdParty\xunit.console.exe Tests.CodePlex.DependencyInjection\bin\Release\Tests.CodePlex.DependencyInjection.dll /nunit Tests.CodePlex.DependencyInjection.results.xml"/>
   </Target>
 
   <Target Name="SetVersionNumber">
@@ -58,9 +59,9 @@
   </Target>
 
   <Target Name="Merge" DependsOnTargets="Build">
-    <MakeDir Directories="..\Merged"/>
-    <Delete Files="..\Merged\CodePlex.DependencyInjection.dll;..\Merged\CodePlex.DependencyInjection.pdb"/>
-    <Exec Command="..\3rdParty\ILMerge /wildcards /out:..\Merged\CodePlex.DependencyInjection.dll CodePlex.DependencyInjection\bin\Release\*.dll"/>
+    <MakeDir Directories="Merged"/>
+    <Delete Files="Merged\CodePlex.DependencyInjection.dll;Merged\CodePlex.DependencyInjection.pdb"/>
+    <Exec Command="3rdParty\ILMerge /wildcards /out:Merged\CodePlex.DependencyInjection.dll CodePlex.DependencyInjection\bin\Release\*.dll"/>
   </Target>
 
 </Project>

@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{813855FB-A0B3-4DB2-89FA-5FC46ADB6735}</ProjectGuid>
+    <ProjectGuid>{4E52C0D8-B2D1-4400-9288-2FA5EDE8817C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ottawa</RootNamespace>
-    <AssemblyName>Tests.OttawaContainer</AssemblyName>
+    <RootNamespace>CodePlex.DependencyInjection</RootNamespace>
+    <AssemblyName>CodePlex.DependencyInjection</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,37 +30,28 @@
   <ItemGroup>
     <Reference Include="ObjectBuilder, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\3rdParty\ObjectBuilder.dll</HintPath>
+      <HintPath>..\3rdParty\ObjectBuilder.dll</HintPath>
     </Reference>
     <Reference Include="ObjectBuilder.EventBroker, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\3rdParty\ObjectBuilder.EventBroker.dll</HintPath>
+      <HintPath>..\3rdParty\ObjectBuilder.EventBroker.dll</HintPath>
     </Reference>
     <Reference Include="ObjectBuilder.Injection, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\3rdParty\ObjectBuilder.Injection.dll</HintPath>
+      <HintPath>..\3rdParty\ObjectBuilder.Injection.dll</HintPath>
     </Reference>
     <Reference Include="ObjectBuilder.Interception, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\3rdParty\ObjectBuilder.Interception.dll</HintPath>
+      <HintPath>..\3rdParty\ObjectBuilder.Interception.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="xunit, Version=7.9.19.1008, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\3rdParty\xunit.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OttawaContainerAcceptanceTests.cs" />
+    <Compile Include="DependencyContainer.cs" />
+    <Compile Include="IDependencyContainerConfigurator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OttawaContainer\OttawaContainer.csproj">
-      <Project>{92DFAD9B-47B0-4AEA-A77A-485E21BCA1F1}</Project>
-      <Name>OttawaContainer</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
