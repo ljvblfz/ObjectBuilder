@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace ObjectBuilder
 {
@@ -25,16 +24,6 @@ namespace ObjectBuilder
                 throw new ArgumentException("Cannot extract type from build key " + buildKey, "buildKey");
 
             return result;
-        }
-
-        public static string ParametersToTypeList(params object[] parameters)
-        {
-            List<string> types = new List<string>();
-
-            foreach (object parameter in parameters)
-                types.Add(parameter.GetType().Name);
-
-            return string.Join(", ", types.ToArray());
         }
 
         public virtual object TearDown(IBuilderContext context,
