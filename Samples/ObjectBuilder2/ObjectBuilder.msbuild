@@ -1,9 +1,9 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <UsingTask
-    AssemblyFile='..\3rdParty\CodePlex.MSBuildTasks.dll'
+    AssemblyFile='3rdParty\CodePlex.MSBuildTasks.dll'
     TaskName='CodePlex.MSBuildTasks.RegexReplace'/>
   <UsingTask
-    AssemblyFile='..\3rdParty\CodePlex.MSBuildTasks.dll'
+    AssemblyFile='3rdParty\CodePlex.MSBuildTasks.dll'
     TaskName='CodePlex.MSBuildTasks.Zip'/>
 
   <!-- Settings -->
@@ -18,27 +18,24 @@
   <!-- CruiseControl targets -->
 
   <Target Name="Cruise" DependsOnTargets="CruiseNoZip;Zip"/>
-  <Target Name="CruiseNoZip" DependsOnTargets="SetVersionNumber;Build;UnitTest"/>
-
-  <!-- Meta-targets -->
-
-  <Target Name="Test" DependsOnTargets="Build;UnitTest"/>
+  <Target Name="CruiseNoZip" DependsOnTargets="SetVersionNumber;Build;Test"/>
 
   <!-- Individiual targets -->
   
   <Target Name="Clean">
     <MSBuild Projects="ObjectBuilder.sln" Targets="Clean" Properties="Configuration=Release"/>
+    <RemoveDir Directories="Merged"/>
   </Target>
 
   <Target Name="Build">
     <MSBuild Projects="ObjectBuilder.sln" Targets="Build" Properties="Configuration=Release"/>
   </Target>
 
-  <Target Name="UnitTest">
-    <Exec Command="..\3rdParty\xunit.console.exe Tests.ObjectBuilder\bin\Release\Tests.ObjectBuilder.dll /nunit Tests.ObjectBuilder.results.xml"/>
-    <Exec Command="..\3rdParty\xunit.console.exe Tests.ObjectBuilder.EventBroker\bin\Release\Tests.ObjectBuilder.EventBroker.dll /nunit Tests.ObjectBuilder.EventBroker.results.xml"/>
-    <Exec Command="..\3rdParty\xunit.console.exe Tests.ObjectBuilder.Injection\bin\Release\Tests.ObjectBuilder.Injection.dll /nunit Tests.ObjectBuilder.Injection.results.xml"/>
-    <Exec Command="..\3rdParty\xunit.console.exe Tests.ObjectBuilder.Interception\bin\Release\Tests.ObjectBuilder.Interception.dll /nunit Tests.ObjectBuilder.Interception.results.xml"/>
+  <Target Name="Test" DependsOnTargets="Build">
+    <Exec Command="3rdParty\xunit.console.exe Tests.ObjectBuilder\bin\Release\Tests.ObjectBuilder.dll /nunit Tests.ObjectBuilder.results.xml"/>
+    <Exec Command="3rdParty\xunit.console.exe Tests.ObjectBuilder.EventBroker\bin\Release\Tests.ObjectBuilder.EventBroker.dll /nunit Tests.ObjectBuilder.EventBroker.results.xml"/>
+    <Exec Command="3rdParty\xunit.console.exe Tests.ObjectBuilder.Injection\bin\Release\Tests.ObjectBuilder.Injection.dll /nunit Tests.ObjectBuilder.Injection.results.xml"/>
+    <Exec Command="3rdParty\xunit.console.exe Tests.ObjectBuilder.Interception\bin\Release\Tests.ObjectBuilder.Interception.dll /nunit Tests.ObjectBuilder.Interception.results.xml"/>
   </Target>
 
   <Target Name="SetVersionNumber">
@@ -48,7 +45,7 @@
       Files='GlobalAssemblyInfo.cs'/>
   </Target>
 
-  <Target Name="Zip">
+  <Target Name="Zip" DependsOnTargets="Build">
     <CreateItem Include="ObjectBuilder\bin\Release\ObjectBuilder.???;ObjectBuilder.EventBroker\bin\Release\ObjectBuilder.EventBroker.???;ObjectBuilder.Injection\bin\Release\ObjectBuilder.Injection.???;ObjectBuilder.Interception\bin\Release\ObjectBuilder.Interception.???">
       <Output TaskParameter="Include" ItemName="ZipFileList"/>
     </CreateItem>
@@ -59,8 +56,10 @@
       Files="@(ZipFileList)"
       StripPath="true"/>
   </Target>
-  
+
   <Target Name="Merge" DependsOnTargets="Build">
+    <MakeDir Directories="Merged"/>
+    <Exec Command="3rdParty\ILMerge.exe /out:Merged\ObjectBuilder.dll ObjectBuilder\bin\Release\ObjectBuilder.dll ObjectBuilder.EventBroker\bin\Release\ObjectBuilder.EventBroker.dll ObjectBuilder.Injection\bin\Release\ObjectBuilder.Injection.dll ObjectBuilder.Interception\bin\Release\ObjectBuilder.Interception.dll"/>
   </Target>
 
 </Project>

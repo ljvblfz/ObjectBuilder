@@ -1,3 +1,0 @@
-<ignore xmlns='http://www.codeplex.com/schema/IgnoreListSchema-1.0.xsd'>
-  <add>ObjectBuilder.*</add>
-</ignore>
