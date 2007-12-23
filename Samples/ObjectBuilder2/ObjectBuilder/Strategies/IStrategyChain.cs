@@ -5,6 +5,7 @@ namespace ObjectBuilder
         IBuilderStrategy Head { get; }
 
         IBuilderStrategy GetNext(IBuilderStrategy currentStrategy);
+
         IStrategyChain Reverse();
     }
 }
