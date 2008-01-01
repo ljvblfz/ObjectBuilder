@@ -14,6 +14,26 @@ namespace ObjectBuilder
             extension.Extend(innerFactory);
         }
 
+        public List<IObjectFactoryExtension> FindAllExtensions(Predicate<IObjectFactoryExtension> match)
+        {
+            return innerFactory.FindAllExtensions(match);
+        }
+
+        public IObjectFactoryExtension FindExtension(Predicate<IObjectFactoryExtension> match)
+        {
+            return innerFactory.FindExtension(match);
+        }
+
+        public TExtension FindExtension<TExtension>()
+            where TExtension : IObjectFactoryExtension
+        {
+            return (TExtension)innerFactory.FindExtension(
+                                   delegate(IObjectFactoryExtension extension)
+                                   {
+                                       return typeof(TExtension).IsAssignableFrom(extension.GetType());
+                                   });
+        }
+
         public object Get(Type type)
         {
             return innerFactory.Get(type);
@@ -71,7 +91,20 @@ namespace ObjectBuilder
 
             public IBuilderStrategy FindStrategy(Predicate<IBuilderStrategy> match)
             {
-                throw new NotImplementedException();
+                // TODO: This is pretty non-optimal; chains should be enumerable, even staged chains
+
+                StrategyChain chain = strategies.MakeStrategyChain();
+                IBuilderStrategy strategy = chain.Head;
+
+                while (strategy != null)
+                {
+                    if (match(strategy))
+                        return strategy;
+
+                    strategy = chain.GetNext(strategy);
+                }
+
+                return null;
             }
 
             public object Get(Type type)
